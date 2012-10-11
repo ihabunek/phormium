@@ -1,0 +1,7 @@
+{
+    "myconnection": {
+        "dsn": "sqlite:example.sq3",
+        "username": "",
+        "password": ""
+    }
+}

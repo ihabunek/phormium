@@ -1,0 +1,4 @@
+source: src
+destination: target/apidocs
+charset: UTF-8
+title: Phormium
