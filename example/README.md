@@ -39,14 +39,12 @@ Config file:
 
 Entity class (Person.php)
 -------------------------
-To map the `person` table onto a PHP class, a corresponding class is created
+To map the `person` table onto a PHP class, a corresponding class is created:
 
 ```
-<?php
-
 /**
  * @connection myconnection
- * @table thingy
+ * @table person
  */
 class Person extends Phormium\Entity
 {

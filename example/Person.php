@@ -2,7 +2,7 @@
 
 /**
  * @connection myconnection
- * @table thingy
+ * @table person
  */
 class Person extends Phormium\Entity
 {
