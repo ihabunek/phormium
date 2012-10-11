@@ -3,7 +3,7 @@
 namespace Phormium;
 
 /**
- * // TODO: implements \Iterator???
+ * Performs lazy database lookup for sets of objects.
  */
 class QuerySet
 {
