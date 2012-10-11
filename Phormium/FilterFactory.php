@@ -62,4 +62,3 @@ class FilterFactory /* factory LOL */
     // public static function notNull($column) {}
 }
 
-class_alias('Phormium\FilterFactory', 'Phormium\f');
