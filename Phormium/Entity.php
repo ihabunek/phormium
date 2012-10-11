@@ -10,10 +10,10 @@ abstract class Entity
     // ******************************************
     // *** Statics                            ***
     // ******************************************
-    
+
     /** Caches the model so it's not parsed multiple times. */
     protected static $model;
-    
+
     /**
      * Parses the entity object to construct a Model.
      */
@@ -25,7 +25,7 @@ abstract class Entity
         }
         return self::$model;
     }
-    
+
     /**
      * Constructs a QuerySet for the entity.
      */
@@ -42,12 +42,12 @@ abstract class Entity
     public function __construct($data = null)
     {
         if (isset($data)) {
-            
+
             if (!is_array($data)) {
                 throw new \Exception("\$data must be an array");
             }
-            
-            foreach($data as $name => $value) {
+
+            foreach ($data as $name => $value) {
                 if (property_exists($this, $name)) {
                     $this->$name = $value;
                 } else {
@@ -57,12 +57,12 @@ abstract class Entity
             }
         }
     }
-    
+
     public function save()
     {
         // TODO
     }
-    
+
     public function toJSON()
     {
         return json_encode($this);

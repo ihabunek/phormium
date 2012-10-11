@@ -9,26 +9,26 @@ class DB
 {
     /** Specifies that the fetch method should return each row as an array. */
     const FETCH_ARRAY = 1;
-    
+
     /** Specifies that the fetch method should return each row as an object. */
     const FETCH_OBJECT = 2;
-    
+
     /** Specifies that the fetch method should return each row as a json encoded object. */
     const FETCH_JSON = 3;
 
     /** The loaded configuration. */
     private static $config;
-    
-    /** 
-     * An array of established database connections - {@link Connection} 
+
+    /**
+     * An array of established database connections - {@link Connection}
      * objects.
      */
     private static $connections;
 
-    /** 
+    /**
      * Human readable JSON error descriptions.
      * Literals are used instead of JSON_ERROR_* constants to have backward
-     * compatibility. 
+     * compatibility.
      */
     private static $jsonErrors = array (
         1 => 'JSON_ERROR_DEPTH - Maximum stack depth exceeded',
@@ -44,7 +44,7 @@ class DB
      */
     public static function configure($path)
     {
-        if(!file_exists($path)) {
+        if (!file_exists($path)) {
             throw new \Exception("Config file not found at [$path].");
         }
 
@@ -55,7 +55,7 @@ class DB
 
         // Decode json to array
         $config = json_decode($json, true);
-        
+
         $errorCode = json_last_error();
         if ($errorCode !== JSON_ERROR_NONE) {
             $errorText = isset(self::$jsonErrors[$errorCode]) ?

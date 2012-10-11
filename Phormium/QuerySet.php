@@ -35,12 +35,10 @@ class QuerySet
      */
     private $order = array();
 
-    /**
-     *
-     */
     private $filters = array();
 
-    public function __construct(Model $model) {
+    public function __construct(Model $model)
+    {
         $this->model = $model;
     }
 
@@ -113,11 +111,11 @@ class QuerySet
         $data = $this->fetch();
         $count = count($data);
 
-        if($count > 1) {
+        if ($count > 1) {
             throw new \Exception("Query returned multiple rows ($count). Requested a single row.");
         }
 
-        if(!$allowEmpty && $count == 0) {
+        if (!$allowEmpty && $count == 0) {
             throw new \Exception("Query returned 0 rows. Requested a single row.");
         }
 
@@ -189,7 +187,7 @@ class QuerySet
         // Accumulate the where clauses and arguments from each filter
         $where = array();
         $args = array();
-        foreach($this->filters as $filter) {
+        foreach ($this->filters as $filter) {
             list($w, $a) = $filter->render($this->model);
             $where[] = $w;
             $args = array_merge($args, $a);

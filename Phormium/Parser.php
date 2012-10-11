@@ -3,7 +3,7 @@
 namespace Phormium;
 
 /**
- * Parses {@link Entity} classes and constructs corresponding {@link Model} 
+ * Parses {@link Entity} classes and constructs corresponding {@link Model}
  * objects.
  */
 class Parser
@@ -12,7 +12,7 @@ class Parser
     {
         $model = new Model();
         $model->class = $class;
-        
+
         $rc = new \ReflectionClass($class);
         $classDoc = $rc->getDocComment();
 
@@ -21,8 +21,7 @@ class Parser
         $model->columns = array();
 
         $props = $rc->getProperties(\ReflectionProperty::IS_PUBLIC);
-        foreach($props as $prop)
-        {
+        foreach ($props as $prop) {
             $propDoc = $prop->getDocComment();
             $name = $prop->name;
             $propID = "$class::\$$name";
@@ -30,12 +29,12 @@ class Parser
             $model->columns[$name] = array(
                 'name' => $name
             );
-            
+
             $type = self::getAnnotation($propID, $propDoc, 'type', false);
             if (isset($type)) {
                 $model->columns[$name]['type'] = $type;
             }
-            
+
             if (self::hasAnnotation($propDoc, 'pk')) {
                 if (isset($model->pk)) {
                     throw new \Exception("Multiple columns marked as @pk. Composite primary keys are not supported.");
@@ -43,7 +42,7 @@ class Parser
                 $model->pk = $name;
             }
         }
-        
+
         return $model;
     }
 
@@ -53,7 +52,7 @@ class Parser
         if ($result == 1) {
             return $matches[1];
         }
-        
+
         if ($required) {
             throw new \Exception("Required annotation @$name not defined in [$id].");
         }
