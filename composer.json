@@ -18,7 +18,7 @@
         "ext-pdo": "*"
     },
     "autoload": {
-        "psr-0": {"Phormium": "src/"}
+        "psr-0": {"Phormium": "./"}
     },
     "support": {
         "issues": "https://github.com/ihabunek/phormium/issues"

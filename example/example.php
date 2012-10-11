@@ -1,6 +1,6 @@
 <?php
 
-require '../src/Autoloader.php';
+require '../Phormium/Autoloader.php';
 Phormium\Autoloader::register();
 
 // Include the database mappings
