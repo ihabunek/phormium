@@ -1,0 +1,26 @@
+{
+    "name": "phormium/phormium",
+    "type": "library",
+    "description": "A minimalist ORM for PHP.",
+    "keywords": ["database","orm","php","mapping"],
+    "homepage": "https://github.com/ihabunek/phormium",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ivan Habunek",
+            "email": "ivan.habunek@gmail.com",
+            "homepage": "https://github.com/ihabunek",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "ext-pdo": "*"
+    },
+    "autoload": {
+        "psr-0": {"Phormium": "src/"}
+    },
+    "support": {
+        "issues": "https://github.com/ihabunek/phormium/issues"
+    }
+}
