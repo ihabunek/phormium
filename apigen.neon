@@ -1,4 +1,4 @@
-source: src
+source: Phormium
 destination: target/apidocs
 charset: UTF-8
 title: Phormium
