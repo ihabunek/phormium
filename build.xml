@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Phormium" basedir="." default="help">
+    <target name="help">
+        <echo msg="Darn! Nobody has written the help section yet." />
+    </target>
+
+    <target name="clean">
+        <delete dir="target" includeemptydirs="true" quiet="true" />
+    </target>
+
+    <target name="apigen">
+        <apigen source="Phormium" destination="target/apidocs" title="Phormium" />
+    </target>
+
+    <target name="test">
+        <mkdir dir="target/temp" />
+        <mkdir dir="target/tests" />
+        
+        <echo message="Running unit tests" />
+        <phpunit haltonerror="true" haltonfailure="true" printsummary="true" bootstrap="test/bootstrap.php">
+            <formatter todir="target/temp" type="xml"/>
+            <batchtest>
+                <fileset dir="test/src">
+                    <include name="**/*Test.php"/>
+                </fileset>
+            </batchtest>
+        </phpunit>
+        
+        <echo message="Generating PHPUnit report" />
+        <phpunitreport infile="target/temp/testsuites.xml" todir="target/tests" />
+        
+        <echo message="Checking PSR2 standard for code" />
+        <phpcodesniffer standard="PSR2" file="Phormium" />
+        
+        <echo message="Checking PSR2 standard for tests" />
+        <phpcodesniffer standard="PSR2" file="test" />
+    </target>
+    
+    <target name="coverage">
+        <mkdir dir="target/temp" />
+        <mkdir dir="target/coverage" />
+
+        <!-- Init coverage database -->
+        <coverage-setup database="target/temp/coverage.db">
+            <fileset dir="Phormium">
+                <include name="**/*.php"/>
+            </fileset>
+        </coverage-setup>
+
+        <!-- Perform unit tests and gather coverage info -->
+        <phpunit printsummary="true" codecoverage="true">
+            <batchtest>
+                <fileset dir="${project.basedir}/test/src">
+                    <include name="**/*Test.php"/>
+                </fileset>
+            </batchtest>
+        </phpunit>
+
+        <!-- Generate the coverage report -->
+        <coverage-report outfile="target/temp/coverage.xml">
+            <report todir="target/coverage" />
+        </coverage-report>
+    </target>
+</project>
