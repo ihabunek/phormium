@@ -6,7 +6,7 @@ Prerequisites for this example:
 
 Before running the example script, you need to create an sqlite database with a table and some data:
 ```
-sqlite3 example.sq3 < model.sql
+sqlite3 example.sq3 < model\person.sql
 ```
 
 This creates a database in `example.sq3`, and within it a table called `person` with some test data.
@@ -50,9 +50,9 @@ class Person extends Phormium\Entity
 {
     /** @pk */
     public $id;
-    
+
     public $name;
-    
+
     public $birthday;
 }
 ```
@@ -64,7 +64,8 @@ The required annotatios are:
 - @table - which table the class maps onto
 - @pk - set on the primary key column to enable fetching records by primary key
 
-
-Example file (example.php)
---------------------------
-Now run `example.php` and see what happens.
+Examples
+--------
+Now run the provided example files:
+* example1.php
+* example2.php
