@@ -33,6 +33,9 @@ class Connection
      */
     private $pdo;
 
+    private $lastInsertID;
+    private $lastRowCount;
+
     public function __construct($name, $config)
     {
         if (empty($config['dsn'])) {
@@ -97,6 +100,9 @@ class Connection
             throw new \Excepion("Unknown fetch type [$fetchType].");
         }
 
+        $this->lastInsertID = $pdo->lastInsertId();
+        $this->lastRowCount = $stmt->rowCount();
+
         $stmt->closeCursor();
         return $data;
     }
@@ -109,6 +115,18 @@ class Connection
         $pdo = $this->getPDO();
         $stmt = $pdo->prepare($query);
         $stmt->execute($args);
+        $this->lastInsertID = $pdo->lastInsertId();
+        $this->lastRowCount = $stmt->rowCount();
         $stmt->closeCursor();
+    }
+
+    public function getLastInsertID()
+    {
+        return $this->lastInsertID;
+    }
+
+    public function getLastRowCount()
+    {
+        return $this->lastRowCount;
     }
 }
