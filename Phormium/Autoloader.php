@@ -34,12 +34,6 @@ class Autoloader
             );
 
             $subpath = substr($class, strlen($namespace));
-
-            // Hack to allow class alias (f for FilterFactory)
-            if ($subpath === 'f') {
-                $subpath = 'FilterFactory';
-            }
-
             $subpath = strtr($subpath, $replacements);
             $path = __DIR__ . DIRECTORY_SEPARATOR . $subpath . ".php";
 
