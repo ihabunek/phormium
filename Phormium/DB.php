@@ -19,10 +19,7 @@ class DB
     /** The loaded configuration. */
     private static $config;
 
-    /**
-     * An array of established database connections - {@link Connection}
-     * objects.
-     */
+    /** An array of established database connections. */
     private static $connections;
 
     /**
@@ -66,8 +63,15 @@ class DB
         self::$config = $config;
     }
 
+    private static $defaultConnection = '\Phormium\Connections\GenericConnection';
+
+    private static $connectionMap = array(
+        'informix' => '\Phormium\Connections\InformixConnection'
+    );
+
     /**
-     * Returns a Connection object for the given connection name.
+     * Returns a connection object for the given connection name.
+     *
      * @param string $name Connection name.
      * @return Connection
      */
@@ -82,7 +86,13 @@ class DB
         }
 
         $config = self::$config[$name];
-        self::$connections[$name] = new Connection($name, $config);
+        $dsn = $config['dsn'];
+
+        $driverID = substr($dsn, 0, strpos($dsn, ':'));
+        $class = isset(self::$connectionMap[$driverID]) ?
+            self::$connectionMap[$driverID] : self::$defaultConnection;
+
+        self::$connections[$name] = new $class($name, $config);
 
         return self::$connections[$name];
     }
