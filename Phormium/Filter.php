@@ -13,11 +13,14 @@ class Filter
     const OP_GREATER = 'gt';
     const OP_GREATER_OR_EQUAL = 'gte';
     const OP_IN = 'in';
+    const OP_IS_NULL = 'null';
     const OP_LESSER = 'lt';
     const OP_LESSER_OR_EQUAL = 'lte';
     const OP_LIKE = 'like';
+    const OP_NOT_LIKE = '!like';
     const OP_NOT_EQUALS = 'neq';
-    const OP_NOT_IN = 'nin';
+    const OP_NOT_IN = '!in';
+    const OP_NOT_NULL = '!null';
     const OP_PK_EQUALS = 'pk';
 
     /** The filter operation, one of OP_* constants. */
@@ -29,7 +32,7 @@ class Filter
     /** The value to use in filtering, depends on operation. */
     public $value;
 
-    public function __construct($operation, $column, $value)
+    public function __construct($operation, $column, $value = null)
     {
         $this->operation = $operation;
         $this->column = $column;
@@ -44,42 +47,41 @@ class Filter
         switch($this->operation)
         {
             case self::OP_EQUALS:
-                return $this->renderSimple($this->column, $this->operation, $this->value);
             case self::OP_NOT_EQUALS:
+            case self::OP_LIKE:
+            case self::OP_NOT_LIKE:
+            case self::OP_GREATER:
+            case self::OP_GREATER_OR_EQUAL:
+            case self::OP_LESSER:
+            case self::OP_LESSER_OR_EQUAL:
                 return $this->renderSimple($this->column, $this->operation, $this->value);
             case self::OP_PK_EQUALS:
                 return $this->renderSimple($model->pk, self::OP_EQUALS, $this->value);
-            case self::OP_LIKE:
-                return $this->renderSimple($this->column, $this->operation, $this->value);
-            case self::OP_GREATER:
-                return $this->renderSimple($this->column, $this->operation, $this->value);
-            case self::OP_GREATER_OR_EQUAL:
-                return $this->renderSimple($this->column, $this->operation, $this->value);
-            case self::OP_LESSER:
-                return $this->renderSimple($this->column, $this->operation, $this->value);
-            case self::OP_LESSER_OR_EQUAL:
-                return $this->renderSimple($this->column, $this->operation, $this->value);
             case self::OP_IN:
                 return $this->renderIn($this->column, $this->value);
             case self::OP_NOT_IN:
                 return $this->renderNotIn($this->column, $this->value);
+            case self::OP_IS_NULL:
+                return $this->renderIsNull($this->column);
+            case self::OP_NOT_NULL:
+                return $this->renderNotNull($this->column);
             case self::OP_BETWEEN:
                 return $this->renderBetween($this->column, $this->value);
             default:
                 throw new \Exception("Render not defined for operation [{$this->operation}].");
         }
-
     }
 
     /** Maps simple operations to corresponding operators. */
-    private $opMap = array(
+    private $simpleOps = array(
         self::OP_EQUALS => '=',
+        self::OP_NOT_EQUALS => '<>',
         self::OP_GREATER => '>',
         self::OP_GREATER_OR_EQUAL => '>=',
         self::OP_LESSER => '<',
         self::OP_LESSER_OR_EQUAL => '<=',
-        self::OP_LIKE => 'like',
-        self::OP_NOT_EQUALS => '<>',
+        self::OP_LIKE => 'LIKE',
+        self::OP_NOT_LIKE => 'NOT LIKE',
     );
 
     /**
@@ -88,11 +90,11 @@ class Filter
      */
     private function renderSimple($column, $operation, $value)
     {
-        if (!isset($this->opMap[$operation])) {
-            throw new \Exception("Operation [$operation] not defined in \$opMap.");
+        if (!isset($this->simpleOps[$operation])) {
+            throw new \Exception("Operation [$operation] not defined in \$simpleOps.");
         }
 
-        $operator = $this->opMap[$operation];
+        $operator = $this->simpleOps[$operation];
         $where = "{$column} {$operator} ?";
         return array($where, array($value));
     }
@@ -113,7 +115,7 @@ class Filter
             throw new \Exception("IN filter requires an array with one or more values.");
         }
 
-        $qs = array_fill(0, '?', count($values));
+        $qs = array_fill(0, count($values), '?');
         $where = "$column IN (" . implode(', ', $qs) . ")";
         return array($where, $values);
     }
@@ -124,8 +126,20 @@ class Filter
             throw new \Exception("NOT IN filter requires an array with one or more values.");
         }
 
-        $qs = array_fill(0, '?', count($values));
+        $qs = array_fill(0, count($values), '?');
         $where = "$column NOT IN (" . implode(', ', $qs) . ")";
         return array($where, $values);
+    }
+
+    private function renderIsNull($column)
+    {
+        $where = "$column IS NULL";
+        return array($where, array());
+    }
+
+    private function renderNotNull($column)
+    {
+        $where = "$column IS NOT NULL";
+        return array($where, array());
     }
 }
