@@ -12,33 +12,18 @@
         <apigen source="Phormium" destination="target/apidocs" title="Phormium" />
     </target>
 
-    <target name="test">
-        <mkdir dir="target/temp" />
-        <mkdir dir="target/tests" />
-        
-        <echo message="Running unit tests" />
-        <phpunit haltonerror="true" haltonfailure="true" printsummary="true" bootstrap="test/bootstrap.php">
-            <formatter todir="target/temp" type="xml"/>
-            <batchtest>
-                <fileset dir="test/src">
-                    <include name="**/*Test.php"/>
-                </fileset>
-            </batchtest>
-        </phpunit>
-        
-        <echo message="Generating PHPUnit report" />
-        <phpunitreport infile="target/temp/testsuites.xml" todir="target/tests" />
-        
+    <target name="codesniffer">
         <echo message="Checking PSR2 standard for code" />
         <phpcodesniffer standard="PSR2" file="Phormium" />
-        
+
         <echo message="Checking PSR2 standard for tests" />
         <phpcodesniffer standard="PSR2" file="test" />
     </target>
-    
-    <target name="coverage">
+
+    <target name="test">
         <mkdir dir="target/temp" />
         <mkdir dir="target/coverage" />
+        <mkdir dir="target/tests" />
 
         <!-- Init coverage database -->
         <coverage-setup database="target/temp/coverage.db">
@@ -47,16 +32,20 @@
             </fileset>
         </coverage-setup>
 
-        <!-- Perform unit tests and gather coverage info -->
-        <phpunit printsummary="true" codecoverage="true">
+        <echo message="Running unit tests" />
+        <phpunit codecoverage="true" haltonerror="true" haltonfailure="true" printsummary="true" bootstrap="test/bootstrap.php">
+            <formatter todir="target/temp" type="xml"/>
             <batchtest>
-                <fileset dir="${project.basedir}/test/src">
+                <fileset dir="test/src">
                     <include name="**/*Test.php"/>
                 </fileset>
             </batchtest>
         </phpunit>
 
-        <!-- Generate the coverage report -->
+        <echo message="Generating PHPUnit report" />
+        <phpunitreport infile="target/temp/testsuites.xml" todir="target/tests" />
+
+        <echo message="Generating coverage report" />
         <coverage-report outfile="target/temp/coverage.xml">
             <report todir="target/coverage" />
         </coverage-report>
