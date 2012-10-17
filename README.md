@@ -2,7 +2,7 @@ Phormium
 ========
 Phormium is a minimal ORM for PHP.
 
-It uses no database-specific feautres meaning it runs on any database which has a PDO driver.
+Work in progress. Things will change. Do not use for anything serious.
 
 License
 -------
