@@ -3,7 +3,7 @@
 namespace Phormium;
 
 /**
- * Maps a database table to a class (subclass of {@link Model}).
+ * Meta-data for a {@link Model}.
  */
 class Meta
 {
@@ -21,4 +21,7 @@ class Meta
 
     /** Name of the primary key database column. */
     public $pk;
+
+    /** Array of all columns except the primary key column. */
+    public $nonPK;
 }

@@ -37,10 +37,18 @@ class Parser
 
             if (self::hasAnnotation($propDoc, 'pk')) {
                 if (isset($meta->pk)) {
-                    throw new \Exception("Multiple columns marked as @pk. Composite primary keys are not supported.");
+                    throw new \Exception(
+                        "Multiple columns marked as primary key. Composite primary keys are not supported."
+                    );
                 }
                 $meta->pk = $name;
+            } else {
+                $meta->nonPK[] = $name;
             }
+        }
+
+        if (empty($meta->pk)) {
+            throw new \Exception("Primary key not annotated.");
         }
 
         return $meta;

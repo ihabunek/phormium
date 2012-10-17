@@ -7,7 +7,7 @@ namespace Phormium;
  *
  * Best used by it's alias <var>f</var>.
  *
- * For example, write:
+ * For example:
  * <pre>
  * f::eq('col', 10)
  * </pre>

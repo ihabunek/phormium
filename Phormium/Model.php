@@ -11,11 +11,15 @@ abstract class Model
     // *** Statics                            ***
     // ******************************************
 
-    /** Caches the meta so it's not parsed multiple times. */
+    /**
+     * Holds the model meta data.
+     * @var Meta
+     */
     protected static $meta;
 
     /**
      * Parses the model object to construct a meta.
+     * @return Meta
      */
     public static function getMeta()
     {
@@ -24,49 +28,6 @@ abstract class Model
             self::$meta = Parser::parse($class);
         }
         return self::$meta;
-    }
-
-    public static function getUpdateQuery()
-    {
-        $meta = self::getMeta();
-        $columns = array_keys($meta->columns);
-        $pk = $meta->pk;
-
-        $updates = array();
-        foreach ($meta->columns as $column => $config) {
-            // Skip primary key
-            if ($column != $meta->pk) {
-                $updates[] = "$column = ?";
-            }
-        }
-
-        $query = "UPDATE {$meta->table} SET ";
-        $query .= implode(', ', $updates);
-        $query .= " WHERE {$pk} = ?;";
-
-        return $query;
-    }
-
-    public static function getInsertQuery()
-    {
-        $meta = self::getMeta();
-        $columns = array_keys($meta->columns);
-
-        $inserts = array();
-        foreach ($meta->columns as $column => $config) {
-            // Skip primary key
-            if ($column != $meta->pk) {
-                $updates[] = "$column = ?";
-            }
-        }
-
-        $query = "INSERT INTO {$meta->table} (";
-        $query .= implode(', ', $columns);
-        $query .= ") VALUES (";
-        $query .= implode(', ', array_fill(0, count($columns), '?'));
-        $query .= ");";
-
-        return $query;
     }
 
     /**
@@ -101,6 +62,10 @@ abstract class Model
         }
     }
 
+    /**
+     * Saves the current Model.
+     * If it already exists, performs an UPDATE, otherwise an INSERT.
+     */
     public function save()
     {
         $meta = static::getMeta();
@@ -122,19 +87,32 @@ abstract class Model
 
     public function insert()
     {
-        $query = self::getInsertQuery();
         $meta = self::getMeta();
+
+        // If PK is set, include it in query, otherwise skip for autogen to work
+        if (isset($this->{$meta->pk})) {
+            $columns = $meta->columns;
+        } else {
+            $columns = $meta->nonPK;
+        }
 
         // Collect query arguments
         $args = array();
-        foreach ($meta->columns as $column => $config) {
+        foreach ($columns as $column) {
             $args[] = $this->{$column};
         }
+
+        // Construct the query
+        $query = "INSERT INTO {$meta->table} (";
+        $query .= implode(', ', $columns);
+        $query .= ") VALUES (";
+        $query .= implode(', ', array_fill(0, count($columns), '?'));
+        $query .= ");";
 
         $conn = DB::getConnection($meta->connection);
         $conn->executeNoFetch($query, $args);
 
-        if (empty($this->{$meta->pk})) {
+        if (!isset($this->{$meta->pk})) {
             $this->{$meta->pk} = $conn->getLastInsertID();
         }
 
@@ -143,7 +121,6 @@ abstract class Model
 
     public function update()
     {
-        $query = self::getUpdateQuery();
         $meta = self::getMeta();
         $columns = array_keys($meta->columns);
 
@@ -152,15 +129,21 @@ abstract class Model
             throw new \Exception("Cannot update model if primary key [$pk] is not set.");
         }
 
-        // Collect query arguments
+        // Collect query arguments (primary key goes last, skip it here)
         $args = array();
-        foreach ($meta->columns as $column => $config) {
-            // Primary key goes last, skip it here
-            if ($column != $meta->pk) {
-                $args[] = $this->{$column};
-            }
+        $updates = array();
+        foreach ($meta->nonPK as $column) {
+            $updates[] = "$column = ?";
+            $args[] = $this->{$column};
         }
+
+        // Add primary key to arguments
         $args[] = $this->{$meta->pk};
+
+        // Construct the query
+        $query = "UPDATE {$meta->table} SET ";
+        $query .= implode(', ', $updates);
+        $query .= " WHERE {$meta->pk} = ?;";
 
         $conn = DB::getConnection($meta->connection);
         $conn->executeNoFetch($query, $args);
