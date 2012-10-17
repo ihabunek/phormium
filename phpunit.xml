@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpunit bootstrap="test/bootstrap.php" colors="true">
+    <testsuite name="Phormium test suite">
+        <directory>test/src</directory>
+    </testsuite>
+</phpunit>
