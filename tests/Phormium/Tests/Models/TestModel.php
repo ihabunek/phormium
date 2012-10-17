@@ -1,6 +1,6 @@
 <?php
 
-namespace Phormium\Test;
+namespace Phormium\Tests\Models;
 
 /**
  * @connection test

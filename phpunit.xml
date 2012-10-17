@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<phpunit bootstrap="test/bootstrap.php" colors="true">
+<phpunit bootstrap="tests/bootstrap.php" colors="true">
     <testsuite name="Phormium test suite">
-        <directory>test/src</directory>
+        <directory>tests/Phormium/Tests</directory>
     </testsuite>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">Phormium</directory>
+        </whitelist>
+    </filter>
+    <logging>
+        <log type="coverage-html" target="target/coverage" charset="UTF-8" />
+    </logging>
 </phpunit>

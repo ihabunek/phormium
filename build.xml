@@ -14,11 +14,11 @@
 
     <target name="codesniffer">
         <echo message="Checking PSR2 code standards" />
-        <phpcodesniffer standard="PSR2" verbosity="1">
+        <phpcodesniffer standard="PSR2">
             <fileset dir="Phormium">
                 <include name="**/*.php"/>
             </fileset>
-            <fileset dir="test">
+            <fileset dir="tests">
                 <include name="**/*.php"/>
             </fileset>
         </phpcodesniffer>
@@ -37,10 +37,10 @@
         </coverage-setup>
 
         <echo message="Running unit tests" />
-        <phpunit codecoverage="true" haltonerror="true" haltonfailure="true" printsummary="true" bootstrap="test/bootstrap.php">
+        <phpunit codecoverage="true" haltonerror="true" haltonfailure="true" printsummary="true" bootstrap="tests/bootstrap.php">
             <formatter todir="target/temp" type="xml"/>
             <batchtest>
-                <fileset dir="test/src">
+                <fileset dir="tests/Phormium">
                     <include name="**/*Test.php"/>
                 </fileset>
             </batchtest>

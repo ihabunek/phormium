@@ -1,6 +1,6 @@
 <?php
 
-namespace Phormium\Test;
+namespace Phormium\Tests;
 
 use \Phormium\DB;
 
@@ -8,7 +8,7 @@ class DBTest extends \PHPUnit_Framework_TestCase
 {
     public function testConfigure()
     {
-        $config = realpath(__DIR__ . '/../config/config.json');
+        $config = realpath(__DIR__ . '/../../config/config.json');
         DB::configure($config);
         self::assertTrue(true);
     }
@@ -19,7 +19,7 @@ class DBTest extends \PHPUnit_Framework_TestCase
      */
     public function testConfigureFail()
     {
-        $config = realpath(__DIR__ . '/../config/invalid.json');
+        $config = realpath(__DIR__ . '/../../config/invalid.json');
         DB::configure($config);
         self::assertTrue(false);
     }

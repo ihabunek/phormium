@@ -1,6 +1,6 @@
 <?php
 
-namespace Phormium\Test;
+namespace Phormium\Tests;
 
 use \Phormium\Parser;
 use \Phormium\Filter;
@@ -12,7 +12,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->meta = TestModel::getMeta();
+        $this->meta = Models\TestModel::getMeta();
     }
 
     public function testEq()
