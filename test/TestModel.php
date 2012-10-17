@@ -6,7 +6,7 @@ namespace Phormium\Test;
  * @connection test
  * @table test
  */
-class TestEntity extends \Phormium\Entity
+class TestModel extends \Phormium\Model
 {
     /** @pk */
     public $id;

@@ -4,7 +4,7 @@
  * @connection myconnection
  * @table person
  */
-class Person extends Phormium\Entity
+class Person extends Phormium\Model
 {
     /** @pk */
     public $id;

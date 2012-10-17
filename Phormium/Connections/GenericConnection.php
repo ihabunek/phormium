@@ -3,6 +3,7 @@
 namespace Phormium\Connections;
 
 use \PDO;
+use \Phormium\DB;
 
 /**
  * A database connection object.

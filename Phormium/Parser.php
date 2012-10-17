@@ -3,22 +3,22 @@
 namespace Phormium;
 
 /**
- * Parses {@link Entity} classes and constructs corresponding {@link Model}
+ * Parses {@link Model} classes and constructs corresponding {@link Meta}
  * objects.
  */
 class Parser
 {
     public static function parse($class)
     {
-        $model = new Model();
-        $model->class = $class;
+        $meta = new Meta();
+        $meta->class = $class;
 
         $rc = new \ReflectionClass($class);
         $classDoc = $rc->getDocComment();
 
-        $model->connection = self::getAnnotation($class, $classDoc, 'connection');
-        $model->table = self::getAnnotation($class, $classDoc, 'table');
-        $model->columns = array();
+        $meta->connection = self::getAnnotation($class, $classDoc, 'connection');
+        $meta->table = self::getAnnotation($class, $classDoc, 'table');
+        $meta->columns = array();
 
         $props = $rc->getProperties(\ReflectionProperty::IS_PUBLIC);
         foreach ($props as $prop) {
@@ -26,24 +26,24 @@ class Parser
             $name = $prop->name;
             $propID = "$class::\$$name";
 
-            $model->columns[$name] = array(
+            $meta->columns[$name] = array(
                 'name' => $name
             );
 
             $type = self::getAnnotation($propID, $propDoc, 'type', false);
             if (isset($type)) {
-                $model->columns[$name]['type'] = $type;
+                $meta->columns[$name]['type'] = $type;
             }
 
             if (self::hasAnnotation($propDoc, 'pk')) {
-                if (isset($model->pk)) {
+                if (isset($meta->pk)) {
                     throw new \Exception("Multiple columns marked as @pk. Composite primary keys are not supported.");
                 }
-                $model->pk = $name;
+                $meta->pk = $name;
             }
         }
 
-        return $model;
+        return $meta;
     }
 
     private static function getAnnotation($id, $doc, $name, $required = true)

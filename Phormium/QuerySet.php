@@ -8,10 +8,10 @@ namespace Phormium;
 class QuerySet
 {
     /**
-     * Holds the model which this QuerySet is handling.
-     * @var Model
+     * Holds the meta which this QuerySet is handling.
+     * @var Meta
      */
-    private $model;
+    private $meta;
 
     /**
      * The SQL query for fetching data.
@@ -37,9 +37,9 @@ class QuerySet
 
     private $filters = array();
 
-    public function __construct(Model $model)
+    public function __construct(Meta $meta)
     {
-        $this->model = $model;
+        $this->meta = $meta;
     }
 
     // ******************************************
@@ -90,7 +90,7 @@ class QuerySet
     {
         $this->constructQueries();
 
-        $conn = DB::getConnection($this->model->connection);
+        $conn = DB::getConnection($this->meta->connection);
         $data = $conn->execute($this->countQuery, $this->args, DB::FETCH_ARRAY);
         return (integer) $data[0]['count'];
     }
@@ -102,8 +102,8 @@ class QuerySet
     public function fetch($type = DB::FETCH_OBJECT)
     {
         $this->constructQueries();
-        $conn = DB::getConnection($this->model->connection);
-        return $conn->execute($this->selectQuery, $this->args, $type, $this->model->class);
+        $conn = DB::getConnection($this->meta->connection);
+        return $conn->execute($this->selectQuery, $this->args, $type, $this->meta->class);
     }
 
     public function single($allowEmpty = false)
@@ -134,8 +134,8 @@ class QuerySet
     private function addFilter(Filter $filter)
     {
         $column = $filter->column;
-        if (isset($filter->column) && !isset($this->model->columns[$column])) {
-            $table = $this->model->table;
+        if (isset($filter->column) && !isset($this->meta->columns[$column])) {
+            $table = $this->meta->table;
             throw new \Exception("Invalid filter: Column [$column] does not exist in table [$table].");
         }
         $this->filters[] = $filter;
@@ -147,8 +147,8 @@ class QuerySet
             throw new \Exception("Invalid direction given: [$direction]. Expected 'asc' or 'desc'.");
         }
 
-        if (!isset($this->model->columns[$column])) {
-            $table = $this->model->table;
+        if (!isset($this->meta->columns[$column])) {
+            $table = $this->meta->table;
             throw new \Exception("Cannot order by column [$column] because it does not exist in table [$table].");
         }
 
@@ -157,8 +157,8 @@ class QuerySet
 
     private function constructQueries()
     {
-        $columns = implode(", ", array_keys($this->model->columns));
-        $table = $this->model->table;
+        $columns = implode(", ", array_keys($this->meta->columns));
+        $table = $this->meta->table;
 
         list($where, $args) = $this->constructWhere();
         $order = $this->constructOrder();
@@ -188,7 +188,7 @@ class QuerySet
         $where = array();
         $args = array();
         foreach ($this->filters as $filter) {
-            list($w, $a) = $filter->render($this->model);
+            list($w, $a) = $filter->render($this->meta);
             $where[] = $w;
             $args = array_merge($args, $a);
         }

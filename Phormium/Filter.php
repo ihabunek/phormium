@@ -42,7 +42,7 @@ class Filter
     /**
      * Renders a WHERE condition for the given filter.
      */
-    public function render(Model $model)
+    public function render(Meta $meta)
     {
         switch($this->operation)
         {
@@ -56,7 +56,7 @@ class Filter
             case self::OP_LESSER_OR_EQUAL:
                 return $this->renderSimple($this->column, $this->operation, $this->value);
             case self::OP_PK_EQUALS:
-                return $this->renderSimple($model->pk, self::OP_EQUALS, $this->value);
+                return $this->renderSimple($meta->pk, self::OP_EQUALS, $this->value);
             case self::OP_IN:
                 return $this->renderIn($this->column, $this->value);
             case self::OP_NOT_IN:
