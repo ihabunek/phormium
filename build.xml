@@ -13,11 +13,15 @@
     </target>
 
     <target name="codesniffer">
-        <echo message="Checking PSR2 standard for code" />
-        <phpcodesniffer standard="PSR2" file="Phormium" />
-
-        <echo message="Checking PSR2 standard for tests" />
-        <phpcodesniffer standard="PSR2" file="test" />
+        <echo message="Checking PSR2 code standards" />
+        <phpcodesniffer standard="PSR2" verbosity="1">
+            <fileset dir="Phormium">
+                <include name="**/*.php"/>
+            </fileset>
+            <fileset dir="test">
+                <include name="**/*.php"/>
+            </fileset>
+        </phpcodesniffer>
     </target>
 
     <target name="test">
