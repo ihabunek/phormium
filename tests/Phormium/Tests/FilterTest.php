@@ -10,9 +10,9 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 {
     private $meta;
 
-    public function __construct()
+    public function setUp()
     {
-        $this->meta = Models\TestModel::getMeta();
+        $this->meta = Models\Person::getMeta();
     }
 
     public function testEq()

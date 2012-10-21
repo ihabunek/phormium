@@ -1,0 +1,7 @@
+{
+    "testdb": {
+        "dsn": "mysql:host=localhost;dbname=phormium_tests",
+        "username": "root",
+        "password": ""
+    }
+}

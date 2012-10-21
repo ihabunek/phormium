@@ -4,5 +4,13 @@ php:
   - 5.3
   - 5.4
 
+env:
+  - DB=mysql
+  - DB=sqlite
+
 before_script:
   - composer install
+  - sh -c "if [ '$DB' = 'mysql' ]; then mysql < tests/travis/mysql.setup.sql; fi"
+  - sh -c "if [ '$DB' = 'sqlite' ]; then sqlite3 target/test.db < tests/travis/sqlite.setup.sql; fi"
+
+script: phpunit --configuration tests/travis/$DB.phpunit.xml

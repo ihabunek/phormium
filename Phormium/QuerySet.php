@@ -8,7 +8,7 @@ namespace Phormium;
 class QuerySet
 {
     /**
-     * Holds the meta which this QuerySet is handling.
+     * Meta data of the Model this QuerySet is handling.
      * @var Meta
      */
     private $meta;
@@ -26,7 +26,7 @@ class QuerySet
     private $countQuery;
 
     /**
-     * Arguments for executing the prepared statemnt with ? placeholders.
+     * Arguments for executing the prepared statemnt.
      */
     private $args;
 
@@ -35,6 +35,9 @@ class QuerySet
      */
     private $order = array();
 
+    /**
+     * Array of {@link Filter} objects.
+     */
     private $filters = array();
 
     public function __construct(Meta $meta)
@@ -43,7 +46,7 @@ class QuerySet
     }
 
     // ******************************************
-    // *** Public methods                     ***
+    // *** Clone methods                      ***
     // ******************************************
 
     /**
@@ -67,7 +70,7 @@ class QuerySet
     }
 
     /**
-     * Returns a new QuerySet instance with the ordering changed.
+     * Returns a new QuerySet with the ordering changed.
      *
      * @param string $column Name of the column to order by.
      * @param string $direction Direction to sort by: 'asc' (default)
@@ -80,8 +83,12 @@ class QuerySet
         return $qs;
     }
 
+    // ******************************************
+    // *** Execute methods                    ***
+    // ******************************************
+
     /**
-     * Performs a SELECT COUNT() and returns the number of records matching
+     * Performs a SELECT COUNT(*) and returns the number of records matching
      * the current filter.
      *
      * @return integer
@@ -106,6 +113,18 @@ class QuerySet
         return $conn->execute($this->selectQuery, $this->args, $type, $this->meta->class);
     }
 
+    /**
+     * Performs a SELECT query on the table, and returns a single row which
+     * matches the current filter.
+     *
+     * @param boolean $allowEmpty If set to false, the method will throw an 
+     * exception if no rows are found. If set to true, will return null in 
+     * this case.
+     *
+     * @throws \Exception If multiple rows are found
+     * @throws \Exception If no rows are found, and {@link $allowEmpty} is set
+     * to false.
+     */
     public function single($allowEmpty = false)
     {
         $data = $this->fetch();
@@ -122,11 +141,6 @@ class QuerySet
         return isset($data[0]) ? $data[0] : null;
     }
 
-    public function getFilters()
-    {
-        return $this->filters;
-    }
-
     // ******************************************
     // *** Private methods                    ***
     // ******************************************
@@ -141,7 +155,7 @@ class QuerySet
         $this->filters[] = $filter;
     }
 
-    public function addOrder($column, $direction)
+    private function addOrder($column, $direction)
     {
         if ($direction !== 'asc' && $direction !== 'desc') {
             throw new \Exception("Invalid direction given: [$direction]. Expected 'asc' or 'desc'.");
@@ -194,5 +208,24 @@ class QuerySet
         }
         $where = " WHERE " . implode(" AND ", $where);
         return array($where, $args);
+    }
+
+    // ******************************************
+    // *** Accessors                          ***
+    // ******************************************
+
+    public function getFilters()
+    {
+        return $this->filters;
+    }
+
+    public function getOrder()
+    {
+        return $this->order;
+    }
+
+    public function getMeta()
+    {
+        return $this->meta;
     }
 }
