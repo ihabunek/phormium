@@ -10,7 +10,8 @@ env:
 
 before_script:
   - composer install
+  - mkdir tmp
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql < tests/travis/mysql.setup.sql; fi"
-  - sh -c "if [ '$DB' = 'sqlite' ]; then sqlite3 target/test.db < tests/travis/sqlite.setup.sql; fi"
+  - sh -c "if [ '$DB' = 'sqlite' ]; then sqlite3 tmp/test.db < tests/travis/sqlite.setup.sql; fi"
 
 script: phpunit --configuration tests/travis/$DB.phpunit.xml

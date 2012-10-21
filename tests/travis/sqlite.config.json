@@ -1,6 +1,6 @@
 {
     "testdb": {
-        "dsn": "sqlite:target/test.db",
+        "dsn": "sqlite:tmp/test.db",
         "username": "",
         "password": ""
     }
