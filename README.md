@@ -4,6 +4,8 @@ Phormium is a minimal ORM for PHP.
 
 Work in progress. Things will change. Do not use for anything serious.
 
+[![Build Status](https://travis-ci.org/ihabunek/phormium.png)](https://travis-ci.org/ihabunek/phormium)
+
 License
 -------
 Copyright (c) 2012 Ivan Habunek <ivan.habunek@gmail.com>
