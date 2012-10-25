@@ -22,14 +22,6 @@ class DB
     /** An array of established database connections. */
     private static $connections;
 
-    /** Default connection class to use if no specific class exists. */
-    private static $defaultConnection = '\Phormium\Connections\GenericConnection';
-
-    /** A map of specific connection classes, indexed by driver name. */
-    private static $connectionMap = array(
-        'informix' => '\Phormium\Connections\InformixConnection'
-    );
-
     /**
      * Human readable JSON error descriptions.
      * Literals are used instead of JSON_ERROR_* constants to have backward
@@ -88,13 +80,8 @@ class DB
         }
 
         $config = self::$config[$name];
-        $dsn = $config['dsn'];
 
-        $driverID = substr($dsn, 0, strpos($dsn, ':'));
-        $class = isset(self::$connectionMap[$driverID]) ?
-            self::$connectionMap[$driverID] : self::$defaultConnection;
-
-        self::$connections[$name] = new $class($name, $config);
+        self::$connections[$name] = new Connection($name, $config);
 
         return self::$connections[$name];
     }

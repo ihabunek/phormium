@@ -1,9 +1,8 @@
 <?php
 
-namespace Phormium\Connections;
+namespace Phormium;
 
 use \PDO;
-use \Phormium\DB;
 
 /**
  * A database connection object.
@@ -11,7 +10,7 @@ use \Phormium\DB;
  * Encapsulates a PDO connection and provides methods for executing queries
  * and fetching data.
  */
-class GenericConnection
+class Connection
 {
     /** Connection name. */
     private $name;
