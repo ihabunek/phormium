@@ -11,4 +11,7 @@
     <logging>
         <log type="coverage-html" target="target/coverage" charset="UTF-8" />
     </logging>
+    <php>
+        <const name="PHORMIUM_CONFIG_FILE" value="tests/config.json"/>
+    </php>
 </phpunit>

@@ -7,7 +7,7 @@ CREATE TABLE person (
   created DATETIME,
   income DECIMAL(10,2)
 );
-
+/*
 INSERT INTO person (id,name,email,birthday,created,income) VALUES (1,'Florence Ramsey','nibh@quis.org','2012-04-09','2013-07-11 22:24:56',8164.97);
 INSERT INTO person (id,name,email,birthday,created,income) VALUES (2,'Carl Blankenship','magna.Praesent@dui.edu','2013-09-10','2012-07-01 16:07:57',105.48);
 INSERT INTO person (id,name,email,birthday,created,income) VALUES (3,'Dai Carey','sem@eratSed.ca','2011-11-14','2013-07-19 19:16:26',5366.02);
@@ -105,6 +105,7 @@ INSERT INTO person (id,name,email,birthday,created,income) VALUES (94,'Brittany 
 INSERT INTO person (id,name,email,birthday,created,income) VALUES (95,'Malik Fischer','ac.ipsum@laoreetposuere.com','2012-05-03','2012-09-05 16:04:37',6542.34);
 INSERT INTO person (id,name,email,birthday,created,income) VALUES (96,'Yasir Phillips','dolor.Quisque@Morbisit.edu','2012-12-08','2013-10-04 04:56:12',2744.49);
 INSERT INTO person (id,name,email,birthday,created,income) VALUES (97,'Madaline Carlson','sit.amet.consectetuer@uterosnon.ca','2011-12-02','2012-03-10 04:12:30',3079.72);
-INSERT INTO person (id,name,email,birthday,created,income) VALUES (98,'Hashim Cobb','pellentesque@Curae;Phasellus.org','2013-03-06','2013-05-06 09:08:28',1432.14);
+INSERT INTO person (id,name,email,birthday,created,income) VALUES (98,'Hashim Cobb','pellentesque@Curae.Phasellus.org','2013-03-06','2013-05-06 09:08:28',1432.14);
 INSERT INTO person (id,name,email,birthday,created,income) VALUES (99,'Callum Crawford','auctor@Pellentesque.org','2013-01-15','2012-06-14 10:06:39',4786.60);
 INSERT INTO person (id,name,email,birthday,created,income) VALUES (100,'Rhona Hutchinson','vitae@ornareelitelit.ca','2012-08-26','2012-10-05 06:34:27',3694.93);
+*/
