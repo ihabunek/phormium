@@ -63,6 +63,32 @@ class Query
     }
 
     /**
+     * Constructs and executes a SELECT aggregate query.
+     *
+     * @param array $filters Array of {@link Filter} instances used to form
+     *      the WHERE clause.
+     * @param Aggregate $aggregate The aggregate to perform.
+     * @return string Result of the aggregate query.
+     */
+    public function aggregate($filters, $aggregate)
+    {
+        $table = $this->meta->table;
+        $type = $aggregate->type;
+
+        $column = $aggregate->column;
+        if (!isset($this->meta->columns[$column])) {
+            throw new \Exception("Error forming aggregate query. Column [$column] does not exist in table [$table].");
+        }
+
+        list($where, $args) = $this->constructWhere($filters);
+
+        $sql = "SELECT {$type}({$column}) as aggregate FROM {$table}{$where};";
+        $conn = DB::getConnection($this->meta->connection);
+        $data = $conn->execute($sql, $args, DB::FETCH_ARRAY);
+        return $data[0]['aggregate'];
+    }
+
+    /**
      * Constructs and executes an INSERT statement for a single Model instance.
      */
     public function insert(Model $model)

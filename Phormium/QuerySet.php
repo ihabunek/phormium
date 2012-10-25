@@ -115,6 +115,16 @@ class QuerySet
         return isset($data[0]) ? $data[0] : null;
     }
 
+    /**
+     * Performs an aggregate SELECT query and returns the result.
+     *
+     * @return string
+     */
+    public function aggregate(Aggregate $aggregate)
+    {
+        return $this->query->aggregate($this->filters, $aggregate);
+    }
+
     // ******************************************
     // *** Private methods                    ***
     // ******************************************
