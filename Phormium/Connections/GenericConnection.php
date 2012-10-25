@@ -77,7 +77,11 @@ class GenericConnection
     public function execute($query, $args = array(), $fetchType = DB::FETCH_OBJECT, $class = null)
     {
         $pdo = $this->getPDO();
+
+        // echo "Preparing query: $query\n";
         $stmt = $pdo->prepare($query);
+
+        // echo "Executing query with args: " . implode(', ', $args) . "\n";
         $stmt->execute($args);
 
         // Fetch into objects
@@ -114,8 +118,13 @@ class GenericConnection
     public function executeNoFetch($query, $args = array())
     {
         $pdo = $this->getPDO();
+
+        // echo "Preparing query: $query\n";
         $stmt = $pdo->prepare($query);
+
+        // echo "Executing query with args: " . implode(', ', $args) . "\n";
         $stmt->execute($args);
+
         $this->lastInsertID = $pdo->lastInsertId();
         $this->lastRowCount = $stmt->rowCount();
         $stmt->closeCursor();
