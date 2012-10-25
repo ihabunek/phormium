@@ -14,23 +14,6 @@ class QuerySet
     private $meta;
 
     /**
-     * The SQL query for fetching data.
-     * Constructed by {@link constructQueries}.
-     */
-    private $selectQuery;
-
-    /**
-     * The SQL query for counting records.
-     * Constructed by {@link constructQueries}.
-     */
-    private $countQuery;
-
-    /**
-     * Arguments for executing the prepared statemnt.
-     */
-    private $args;
-
-    /**
      * Order by clauses.
      */
     private $order = array();
@@ -40,9 +23,10 @@ class QuerySet
      */
     private $filters = array();
 
-    public function __construct(Meta $meta)
+    public function __construct(Query $query, Meta $meta)
     {
         $this->meta = $meta;
+        $this->query = $query;
     }
 
     // ******************************************
@@ -95,11 +79,7 @@ class QuerySet
      */
     public function count()
     {
-        $this->constructQueries();
-
-        $conn = DB::getConnection($this->meta->connection);
-        $data = $conn->execute($this->countQuery, $this->args, DB::FETCH_ARRAY);
-        return (integer) $data[0]['count'];
+        return $this->query->count($this->filters);
     }
 
     /**
@@ -108,33 +88,27 @@ class QuerySet
      */
     public function fetch($type = DB::FETCH_OBJECT)
     {
-        $this->constructQueries();
-        $conn = DB::getConnection($this->meta->connection);
-        return $conn->execute($this->selectQuery, $this->args, $type, $this->meta->class);
+        return $this->query->select($this->filters, $this->order, $type);
     }
 
     /**
      * Performs a SELECT query on the table, and returns a single row which
      * matches the current filter.
      *
-     * @param boolean $allowEmpty If set to false, the method will throw an 
-     * exception if no rows are found. If set to true, will return null in 
-     * this case.
-     *
      * @throws \Exception If multiple rows are found
      * @throws \Exception If no rows are found, and {@link $allowEmpty} is set
      * to false.
      */
-    public function single($allowEmpty = false)
+    public function single($type = DB::FETCH_OBJECT)
     {
-        $data = $this->fetch();
+        $data = $this->fetch($type);
         $count = count($data);
 
         if ($count > 1) {
             throw new \Exception("Query returned multiple rows ($count). Requested a single row.");
         }
 
-        if (!$allowEmpty && $count == 0) {
+        if ($count == 0) {
             throw new \Exception("Query returned 0 rows. Requested a single row.");
         }
 
@@ -167,47 +141,6 @@ class QuerySet
         }
 
         $this->order[] = "{$column} {$direction}";
-    }
-
-    private function constructQueries()
-    {
-        $columns = implode(", ", array_keys($this->meta->columns));
-        $table = $this->meta->table;
-
-        list($where, $args) = $this->constructWhere();
-        $order = $this->constructOrder();
-
-        $this->selectQuery = "SELECT {$columns} FROM {$table}{$where}{$order};";
-        $this->countQuery = "SELECT count(*) AS count FROM {$table}{$where};";
-        $this->args = $args;
-    }
-
-    /** Constructs an ORDER BY clause based on data in $this->order. */
-    private function constructOrder()
-    {
-        if (empty($this->order)) {
-            return "";
-        }
-        return " ORDER BY " . implode(', ', $this->order);
-    }
-
-    /** Constructs a WHERE clause based on data in $this->filters. */
-    private function constructWhere()
-    {
-        if (empty($this->filters)) {
-            return array("", array());
-        }
-
-        // Accumulate the where clauses and arguments from each filter
-        $where = array();
-        $args = array();
-        foreach ($this->filters as $filter) {
-            list($w, $a) = $filter->render($this->meta);
-            $where[] = $w;
-            $args = array_merge($args, $a);
-        }
-        $where = " WHERE " . implode(" AND ", $where);
-        return array($where, $args);
     }
 
     // ******************************************
