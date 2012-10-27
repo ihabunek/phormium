@@ -109,28 +109,43 @@ abstract class Model
         return $meta;
     }
 
+    /** Creates a Model instance from data in the given array. */
+    public static function fromArray($array)
+    {
+        $class = get_called_class();
+        $instance = new $class();
+
+        if (!is_array($array)) {
+            throw new \Exception("Given argument is not an array.");
+        }
+
+        foreach ($array as $name => $value) {
+            if (property_exists($instance, $name)) {
+                $instance->{$name} = $value;
+            } else {
+                throw new \Exception("Property [$name] does not exist in class [$class].");
+            }
+        }
+
+        return $instance;
+    }
+
+    /** Creates a Model instance from data in the given array. */
+    public static function fromJSON($json)
+    {
+        $array = json_decode($json);
+
+        $error = json_last_error();
+        if ($error !== JSON_ERROR_NONE) {
+            throw new \Exception("Invalid JSON string. Error code [$error].");
+        }
+
+        return self::fromArray($array);
+    }
+
     // ******************************************
     // *** Dynamics                           ***
     // ******************************************
-
-    public function __construct($data = null)
-    {
-        if (isset($data)) {
-
-            if (!is_array($data)) {
-                throw new \Exception("\$data must be an array");
-            }
-
-            foreach ($data as $name => $value) {
-                if (property_exists($this, $name)) {
-                    $this->$name = $value;
-                } else {
-                    $class = get_class($this);
-                    throw new \Exception("Property [$name] does not exist in class [$class].");
-                }
-            }
-        }
-    }
 
     /**
      * Saves the current Model.
