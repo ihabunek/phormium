@@ -26,7 +26,7 @@ class Aggregate
     {
         if (!in_array($type, $this->types)) {
             $types = implode(', ', $this->types);
-            throw new \Exception("Invalid aggrete type [$type]. Supported types: $types.");
+            throw new \Exception("Invalid aggregate type [$type]. Supported types: $types.");
         }
 
         $this->type = $type;
@@ -41,6 +41,11 @@ class Aggregate
     // ******************************************
     // *** Static factory methods             ***
     // ******************************************
+
+    public static function __callStatic($name, $args)
+    {
+        throw new \Exception("Invalid aggregate type [$name]");
+    }
 
     public static function avg($column)
     {
