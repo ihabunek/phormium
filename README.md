@@ -212,3 +212,35 @@ Person::objects()
     ->filter(f::between('id', 54, 57))
     ->fetch(DB::FETCH_JSON);
 ```
+
+Writing data
+------------
+
+### Creating objects
+
+To create a new record in `person`, just create a new `Person` object and `save()` it.
+
+```php
+// Create a new person and save it to the database
+$person = new Person();
+$person->name = "Frank Zappa";
+$person->birthday = "1940-12-20";
+$person->save();
+```
+
+If the primary key column is auto-incremented, it is not necessary to manually assign a value to it. The `save()` method will persist the object to the database and populate the primary key property of the Person object with the value assigned by the database.
+
+### Updating objects
+
+To change an existing record, fetch it from the database, make the required changes and call `save()`.
+
+```php
+// Fetch the newly created person from the database
+$person = Person::objects()
+    ->filter(f::pk(37))
+    ->single();
+
+// Perform a change and save
+$person->birthday = "1940-12-21";
+$person->save(); 
+```
