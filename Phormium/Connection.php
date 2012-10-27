@@ -138,9 +138,4 @@ class Connection
     {
         return $this->lastRowCount;
     }
-
-    public function getTables()
-    {
-        throw new \Exception("Not implemented.");
-    }
 }
