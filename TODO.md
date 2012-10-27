@@ -37,3 +37,36 @@ foreach(Person::objects() as $person)
     // do something
 }
 ```
+
+Make OR-able filters
+--------------------
+
+Currently all filters are joined with AND. Consider enabling OR operation on filters. 
+
+e.g. Perhaps something like:
+
+```php
+Person::objects()
+    ->filter(f::or(
+        f::gte('birthday', '2012-01-01'),
+        f::lt('birthday', '2011-01-01')
+    ))
+```
+
+e.g. Nesting of f::and() f::or()
+
+```php
+Person::objects()
+    ->filter(
+        f::or(
+            f::and(
+                f::gte('birthday', '2012-01-01'),
+                f::lt('income', 10000)
+            ),
+            f::and(
+                f::lt('birthday', '2012-01-01'),
+                f::gt('income', 10000)
+            )
+        )
+    )
+```
