@@ -18,22 +18,9 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         self::$meta->table = 'person';
         self::$meta->class = 'Phormium\\Tests\\Models\\Person';
         self::$meta->connection = 'testdb';
-        self::$meta->columns = array (
-            'id' => array ('name' => 'id'),
-            'name' => array ('name' => 'name'),
-            'email' => array ('name' => 'email'),
-            'birthday' => array ('name' => 'birthday'),
-            'created' => array ('name' => 'created'),
-            'income' => array ('name' => 'income'),
-        );
+        self::$meta->columns = array('id', 'name', 'email', 'birthday', 'created', 'income');
         self::$meta->pk = 'id';
-        self::$meta->nonPK = array(
-            'name',
-            'email',
-            'birthday',
-            'created',
-            'income',
-        );
+        self::$meta->nonPK = array('name', 'email', 'birthday', 'created', 'income');
 
         DB::configure(PHORMIUM_CONFIG_FILE);
     }

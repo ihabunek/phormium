@@ -132,7 +132,7 @@ class QuerySet
     private function addFilter(Filter $filter)
     {
         $column = $filter->column;
-        if (isset($filter->column) && !isset($this->meta->columns[$column])) {
+        if (isset($filter->column) && !in_array($column, $this->meta->columns)) {
             $table = $this->meta->table;
             throw new \Exception("Invalid filter: Column [$column] does not exist in table [$table].");
         }
@@ -145,7 +145,7 @@ class QuerySet
             throw new \Exception("Invalid direction given: [$direction]. Expected 'asc' or 'desc'.");
         }
 
-        if (!isset($this->meta->columns[$column])) {
+        if (!in_array($column, $this->meta->columns)) {
             $table = $this->meta->table;
             throw new \Exception("Cannot order by column [$column] because it does not exist in table [$table].");
         }

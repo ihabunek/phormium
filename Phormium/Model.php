@@ -12,32 +12,41 @@ abstract class Model
     // ******************************************
 
     /**
-     * Holds the model meta data.
-     * @var Meta
+     * User-populated meta-data. Used to construct a Meta object.
+     * @var array
      */
-    protected static $meta;
-
-    protected static $query;
+    protected static $_meta;
 
     /**
-     * Parses the model object to construct a meta.
+     * The Meta object contructed from Model properties and data in <var>$_meta</var>.
+     * @var Meta
+     */
+    protected static $_parsedMeta;
+
+    /**
+     * The Query object used to construct an execute SQL queries for this model.
+     * @var Query
+     */
+    protected static $_query;
+
+    /**
+     * Returns the Model's Meta object.
      * @return Meta
      */
     public static function getMeta()
     {
-        if (!isset(self::$meta)) {
-            $class = get_called_class(); // Late static binding in work
-            self::$meta = Parser::parse($class);
+        if (!isset(self::$_parsedMeta)) {
+            self::$_parsedMeta = self::parseMeta();
         }
-        return self::$meta;
+        return self::$_parsedMeta;
     }
 
     public static function getQuery()
     {
-        if (!isset(self::$query)) {
-            self::$query = new Query(self::getMeta());
+        if (!isset(self::$_query)) {
+            self::$_query = new Query(self::getMeta());
         }
-        return self::$query;
+        return self::$_query;
     }
 
     /**
@@ -48,6 +57,56 @@ abstract class Model
         $meta = self::getMeta();
         $query = self::getQuery();
         return new QuerySet($query, $meta);
+    }
+
+    protected static function parseMeta()
+    {
+        // Late static binding at work
+        $class = get_called_class();
+        $_meta = static::$_meta;
+
+        if (!is_array($_meta)) {
+            throw new \Exception("Invalid $class::\$_meta. Not an array.");
+        }
+
+        if (empty($_meta['database'])) {
+            throw new \Exception("Invalid $class::\$_meta. Missing 'database'.");
+        }
+
+        if (empty($_meta['table'])) {
+            throw new \Exception("Invalid $class::\$_meta. Missing 'table'.");
+        }
+
+        if (empty($_meta['pk'])) {
+            throw new \Exception("Invalid $class::\$_meta. Missing 'pk'.");
+        }
+
+        $meta = new Meta();
+        $meta->class = $class;
+        $meta->connection = $_meta['database'];
+        $meta->table = $_meta['table'];
+        $meta->pk = $_meta['pk'];
+        $meta->nonPK = array();
+        $meta->columns = array();
+
+        // Fetch class' public properties which correspond to column names
+        $rc = new \ReflectionClass($class);
+        $props = $rc->getProperties(\ReflectionProperty::IS_PUBLIC);
+
+        foreach ($props as $prop) {
+            $name = $prop->name;
+            $meta->columns[] = $name;
+            if ($name != $meta->pk) {
+                $meta->nonPK[] = $name;
+            }
+        }
+
+        // Check the given primary key exists as column
+        if (!in_array($meta->pk, $meta->columns)) {
+            throw new \Exception("Invalid $class::\$_meta. Given primary key [{$meta->pk}] is not a column.");
+        }
+
+        return $meta;
     }
 
     // ******************************************
@@ -95,14 +154,12 @@ abstract class Model
 
     public function insert()
     {
-        $query = self::getQuery();
-        return $query->insert($this);
+        return self::getQuery()->insert($this);
     }
 
     public function update()
     {
-        $query = self::getQuery();
-        return $query->update($this);
+        return self::getQuery()->update($this);
     }
 
     public function toJSON()

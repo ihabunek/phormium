@@ -2,70 +2,34 @@ Phormium Example using SQLite
 =============================
 Prerequisites for this example:
 * [sqlite](http://www.sqlite.org/) - to create a test database
-* [pdo_sqlite](http://php.net/manual/en/ref.pdo-sqlite.php) extension - for Phormium to connect to sqlite
+* [pdo_sqlite](http://php.net/manual/en/ref.pdo-sqlite.php) extension - for Phormium to connect to the test database
 
-Before running the example script, you need to create an sqlite database with a table and some data:
-```
-sqlite3 example.sq3 < model\person.sql
-```
+Before running the example script, you will need to create a sqlite database with a table and some data:
+
+    sqlite3 example.sq3 < person.sql
 
 This creates a database in `example.sq3`, and within it a table called `person` with some test data.
 
-Here's the code used to create the table:
-```
-CREATE TABLE person(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(100),
-    birthday DATE
-);
-```
+Database config file (config.json)
+----------------------------------
+You need a config file which defines your databases. These are contained in `config.json`.
 
-DB config file (config.json)
-----------------------------
-You need a config file which defines your database connections. These are contained in `config.json`.
-
-Only one connection is defined, for the database created above. The connection is named `myconnection`, this is later referenced when mapping objects to the database.
-
-Config file:
-```
-{
-    "myconnection": {
-        "dsn": "sqlite:example.sq3",
-        "username": "",
-        "password": ""
-    }
-}
-```
+You can use anything as the database name, you will use this name to reference the database in the model. In this example it's called `exampledb`.
 
 Entity class (Person.php)
 -------------------------
-To map the `person` table onto a PHP class, a corresponding class is created:
+To map the `person` table onto a PHP class, a corresponding Model class is needed, which must extend Phormium\Model. In this example, the class is called Person (can be named anything, but this is logical).
 
-```
-/**
- * @connection myconnection
- * @table person
- */
-class Person extends Phormium\Entity
-{
-    /** @pk */
-    public $id;
+Public properties of the Person class match the column names of the `person` database table.
 
-    public $name;
-
-    public $birthday;
-}
-```
-
-Public properties of the Person class should match the column names of the `person` database table.
-
-The required annotatios are:
-- @connection - determines which connection from `config.json` to use
-- @table - which table the class maps onto
-- @pk - set on the primary key column to enable fetching records by primary key
+Additionaly, a protected static $_meta property is required which holds an array with the following values:
+- connection - name of the database, as defined in `config.json`
+- table - name of the database table
+- pk - name of the primary key column (required, composite keys not supported)
 
 Examples
 --------
 Now run the provided example files:
 * example1.php
 * example2.php
+* example3.php

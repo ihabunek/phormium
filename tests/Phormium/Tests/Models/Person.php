@@ -2,13 +2,14 @@
 
 namespace Phormium\Tests\Models;
 
-/**
- * @connection testdb
- * @table person
- */
 class Person extends \Phormium\Model
 {
-    /** @pk */
+    protected static $_meta = array(
+        'database' => 'testdb',
+        'table' => 'person',
+        'pk' => 'id'
+    );
+
     public $id;
     public $name;
     public $email;

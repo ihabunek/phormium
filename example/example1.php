@@ -8,7 +8,7 @@ require '../Phormium/Autoloader.php';
 Phormium\Autoloader::register();
 
 // Include the database mappings
-require 'model/Person.php';
+require 'Person.php';
 
 use \Phormium\DB;
 use \Phormium\f;

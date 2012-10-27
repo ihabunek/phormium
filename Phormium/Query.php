@@ -31,7 +31,7 @@ class Query
      */
     public function select($filters, $order, $fetchType)
     {
-        $columns = implode(", ", array_keys($this->meta->columns));
+        $columns = implode(", ", $this->meta->columns);
         $table = $this->meta->table;
         $class = $this->meta->class;
 
@@ -76,7 +76,7 @@ class Query
         $type = $aggregate->type;
 
         $column = $aggregate->column;
-        if (!isset($this->meta->columns[$column])) {
+        if (!in_array($column, $this->meta->columns)) {
             throw new \Exception("Error forming aggregate query. Column [$column] does not exist in table [$table].");
         }
 
@@ -97,7 +97,7 @@ class Query
 
         // If PK is set, include it in query, otherwise skip for autogen to work
         if (isset($model->{$meta->pk})) {
-            $columns = array_keys($meta->columns);
+            $columns = $meta->columns;
         } else {
             $columns = $meta->nonPK;
         }
@@ -129,7 +129,6 @@ class Query
     public function update(Model $model)
     {
         $meta = $this->meta;
-        $columns = array_keys($meta->columns);
 
         // Just for safety
         if (empty($model->{$meta->pk})) {
