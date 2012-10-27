@@ -81,8 +81,9 @@ class Query
         }
 
         list($where, $args) = $this->constructWhere($filters);
+        $select = $aggregate->render();
 
-        $sql = "SELECT {$type}({$column}) as aggregate FROM {$table}{$where};";
+        $sql = "SELECT {$select} as aggregate FROM {$table}{$where};";
         $conn = DB::getConnection($this->meta->database);
         $data = $conn->execute($sql, $args, DB::FETCH_ARRAY);
         return $data[0]['aggregate'];
