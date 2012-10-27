@@ -2,6 +2,8 @@
 
 namespace Phormium\Tests;
 
+use \Phormium\a;
+use \Phormium\Aggregate;
 use \Phormium\f;
 use \Phormium\Meta;
 use \Phormium\QuerySet;
@@ -60,5 +62,65 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         $expected = array('name desc', 'id asc');
         $actual = $qs3->getOrder();
         self::assertSame($expected, $actual);
+    }
+
+    public function testAggregates()
+    {
+        // Create some sample data
+        $uniq = uniqid('agg');
+
+        $p1 = array(
+            'name' => "{$uniq}_1",
+            'birthday' => '2000-01-01',
+            'income' => 10000
+        );
+
+        $p2 = array(
+            'name' => "{$uniq}_2",
+            'birthday' => '2001-01-01',
+            'income' => 20000
+        );
+
+        $p3 = array(
+            'name' => "{$uniq}_3",
+            'birthday' => '2002-01-01',
+            'income' => 30000
+        );
+
+        Person::fromArray($p1)->save();
+        Person::fromArray($p2)->save();
+        Person::fromArray($p3)->save();
+
+        // Query set filtering the above created records
+        $qs = Person::objects()->filter(f::like('name', "$uniq%"));
+
+        $count = $qs->count();
+        self::assertSame(3, $count);
+
+        self::assertSame('2000-01-01', $qs->aggregate(a::min('birthday')));
+        self::assertSame('2002-01-01', $qs->aggregate(a::max('birthday')));
+
+        self::assertEquals(10000, $qs->aggregate(a::min('income')));
+        self::assertEquals(20000, $qs->aggregate(a::avg('income')));
+        self::assertEquals(60000, $qs->aggregate(a::sum('income')));
+        self::assertEquals(30000, $qs->aggregate(a::max('income')));
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Invalid aggregate type [foo]
+     */
+    public function testAggregatesFail1()
+    {
+        a::foo('bar');
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Invalid aggregate type [foo]
+     */
+    public function testAggregatesFail2()
+    {
+        new Aggregate('foo', 'bar');
     }
 }

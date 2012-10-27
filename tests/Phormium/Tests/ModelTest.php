@@ -74,7 +74,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testNewPersonFromArray()
     {
-        $p = new Person(
+        $p = Person::fromArray(
             array(
                 'name' => 'Peter Peterson',
                 'email' => 'peter@peterson.com'
@@ -115,7 +115,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             'income' => 12345.67
         );
 
-        $person = new Person($data);
+        $person = Person::fromArray($data);
         $person->save();
 
         // Expected JSON representation
@@ -132,11 +132,11 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage $data must be an array
+     * @expectedExceptionMessage Given argument is not an array
      */
     public function testInvalidData()
     {
-        $p = new Person('invalid data');
+        $p = Person::fromArray('invalid data');
     }
 
     /**
@@ -145,7 +145,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidProperty()
     {
-        $p = new Person(
+        $p = Person::fromArray(
             array(
                 'name' => 'Peter Peterson',
                 'xxx' => 'peter@peterson.com' // doesn't exist
