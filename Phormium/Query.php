@@ -59,7 +59,7 @@ class Query
         $sql = "SELECT COUNT(*) AS count FROM {$table}{$where};";
         $conn = DB::getConnection($this->meta->database);
         $data = $conn->execute($sql, $args, DB::FETCH_ARRAY);
-        return $data[0]['count'];
+        return (integer) $data[0]['count'];
     }
 
     /**
