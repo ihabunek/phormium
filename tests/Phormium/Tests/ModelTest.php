@@ -17,7 +17,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         self::$meta = new Meta();
         self::$meta->table = 'person';
         self::$meta->class = 'Phormium\\Tests\\Models\\Person';
-        self::$meta->connection = 'testdb';
+        self::$meta->database = 'testdb';
         self::$meta->columns = array('id', 'name', 'email', 'birthday', 'created', 'income');
         self::$meta->pk = 'id';
         self::$meta->nonPK = array('name', 'email', 'birthday', 'created', 'income');

@@ -83,7 +83,7 @@ abstract class Model
 
         $meta = new Meta();
         $meta->class = $class;
-        $meta->connection = $_meta['database'];
+        $meta->database = $_meta['database'];
         $meta->table = $_meta['table'];
         $meta->pk = $_meta['pk'];
         $meta->nonPK = array();

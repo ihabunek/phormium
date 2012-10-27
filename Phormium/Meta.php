@@ -10,8 +10,8 @@ class Meta
     /** Database table onto which the object is mapped. */
     public $table;
 
-    /** Connection to the database in which the table is located. */
-    public $connection;
+    /** The database in which the table is located (as defined in JSON config). */
+    public $database;
 
     /** Array of columns, and associated data. */
     public $columns;

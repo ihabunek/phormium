@@ -39,7 +39,7 @@ class Query
         $order = $this->constructOrder($order);
 
         $sql = "SELECT {$columns} FROM {$table}{$where}{$order};";
-        $conn = DB::getConnection($this->meta->connection);
+        $conn = DB::getConnection($this->meta->database);
         return $conn->execute($sql, $args, $fetchType, $class);
     }
 
@@ -57,7 +57,7 @@ class Query
         list($where, $args) = $this->constructWhere($filters);
 
         $sql = "SELECT COUNT(*) AS count FROM {$table}{$where};";
-        $conn = DB::getConnection($this->meta->connection);
+        $conn = DB::getConnection($this->meta->database);
         $data = $conn->execute($sql, $args, DB::FETCH_ARRAY);
         return $data[0]['count'];
     }
@@ -83,7 +83,7 @@ class Query
         list($where, $args) = $this->constructWhere($filters);
 
         $sql = "SELECT {$type}({$column}) as aggregate FROM {$table}{$where};";
-        $conn = DB::getConnection($this->meta->connection);
+        $conn = DB::getConnection($this->meta->database);
         $data = $conn->execute($sql, $args, DB::FETCH_ARRAY);
         return $data[0]['aggregate'];
     }
@@ -115,7 +115,7 @@ class Query
         $query .= implode(', ', array_fill(0, count($columns), '?'));
         $query .= ");";
 
-        $conn = DB::getConnection($meta->connection);
+        $conn = DB::getConnection($meta->database);
         $conn->executeNoFetch($query, $args);
 
         if (!isset($model->{$meta->pk})) {
@@ -151,7 +151,7 @@ class Query
         $query .= implode(', ', $updates);
         $query .= " WHERE {$meta->pk} = ?;";
 
-        $conn = DB::getConnection($meta->connection);
+        $conn = DB::getConnection($meta->database);
         $conn->executeNoFetch($query, $args);
         return $conn->getLastRowCount();
     }
