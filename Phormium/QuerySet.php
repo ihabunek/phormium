@@ -68,7 +68,7 @@ class QuerySet
     }
 
     // ******************************************
-    // *** Execute methods                    ***
+    // *** Query methods                      ***
     // ******************************************
 
     /**
@@ -123,6 +123,22 @@ class QuerySet
     public function aggregate(Aggregate $aggregate)
     {
         return $this->query->aggregate($this->filters, $aggregate);
+    }
+
+    /**
+     * Performs an UPDATE query on all records matching the current filter.
+     */
+    public function update($updates)
+    {
+        return $this->query->batchUpdate($this->filters, $updates);
+    }
+
+    /**
+     * DELETEs all records matching the current filter.
+     */
+    public function delete()
+    {
+        return $this->query->batchDelete($this->filters);
     }
 
     // ******************************************

@@ -176,6 +176,50 @@ class Query
         return $conn->getLastRowCount();
     }
 
+    /**
+     * Constructs and executes an UPDATE statement for all records matching
+     * the given filters.
+     */
+    public function batchUpdate($filters, $updates)
+    {
+        $updateBits = array();
+
+        // Check columns exist
+        foreach ($updates as $column => $value) {
+            if (!in_array($column, $this->meta->columns)) {
+                throw new \Exception("Column [$column] does not exist in table [{$this->meta->table}].");
+            }
+
+            $updateBits[] = "{$column} = ?";
+        }
+
+        list($where, $args) = $this->constructWhere($filters);
+        $args = array_merge(array_values($updates), $args);
+
+        $query  = "UPDATE {$this->meta->table} ";
+        $query .= "SET " . implode(', ', $updateBits);
+        $query .= $where;
+
+        $conn = DB::getConnection($this->meta->database);
+        $conn->executeNoFetch($query, $args);
+        return $conn->getLastRowCount();
+    }
+
+    /**
+     * Constructs and executes a DELETE statement for all records matching
+     * the given filters.
+     */
+    public function batchDelete($filters)
+    {
+        list($where, $args) = $this->constructWhere($filters);
+
+        $query = "DELETE FROM {$this->meta->table}{$where}";
+
+        $conn = DB::getConnection($this->meta->database);
+        $conn->executeNoFetch($query, $args);
+        return $conn->getLastRowCount();
+    }
+    
     // ******************************************
     // *** Private methods                    ***
     // ******************************************
