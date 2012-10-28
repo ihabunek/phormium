@@ -219,7 +219,7 @@ class Query
         $conn->executeNoFetch($query, $args);
         return $conn->getLastRowCount();
     }
-    
+
     // ******************************************
     // *** Private methods                    ***
     // ******************************************
