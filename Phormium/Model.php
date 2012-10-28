@@ -177,8 +177,18 @@ abstract class Model
         return self::getQuery()->update($this);
     }
 
+    public function delete()
+    {
+        return self::getQuery()->delete($this);
+    }
+
     public function toJSON()
     {
         return json_encode($this);
+    }
+
+    public function toArray()
+    {
+        return (array) $this;
     }
 }

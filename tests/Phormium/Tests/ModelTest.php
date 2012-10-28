@@ -152,4 +152,20 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             )
         );
     }
+
+    public function testDelete()
+    {
+        $p = new Person();
+        $p->name = 'Short Lived Person';
+        $p->save();
+        
+        $qs = Person::objects()->filter(f::pk($p->id));
+        
+        $p2 = $qs->single();
+        self::assertEquals($p, $p2);
+        
+        self::assertSame(1, $qs->count());
+        $p->delete();
+        self::assertSame(0, $qs->count());
+    }
 }

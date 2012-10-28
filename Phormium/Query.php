@@ -157,6 +157,25 @@ class Query
         return $conn->getLastRowCount();
     }
 
+    /**
+     * Deletes a single model from the database.
+     */
+    public function delete(Model $model)
+    {
+        $pk = $this->meta->pk;
+
+        if (empty($model->{$pk})) {
+            throw new \Exception("Cannot delete a model without the primary key field set.");
+        }
+
+        $query = "DELETE FROM {$this->meta->table} WHERE {$pk} = ?";
+        $args = array($model->{$pk});
+
+        $conn = DB::getConnection($this->meta->database);
+        $conn->executeNoFetch($query, $args);
+        return $conn->getLastRowCount();
+    }
+
     // ******************************************
     // *** Private methods                    ***
     // ******************************************

@@ -242,5 +242,19 @@ $person = Person::objects()
 
 // Perform a change and save
 $person->birthday = "1940-12-21";
-$person->save(); 
+$person->save();
+```
+
+### Deleting objects
+
+Similar for deleting records.
+
+```php
+// Fetch a person from the database
+$person = Person::objects()
+    ->filter(f::pk(37))
+    ->single();
+
+// Delete person
+$person->delete();
 ```
