@@ -19,7 +19,7 @@ Start the Composer install procedure:
 
     php composer.phar install
 
-Phormium will be installed in `vendor/ihabunek/phormium`.
+Phormium will be installed in `vendor/phormium/phormium`.
 
 In your code, include `vendor/autoload.php` to get access to Phormium classes.
 
@@ -27,7 +27,8 @@ In your code, include `vendor/autoload.php` to get access to Phormium classes.
 require 'vendor/autoload.php';
 ```
 
-### Clone from Github
+Clone from Github
+-----------------
 
 Clone the source into `phormium` directory:
 
