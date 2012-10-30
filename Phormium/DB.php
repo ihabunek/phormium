@@ -36,10 +36,24 @@ class DB
     );
 
     /**
-     * Loads connection setttings from the provided config file.
-     * @param string $env Path to the JSON encoded configuration file.
+     * Configures database definitions.
+     *
+     * @param string|array $config Either a path to the JSON encoded
+     *      configuration file, or the configuration as an array.
      */
-    public static function configure($path)
+    public static function configure($config)
+    {
+        if (is_array($config)) {
+            self::$config = $config;
+        } elseif (is_string($config)) {
+            self::$config = self::parseConfigFile($config);
+        } else {
+            throw new \InvalidArgumentException("Configuration should be array or path to config file.");
+        }
+    }
+
+    /** Parses a JSON configuration file and returns config as an array. */
+    private static function parseConfigFile($path)
     {
         if (!file_exists($path)) {
             throw new \Exception("Config file not found at [$path].");
@@ -60,7 +74,7 @@ class DB
             throw new \Exception("Failed parsing json config file: $errorText");
         }
 
-        self::$config = $config;
+        return $config;
     }
 
     /**
@@ -81,7 +95,7 @@ class DB
 
         $config = self::$config[$name];
 
-        self::$connections[$name] = new Connection($name, $config);
+        self::$connections[$name] = new Connection($config);
 
         return self::$connections[$name];
     }

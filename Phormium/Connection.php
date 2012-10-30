@@ -12,9 +12,6 @@ use \PDO;
  */
 class Connection
 {
-    /** Connection name. */
-    private $name;
-
     /**
      * The Data Source Name.
      * @see http://www.php.net/manual/en/pdo.construct.php
@@ -33,16 +30,18 @@ class Connection
      */
     private $pdo;
 
+    /** Holds inserted ID of the last executed query. */
     private $lastInsertID;
+
+    /** Holds row count of the last executed query. */
     private $lastRowCount;
 
-    public function __construct($name, $config)
+    public function __construct($config)
     {
         if (empty($config['dsn'])) {
             throw new \Exception("Invalid configuration for database [$name]: DSN not specified.");
         }
 
-        $this->name = $name;
         $this->dsn = $config['dsn'];
         $this->username = isset($config['username']) ? $config['username'] : null;
         $this->password = isset($config['password']) ? $config['password'] : null;
@@ -52,7 +51,7 @@ class Connection
      * Returns the underlying PDO connection. Creates it if it doesn't yet exist.
      * @return PDO
      */
-    private function getPDO()
+    public function getPDO()
     {
         if (!isset($this->pdo)) {
             // Establish a connection
@@ -71,7 +70,7 @@ class Connection
     /**
      * Prepares and executes a query and fetches all returned data.
      * @return array An array of either objects, arrays or strings, depending
-     *  on the fetch type.
+     *      on the fetch type.
      */
     public function execute($query, $args = array(), $fetchType = DB::FETCH_OBJECT, $class = null)
     {
