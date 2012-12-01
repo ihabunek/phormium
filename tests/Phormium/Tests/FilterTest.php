@@ -99,13 +99,13 @@ class FilterTest extends \PHPUnit_Framework_TestCase
         $filter->render($this->meta);
     }
 
-    public function testPK()
-    {
-        $filter = f::pk(1);
-        $actual = $filter->render($this->meta);
-        $expected = array("id = ?", array(1));
-        self::assertSame($expected, $actual);
-    }
+    // public function testPK()
+    // {
+        // $filter = f::pk(1);
+        // $actual = $filter->render($this->meta);
+        // $expected = array("id = ?", array(1));
+        // self::assertSame($expected, $actual);
+    // }
 
     public function testIsNull()
     {

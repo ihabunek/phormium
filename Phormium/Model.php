@@ -77,36 +77,58 @@ abstract class Model
             throw new \Exception("Invalid $class::\$_meta. Missing 'table'.");
         }
 
-        if (empty($_meta['pk'])) {
-            throw new \Exception("Invalid $class::\$_meta. Missing 'pk'.");
-        }
-
         $meta = new Meta();
         $meta->class = $class;
         $meta->database = $_meta['database'];
         $meta->table = $_meta['table'];
-        $meta->pk = $_meta['pk'];
-        $meta->nonPK = array();
+        $meta->pk = self::parsePK($_meta);
         $meta->columns = array();
 
         // Fetch class' public properties which correspond to column names
         $rc = new \ReflectionClass($class);
         $props = $rc->getProperties(\ReflectionProperty::IS_PUBLIC);
-
         foreach ($props as $prop) {
-            $name = $prop->name;
-            $meta->columns[] = $name;
-            if ($name != $meta->pk) {
-                $meta->nonPK[] = $name;
+            $meta->columns[] = $prop->name;
+        }
+
+        if (isset($meta->pk)) {
+
+            // Verify primary key columns exist
+            foreach ($meta->pk as $column) {
+                if (!in_array($column, $meta->columns)) {
+                    throw new \Exception(
+                        "Invalid $class::\$_meta. Given primary key column [{$column}] does not exist."
+                    );
+                }
+            }
+
+            // Compile non-pk columns
+            $meta->nonPK = array();
+            foreach ($meta->columns as $column) {
+                if (!in_array($column, $meta->pk)) {
+                    $meta->nonPK[] = $column;
+                }
             }
         }
 
-        // Check the given primary key exists as column
-        if (!in_array($meta->pk, $meta->columns)) {
-            throw new \Exception("Invalid $class::\$_meta. Given primary key [{$meta->pk}] is not a column.");
+        return $meta;
+    }
+
+    private static function parsePK($meta)
+    {
+        if (!isset($meta['pk'])) {
+            return null;
         }
 
-        return $meta;
+        if (is_string($meta['pk'])) {
+            return array($meta['pk']);
+        }
+
+        if (is_array($meta['pk'])) {
+            return $meta['pk'];
+        }
+
+        throw new \Exception("Invalid {$meta['class']}::\$_meta['pk']. Not a string or array.");
     }
 
     /** Creates a Model instance from data in the given array. */
@@ -140,6 +162,10 @@ abstract class Model
             throw new \Exception("Invalid JSON string. Error code [$error].");
         }
 
+        if (is_object($array)) {
+            $array = (array) $array;
+        }
+
         return self::fromArray($array);
     }
 
@@ -155,8 +181,21 @@ abstract class Model
     {
         $meta = self::getMeta();
 
+        if (!isset($meta->pk)) {
+            throw new \Exception("Model not writable because primary key is not defined in _meta.");
+        }
+
+        // Check if all primary key columns are populated
+        $pkSet = true;
+        foreach ($meta->pk as $col) {
+            if (empty($this->{$col})) {
+                $pkSet = false;
+                break;
+            }
+        }
+
         // If primary key value is not set, do an INSERT
-        if (empty($this->{$meta->pk})) {
+        if (!$pkSet) {
             $this->insert();
         } else {
             // Otherwise, try to UPDATE, and if nothing is updated then INSERT
@@ -165,6 +204,19 @@ abstract class Model
                 $this->insert();
             }
         }
+    }
+
+    /**
+     * Returns the PK columns with their values as an associative array.
+     */
+    public function getPK()
+    {
+        $meta = self::getMeta();
+        $pk = array();
+        foreach ($meta->pk as $column) {
+            $pk[$column] = $this->{$column};
+        }
+        return $pk;
     }
 
     public function insert()

@@ -19,9 +19,9 @@ class Meta
     /** The name of the class onto which the table is mapped. */
     public $class;
 
-    /** Name of the primary key database column. */
+    /** Array of columns which form the primary key. If not set, the model will not be writable. */
     public $pk;
 
-    /** Array of all columns except the primary key column. */
+    /** Array of all columns except the primary key column. Only populated if pk is set. */
     public $nonPK;
 }

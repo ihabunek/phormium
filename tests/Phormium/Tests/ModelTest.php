@@ -7,6 +7,7 @@ use \Phormium\f;
 use \Phormium\Meta;
 use \Phormium\QuerySet;
 use \Phormium\Tests\Models\Person;
+use \Phormium\Tests\Models\Trade;
 
 class ModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,7 +20,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         self::$meta->class = 'Phormium\\Tests\\Models\\Person';
         self::$meta->database = 'testdb';
         self::$meta->columns = array('id', 'name', 'email', 'birthday', 'created', 'income');
-        self::$meta->pk = 'id';
+        self::$meta->pk = array('id');
         self::$meta->nonPK = array('name', 'email', 'birthday', 'created', 'income');
 
         DB::configure(PHORMIUM_CONFIG_FILE);
@@ -56,12 +57,15 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     {
         $id = 100;
 
+        // Delete if person id 100 already exists
+        Person::objects()->filter(f::pk(100))->delete();
+
         $p = new Person();
         $p->id = $id;
         $p->name = 'Test Person';
         $p->email = 'test.person@example.com';
-
         $p->save();
+
         self::assertEquals($id, $p->id);
 
         // Load it from the database
@@ -128,6 +132,33 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             ->single(DB::FETCH_JSON);
 
         self::assertSame($expected, $dbJSON);
+    }
+
+    public function testFromJSON()
+    {
+        $actual = Person::fromJSON(
+            '{"id":"101","name":"Jack Jackson","email":"jack@jackson.org","birthday":"1980-03-14",' .
+            '"created":"2000-03-07 10:45:13","income":"12345.67"}'
+        );
+
+        $expected = new Person();
+        $expected->id = 101;
+        $expected->name = 'Jack Jackson';
+        $expected->email = 'jack@jackson.org';
+        $expected->birthday = '1980-03-14';
+        $expected->created = '2000-03-07 10:45:13';
+        $expected->income = 12345.67;
+
+        self::assertEquals($expected, $actual);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Invalid JSON string
+     */
+    public function testFromJSONError()
+    {
+        Person::fromJSON('[[[');
     }
 
     /**

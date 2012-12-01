@@ -56,7 +56,7 @@ class Filter
             case self::OP_LESSER_OR_EQUAL:
                 return $this->renderSimple($this->column, $this->operation, $this->value);
             case self::OP_PK_EQUALS:
-                return $this->renderSimple($meta->pk, self::OP_EQUALS, $this->value);
+                return $this->renderPK($meta->pk, $this->value);
             case self::OP_IN:
                 return $this->renderIn($this->column, $this->value);
             case self::OP_NOT_IN:
@@ -143,6 +143,22 @@ class Filter
         return array($where, array());
     }
 
+    private function renderPK($pkColumns, $values)
+    {
+        if (count($values) !== count($pkColumns)) {
+            throw new \Exception("Number of values does not match the number of PK columns.");
+        }
+
+        $args = array();
+        $where = array();
+        foreach ($pkColumns as $key => $column) {
+            $args[] = $values[$key];
+            $where[] = "{$column} = ?";
+        }
+        $where = implode(' AND ', $where);
+        return array($where, $args);
+    }
+
     // ******************************************
     // *** Static factory methods             ***
     // ******************************************
@@ -152,9 +168,20 @@ class Filter
         throw new \Exception("Filter [$name] is not implemented.");
     }
 
-    public static function pk($value)
+    public static function pk()
     {
-        return new Filter(Filter::OP_PK_EQUALS, null, $value);
+        $num = func_num_args();
+
+        if ($num == 1) {
+            $arg = func_get_arg(0);
+            $values = is_array($arg) ? array_values($arg) : array($arg);
+        } elseif ($num > 1) {
+            $values = func_get_args();
+        } else {
+            throw new \Exception("Filter pk requires at least one argument.");
+        }
+
+        return new Filter(Filter::OP_PK_EQUALS, null, $values);
     }
 
     public static function eq($column, $value)
