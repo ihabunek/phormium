@@ -76,7 +76,7 @@ class Connection
     {
         $pdo = $this->getPDO();
 
-        // echo "Preparing query: $query\n";
+        // echo "\nPreparing query: $query\n";
         $stmt = $pdo->prepare($query);
 
         // echo "Executing query with args: " . implode(', ', $args) . "\n";
@@ -117,7 +117,7 @@ class Connection
     {
         $pdo = $this->getPDO();
 
-        // echo "Preparing query: $query\n";
+        // echo "\nPreparing query: $query\n";
         $stmt = $pdo->prepare($query);
 
         // echo "Executing query with args: " . implode(', ', $args) . "\n";
@@ -126,6 +126,8 @@ class Connection
         $this->lastInsertID = $pdo->lastInsertId();
         $this->lastRowCount = $stmt->rowCount();
         $stmt->closeCursor();
+
+        // echo "Finished execution, rowCount: {$this->lastRowCount}, lastInsertID: {$this->lastInsertID}\n";
     }
 
     public function getLastInsertID()
