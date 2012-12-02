@@ -64,6 +64,8 @@ class Parser
                     $meta->nonPK[] = $column;
                 }
             }
+        } else {
+            $meta->nonPK = $meta->columns;
         }
 
         return $meta;

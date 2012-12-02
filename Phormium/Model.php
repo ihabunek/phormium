@@ -125,6 +125,11 @@ abstract class Model
     public function getPK()
     {
         $meta = self::getMeta();
+
+        if (!isset($meta->pk)) {
+            return array();
+        }
+
         $pk = array();
         foreach ($meta->pk as $column) {
             $pk[$column] = $this->{$column};

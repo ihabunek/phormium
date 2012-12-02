@@ -151,6 +151,10 @@ class Query
     {
         $meta = $this->meta;
 
+        if (!isset($meta->pk)) {
+            throw new \Exception("Cannot update, model does not have a primary key defined in _meta.");
+        }
+
         // All pk fields must be set to attempt an update
         foreach ($meta->pk as $column) {
             if (!isset($model->{$column})) {
