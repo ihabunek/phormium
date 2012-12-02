@@ -6,10 +6,10 @@ namespace Phormium\Tests\Models;
  * A stock exchange trade.
  * Demonstrates usage of composite primary key.
  */
-class Trade extends Phormium\Model
+class Trade extends \Phormium\Model
 {
     protected static $_meta = array(
-        'database' => 'exampledb',
+        'database' => 'testdb',
         'table' => 'trade',
         'pk' => array('tradedate', 'tradeno')
     );

@@ -8,17 +8,19 @@ use \Phormium\f;
 
 class FilterTest extends \PHPUnit_Framework_TestCase
 {
-    private $meta;
+    private $metaPerson;
+    private $metaTrade;
 
     public function setUp()
     {
-        $this->meta = Models\Person::getMeta();
+        $this->metaPerson = Models\Person::getMeta();
+        $this->metaTrade = Models\Trade::getMeta();
     }
 
     public function testEq()
     {
         $filter = f::eq('test', 1);
-        $actual = $filter->render($this->meta);
+        $actual = $filter->render($this->metaPerson);
         $expected = array("test = ?", array(1));
         self::assertSame($expected, $actual);
     }
@@ -26,7 +28,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     public function testNeq()
     {
         $filter = f::neq('test', 1);
-        $actual = $filter->render($this->meta);
+        $actual = $filter->render($this->metaPerson);
         $expected = array("test <> ?", array(1));
         self::assertSame($expected, $actual);
     }
@@ -34,7 +36,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     public function testGt()
     {
         $filter = f::gt('test', 1);
-        $actual = $filter->render($this->meta);
+        $actual = $filter->render($this->metaPerson);
         $expected = array("test > ?", array(1));
         self::assertSame($expected, $actual);
     }
@@ -42,7 +44,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     public function testGte()
     {
         $filter = f::gte('test', 1);
-        $actual = $filter->render($this->meta);
+        $actual = $filter->render($this->metaPerson);
         $expected = array("test >= ?", array(1));
         self::assertSame($expected, $actual);
     }
@@ -50,7 +52,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     public function testLt()
     {
         $filter = f::lt('test', 1);
-        $actual = $filter->render($this->meta);
+        $actual = $filter->render($this->metaPerson);
         $expected = array("test < ?", array(1));
         self::assertSame($expected, $actual);
     }
@@ -58,7 +60,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     public function testLte()
     {
         $filter = f::lte('test', 1);
-        $actual = $filter->render($this->meta);
+        $actual = $filter->render($this->metaPerson);
         $expected = array("test <= ?", array(1));
         self::assertSame($expected, $actual);
     }
@@ -66,7 +68,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     public function testIn()
     {
         $filter = f::in('test', array(1, 2, 3));
-        $actual = $filter->render($this->meta);
+        $actual = $filter->render($this->metaPerson);
         $expected = array("test IN (?, ?, ?)", array(1, 2, 3));
         self::assertSame($expected, $actual);
     }
@@ -78,13 +80,13 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     public function testInWrongParam()
     {
         $filter = new Filter(Filter::OP_IN, 'test', 1);
-        $filter->render($this->meta);
+        $filter->render($this->metaPerson);
     }
 
     public function testNotIn()
     {
         $filter = f::nin('test', array(1, 2, 3));
-        $actual = $filter->render($this->meta);
+        $actual = $filter->render($this->metaPerson);
         $expected = array("test NOT IN (?, ?, ?)", array(1, 2, 3));
         self::assertSame($expected, $actual);
     }
@@ -96,21 +98,31 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     public function testNotInWrongParam()
     {
         $filter = new Filter(Filter::OP_NOT_IN, 'test', 1);
-        $filter->render($this->meta);
+        $filter->render($this->metaPerson);
     }
 
-    // public function testPK()
-    // {
-        // $filter = f::pk(1);
-        // $actual = $filter->render($this->meta);
-        // $expected = array("id = ?", array(1));
-        // self::assertSame($expected, $actual);
-    // }
+    public function testPK()
+    {
+        $filter = f::pk(1);
+        $actual = $filter->render($this->metaPerson);
+        $expected = array("id = ?", array(1));
+        self::assertSame($expected, $actual);
+        
+        $filter = f::pk(array(1));
+        $actual = $filter->render($this->metaPerson);
+        $expected = array("id = ?", array(1));
+        self::assertSame($expected, $actual);
 
+        $filter = f::pk('foo', 'bar');
+        $actual = $filter->render($this->metaTrade);
+        $expected = array("tradedate = ? AND tradeno = ?", array('foo', 'bar'));
+        self::assertSame($expected, $actual);
+    }
+    
     public function testIsNull()
     {
         $filter = f::isNull('test');
-        $actual = $filter->render($this->meta);
+        $actual = $filter->render($this->metaPerson);
         $expected = array("test IS NULL", array());
         self::assertSame($expected, $actual);
     }
@@ -118,7 +130,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     public function testNotNull()
     {
         $filter = f::notNull('test');
-        $actual = $filter->render($this->meta);
+        $actual = $filter->render($this->metaPerson);
         $expected = array("test IS NOT NULL", array());
         self::assertSame($expected, $actual);
     }
@@ -126,7 +138,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     public function testLike()
     {
         $filter = f::like('test', '%foo%');
-        $actual = $filter->render($this->meta);
+        $actual = $filter->render($this->metaPerson);
         $expected = array("test LIKE ?", array('%foo%'));
         self::assertSame($expected, $actual);
     }
@@ -134,7 +146,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     public function testNotLike()
     {
         $filter = f::notLike('test', '%bar%');
-        $actual = $filter->render($this->meta);
+        $actual = $filter->render($this->metaPerson);
         $expected = array("test NOT LIKE ?", array('%bar%'));
         self::assertSame($expected, $actual);
     }
@@ -142,7 +154,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     public function testBetween()
     {
         $filter = f::between('test', 10, 20);
-        $actual = $filter->render($this->meta);
+        $actual = $filter->render($this->metaPerson);
         $expected = array("test BETWEEN ? AND ?", array(10, 20));
         self::assertSame($expected, $actual);
     }
@@ -154,7 +166,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     public function testBetweenWrongParam1()
     {
         $filter = new Filter(Filter::OP_BETWEEN, 'test', 1);
-        $filter->render($this->meta);
+        $filter->render($this->metaPerson);
     }
 
     /**
@@ -164,7 +176,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     public function testBetweenWrongParam2()
     {
         $filter = new Filter(Filter::OP_BETWEEN, 'test', array(1));
-        $filter->render($this->meta);
+        $filter->render($this->metaPerson);
     }
 
     /**
@@ -183,6 +195,6 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     public function testUnknownOp2()
     {
         $filter = new Filter('foo', 'test', 1);
-        $filter->render($this->meta);
+        $filter->render($this->metaPerson);
     }
 }

@@ -17,3 +17,10 @@ CREATE TABLE trade(
     quantity INTEGER,
     PRIMARY KEY(tradedate, tradeno)
 );
+
+DROP TABLE IF EXISTS pkless;
+CREATE TABLE pkless (
+    foo VARCHAR(20),
+    bar VARCHAR(20),
+    baz VARCHAR(20)
+);
