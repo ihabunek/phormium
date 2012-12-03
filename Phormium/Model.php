@@ -65,6 +65,18 @@ abstract class Model
         return $instance;
     }
 
+    /**
+     * Fetches a single record by primary key; shorthand method.
+     * @param mixed The primary key, can be more than 1 param for composite keys.
+     */
+    public static function get()
+    {
+        $args = func_get_args();
+        return self::objects()
+            ->filter(f::pk($args))
+            ->single();
+    }
+
     /** Creates a Model instance from data in the given array. */
     public static function fromJSON($json)
     {
