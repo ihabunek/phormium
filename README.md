@@ -58,9 +58,8 @@ CREATE TABLE person (
 );
 ```
 
-There are two conditions:
-* the table must have a primary key (it does not have to be auto-incremental though)
-* composite primary keys are not (yet) supported
+The table does not have to have a primary key, but if it doesn't the model will not perform
+update or delete queries.
 
 ### Create a Model class
 
@@ -92,7 +91,7 @@ values:
 
 - database - name of the database, as defined in `config.json`
 - table - name of the database table
-- pk - name of the primary key column (required, composite keys not supported)
+- pk - name of the primary key column (or an array of names for composite primary keys)
 
 Now that a database table and the corresponding PHP model are created, we can begin using Phormium.
 
