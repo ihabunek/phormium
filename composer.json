@@ -8,9 +8,7 @@
     "authors": [
         {
             "name": "Ivan Habunek",
-            "email": "ivan.habunek@gmail.com",
-            "homepage": "https://github.com/ihabunek",
-            "role": "Developer"
+            "email": "ivan.habunek@gmail.com"
         }
     ],
     "require": {
@@ -23,7 +21,7 @@
         "phing/phing": "dev-master"
     },
     "autoload": {
-        "psr-0": {"Phormium": "./"}
+        "psr-0": {"Phormium": "src/"}
     },
     "support": {
         "issues": "https://github.com/ihabunek/phormium/issues"
