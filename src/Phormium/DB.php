@@ -66,12 +66,29 @@ class DB
 
         // Decode json to array
         $config = json_decode($json, true);
-
         $errorCode = json_last_error();
         if ($errorCode !== JSON_ERROR_NONE) {
             $errorText = isset(self::$jsonErrors[$errorCode]) ?
                 self::$jsonErrors[$errorCode] : "Unknown error code [$errorCode]";
             throw new \Exception("Failed parsing json config file: $errorText");
+        }
+
+        // Check the config
+        if (!is_array($config)) {
+            throw new \Exception("Configuration is not an array.");
+        }
+
+        foreach ($config as $name => &$values) {
+            if (!isset($values['dsn'])) {
+                throw new \Exception("Invalid configuration. Missing 'dsn' for database [$name].");
+            }
+
+            // Parse the PDO driver from the DSN
+            $values['dsn'] = trim($values['dsn']);
+            if (!preg_match('/^([a-z]+):/', $values['dsn'], $matches)) {
+                throw new \Exception("Invalid dsn for [$name]. Should start with \"<driver>:\"");
+            }
+            $values['driver'] = $matches[1];
         }
 
         return $config;
@@ -94,9 +111,14 @@ class DB
         }
 
         $config = self::$config[$name];
+        $connection = new Connection($config);
 
-        self::$connections[$name] = new Connection($config);
+        self::$connections[$name] = $connection;
+        return $connection;
+    }
 
-        return self::$connections[$name];
+    public static function getConnectionConfig($name)
+    {
+        return isset(self::$config[$name]) ? self::$config[$name] : null;
     }
 }

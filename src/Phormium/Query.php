@@ -13,8 +13,13 @@ class Query
      */
     private $meta;
 
+    /** The database driver used. Used to tailor custom queries when needed.*/
+    private $driver;
+
     public function __construct(Meta $meta)
     {
+        $dbConfig = DB::getConnectionConfig($meta->database);
+        $this->driver = $dbConfig['driver'];
         $this->meta = $meta;
     }
 
