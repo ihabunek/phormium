@@ -121,4 +121,21 @@ class DB
     {
         return isset(self::$config[$name]) ? self::$config[$name] : null;
     }
+
+    public static function disconnect($name)
+    {
+        if (!isset(self::$connections[$name])) {
+            trigger_error("Disconnect called for a non-connected connection [$name].", E_USER_WARNING);
+            return;
+        }
+        unset(self::$connections[$name]);
+    }
+
+    public static function disconnectAll()
+    {
+        foreach(self::$connections as $connection) {
+            $connection->disconnect();
+        }
+        self::$connections = array();
+    }
 }
