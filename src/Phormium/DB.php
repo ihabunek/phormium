@@ -22,6 +22,9 @@ class DB
     /** An array of established database connections. */
     private static $connections;
 
+    /** Whether to log queries */
+    public static $log = false;
+
     /**
      * Human readable JSON error descriptions.
      * Literals are used instead of JSON_ERROR_* constants to have backward

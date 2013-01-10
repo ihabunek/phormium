@@ -76,10 +76,10 @@ class Connection
     {
         $pdo = $this->getPDO();
 
-        // echo "\nPreparing query: $query\n";
+        $this->logPrepare($query);
         $stmt = $pdo->prepare($query);
 
-        // echo "Executing query with args: " . implode(', ', $args) . "\n";
+        $this->logExecute($args);
         $stmt->execute($args);
 
         // Fetch into objects
@@ -107,6 +107,7 @@ class Connection
         $this->lastRowCount = $stmt->rowCount();
 
         $stmt->closeCursor();
+        $this->logFinished();
         return $data;
     }
 
@@ -117,17 +118,16 @@ class Connection
     {
         $pdo = $this->getPDO();
 
-        // echo "\nPreparing query: $query\n";
+        $this->logPrepare($query);
         $stmt = $pdo->prepare($query);
 
-        // echo "Executing query with args: " . implode(', ', $args) . "\n";
+        $this->logExecute($args);
         $stmt->execute($args);
 
         $this->lastInsertID = $pdo->lastInsertId();
         $this->lastRowCount = $stmt->rowCount();
         $stmt->closeCursor();
-
-        // echo "Finished execution, rowCount: {$this->lastRowCount}, lastInsertID: {$this->lastInsertID}\n";
+        $this->logFinished();
     }
 
     public function getLastInsertID()
@@ -138,5 +138,28 @@ class Connection
     public function getLastRowCount()
     {
         return $this->lastRowCount;
+    }
+
+    private function logPrepare($query)
+    {
+        if (DB::$log) {
+            echo date('Y-m-d H:i:s') . " Preparing query: $query\n";
+        }
+    }
+
+    private function logExecute($args)
+    {
+        if (DB::$log) {
+            echo date('Y-m-d H:i:s') . " Executing query with args: ";
+            var_export($args);
+            echo "\n";
+        }
+    }
+
+    private function logFinished()
+    {
+        if (DB::$log) {
+            echo date('Y-m-d H:i:s') . " Finished execution, rowCount: {$this->lastRowCount}, lastInsertID: {$this->lastInsertID}\n";
+        }
     }
 }
