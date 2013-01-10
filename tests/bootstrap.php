@@ -17,7 +17,7 @@ if (file_exists($dbPath)) {
 
 $pdo = new PDO("sqlite:$dbPath");
 
-$sqlPath = __DIR__ . '/travis/sqlite.setup.sql';
+$sqlPath = __DIR__ . '/travis/sqlite/setup.sql';
 $sql = file_get_contents($sqlPath);
 $pdo->exec($sql);
 unset($pdo);

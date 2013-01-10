@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpunit bootstrap="../bootstrap.php" colors="true">
+    <testsuite name="Phormium test suite">
+        <directory>../../../tests/Phormium/Tests</directory>
+    </testsuite>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">Phormium</directory>
+        </whitelist>
+    </filter>
+    <php>
+        <const name="PHORMIUM_CONFIG_FILE" value="tests/travis/postgres/config.json"/>
+    </php>
+</phpunit>

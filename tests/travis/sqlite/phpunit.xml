@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<phpunit bootstrap="bootstrap.php" colors="true">
+<phpunit bootstrap="../bootstrap.php" colors="true">
     <testsuite name="Phormium test suite">
-        <directory>../../tests/Phormium/Tests</directory>
+        <directory>../../../tests/Phormium/Tests</directory>
     </testsuite>
     <filter>
         <whitelist>
@@ -9,6 +9,6 @@
         </whitelist>
     </filter>
     <php>
-        <const name="PHORMIUM_CONFIG_FILE" value="tests/travis/mysql.config.json"/>
+        <const name="PHORMIUM_CONFIG_FILE" value="tests/travis/sqlite/config.json"/>
     </php>
 </phpunit>
