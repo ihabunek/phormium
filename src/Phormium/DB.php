@@ -13,9 +13,6 @@ class DB
     /** Specifies that the fetch method should return each row as an object. */
     const FETCH_OBJECT = 2;
 
-    /** Specifies that the fetch method should return each row as a json encoded object. */
-    const FETCH_JSON = 3;
-
     /** The loaded configuration. */
     private static $config;
 

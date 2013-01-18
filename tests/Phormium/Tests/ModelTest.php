@@ -134,32 +134,6 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         self::assertEquals($id, $p3->id);
     }
 
-    public function testJSON()
-    {
-        $data = array(
-            'id' => 101,
-            'name' => 'Jack Jackson',
-            'email' => 'jack@jackson.org',
-            'birthday' => '1980-03-14',
-            'created' => '2000-03-07 10:45:13',
-            'income' => 12345.67
-        );
-
-        $person = Person::fromArray($data);
-        $person->save();
-
-        // Expected JSON representation
-        $expected = '{"id":"101","name":"Jack Jackson","email":"jack@jackson.org","birthday":"1980-03-14",' .
-            '"created":"2000-03-07 10:45:13","income":"12345.67"}';
-
-        // Fetch from database as JSON
-        $dbJSON = Person::objects()
-            ->filter(f::pk($data['id']))
-            ->single(DB::FETCH_JSON);
-
-        self::assertSame($expected, $dbJSON);
-    }
-
     public function testFromJSON()
     {
         $actual = Person::fromJSON(

@@ -82,23 +82,11 @@ class Connection
         $this->logExecute($args);
         $stmt->execute($args);
 
-        // Fetch into objects
+        // Fetch into objects or associative arrays
         if ($fetchType === DB::FETCH_OBJECT) {
             $data = $stmt->fetchAll(PDO::FETCH_CLASS, $class);
-        }
-
-        // Fetch into associative arrays
-        elseif ($fetchType === DB::FETCH_ARRAY) {
+        } elseif ($fetchType === DB::FETCH_ARRAY) {
             $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
-
-        // Fetch into objects and perform json_encode on each one
-        elseif ($fetchType === DB::FETCH_JSON) {
-            $data = array();
-            $stmt->setFetchMode(PDO::FETCH_CLASS, $class);
-            while ($object = $stmt->fetch()) {
-                $data[] = json_encode($object);
-            }
         } else {
             throw new \Excepion("Unknown fetch type [$fetchType].");
         }

@@ -215,22 +215,21 @@ it is possible to change this by specifying a fetch type.
 Fetch types are defined as constants in `Phormium\DB`:
 - `DB::FETCH_OBJECT` - Return results as objects (default)
 - `DB::FETCH_ARRAY` - Return results as array
-- `DB::FETCH_JSON` - Return results as JSON-encoded objects
 
 Both `single()` and `fetch()` methods can be given a fetch type as an optional first argument.
 
 For example:
 
 ```php
-// Fetch person with id=13 as an array
+// Fetch person with id=13 as an object
 Person::objects()
     ->filter(f::pk(13))
-    ->single(DB::FETCH_ARRAY);
+    ->single();
 
-// Fetch all people with id between 54 and 57, as JSON
+// Fetch all people with id between 54 and 57, as array
 Person::objects()
     ->filter(f::between('id', 54, 57))
-    ->fetch(DB::FETCH_JSON);
+    ->fetch(DB::FETCH_ARRAY);
 ```
 
 Writing data

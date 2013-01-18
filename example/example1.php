@@ -37,9 +37,9 @@ $a = Person::objects()
 
 print_r($a);
 
-// Fetch all people with id between 54 and 57, as JSON 
+// Fetch all people with id between 54 and 57 as arrays
 $a = Person::objects()
     ->filter(f::between('id', 54, 57))
-    ->fetch(DB::FETCH_JSON);
+    ->fetch(DB::FETCH_ARRAY);
     
 print_r($a);
