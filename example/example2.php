@@ -4,7 +4,7 @@
  * Demonstrates creating and updating objects.
  */
 
-require '../Phormium/Autoloader.php';
+require __DIR__ . '/../src/Phormium/Autoloader.php';
 Phormium\Autoloader::register();
 
 // Include the database mappings
