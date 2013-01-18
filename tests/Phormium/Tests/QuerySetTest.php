@@ -87,9 +87,13 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
             'income' => 30000
         );
 
+		self::assertFalse(Person::objects()->filter(f::eq('birthday', '2000-01-01'))->exists());
+
         Person::fromArray($p1)->save();
         Person::fromArray($p2)->save();
         Person::fromArray($p3)->save();
+
+		self::assertTrue(Person::objects()->filter(f::eq('birthday', '2000-01-01'))->exists());
 
         // Query set filtering the above created records
         $qs = Person::objects()->filter(f::like('name', "$uniq%"));

@@ -83,6 +83,17 @@ class QuerySet
     }
 
     /**
+     * Fetches the count of records matching the current filter and returns
+	 * TRUE if it's greater than 0, or FALSE otherwise.
+     *
+     * @return boolean
+     */
+    public function exists()
+    {
+        return $this->query->count($this->filters) > 0;
+    }
+
+    /**
      * Performs a SELECT query on the table, and returns rows matching the
      * current filter.
      */
