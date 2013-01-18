@@ -5,7 +5,7 @@
     </testsuite>
     <filter>
         <whitelist>
-            <directory suffix=".php">Phormium</directory>
+            <directory suffix=".php">src/Phormium</directory>
         </whitelist>
     </filter>
     <logging>
