@@ -133,7 +133,7 @@ class DB
 
     public static function disconnectAll()
     {
-        foreach(self::$connections as $connection) {
+        foreach (self::$connections as $connection) {
             $connection->disconnect();
         }
         self::$connections = array();

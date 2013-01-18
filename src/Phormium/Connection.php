@@ -147,7 +147,9 @@ class Connection
     private function logFinished()
     {
         if (DB::$log) {
-            echo date('Y-m-d H:i:s') . " Finished execution, rowCount: {$this->lastRowCount}, lastInsertID: {$this->lastInsertID}\n";
+            echo date('Y-m-d H:i:s') .
+                " Finished execution, rowCount: {$this->lastRowCount}," .
+                " lastInsertID: {$this->lastInsertID}\n";
         }
     }
 }
