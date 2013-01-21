@@ -50,6 +50,24 @@ class DB
         } else {
             throw new \InvalidArgumentException("Configuration should be array or path to config file.");
         }
+
+        // Check the config
+        if (!is_array(self::$config)) {
+            throw new \Exception("Configuration is not an array.");
+        }
+
+        foreach (self::$config as $name => &$values) {
+            if (!isset($values['dsn'])) {
+                throw new \Exception("Invalid configuration. Missing 'dsn' for database [$name].");
+            }
+
+            // Parse the PDO driver from the DSN
+            $values['dsn'] = trim($values['dsn']);
+            if (!preg_match('/^([a-z]+):/', $values['dsn'], $matches)) {
+                throw new \Exception("Invalid dsn for [$name]. Should start with \"<driver>:\"");
+            }
+            $values['driver'] = $matches[1];
+        }
     }
 
     /** Parses a JSON configuration file and returns config as an array. */
@@ -71,24 +89,6 @@ class DB
             $errorText = isset(self::$jsonErrors[$errorCode]) ?
                 self::$jsonErrors[$errorCode] : "Unknown error code [$errorCode]";
             throw new \Exception("Failed parsing json config file: $errorText");
-        }
-
-        // Check the config
-        if (!is_array($config)) {
-            throw new \Exception("Configuration is not an array.");
-        }
-
-        foreach ($config as $name => &$values) {
-            if (!isset($values['dsn'])) {
-                throw new \Exception("Invalid configuration. Missing 'dsn' for database [$name].");
-            }
-
-            // Parse the PDO driver from the DSN
-            $values['dsn'] = trim($values['dsn']);
-            if (!preg_match('/^([a-z]+):/', $values['dsn'], $matches)) {
-                throw new \Exception("Invalid dsn for [$name]. Should start with \"<driver>:\"");
-            }
-            $values['driver'] = $matches[1];
         }
 
         return $config;
