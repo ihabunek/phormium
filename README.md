@@ -2,22 +2,20 @@ Phormium
 ========
 Phormium is a minimalist ORM for PHP.
 
-Phormium is designed primarily to:
-* make CRUD operations trivial
-* enable complex select queries which can be constructed programatically
-
 Works with most relational databases which have a PDO driver.
 
-This is a work in progress. Things will change. Do not use for anything serious, yet.
+This is a work in progress. Things will change. Do not use for anything serious,
+yet.
 
 [![Build Status](https://travis-ci.org/ihabunek/phormium.png)](https://travis-ci.org/ihabunek/phormium)
 
 Why?
 ----
 
-Why another ORM, I hear you cry. Well, first and foremost, no other ORM I found works with Informix,
-and I'm tied to Informix on my day job. It's a real pain writing CRUD functions by hand. Second,
-It's fun to try and write an ORM. Tell me how you like it.
+Why another ORM, I hear you cry! Well, first and foremost, no other ORM I found
+works with Informix, and I'm tied to Informix on my day job. It's a real pain
+writing CRUD functions by hand. Second, It's fun to try and write an ORM. Tell
+me how you like it.
 
 Quick start
 -----------
@@ -27,8 +25,9 @@ Quick start
 Phormium works with most relational databases which have a
 [PDO driver](http://www.php.net/manual/en/pdo.drivers.php).
 
-Create a JSON configuration file which contains database definitions you wish to use. Each database
-must have a DSN string, and optional username and password if required.
+Create a JSON configuration file which contains database definitions you wish to
+use. Each database must have a DSN string, and optional username and password if
+required.
 
 ```javascript
 {
@@ -40,7 +39,7 @@ must have a DSN string, and optional username and password if required.
 }
 ```
 
-For details on database specific DSNs consult the 
+For details on database specific DSNs consult the
 [PHP documentation](http://www.php.net/manual/en/pdo.construct.php).
 
 ### Create a database model
@@ -63,7 +62,7 @@ update or delete queries.
 
 ### Create a Model class
 
-To map the `person` table onto a PHP class, a corresponding Model class is defined. In this example, 
+To map the `person` table onto a PHP class, a corresponding Model class is defined. In this example,
 the class is called Person (can be named anything).
 
 ```php
@@ -98,15 +97,27 @@ Now that a database table and the corresponding PHP model are created, we can be
 Querying data
 -------------
 
-The simplest query is to fetch all records from a table.
+Fetching a single record by primary key:
+
+```php
+Person::get(13);
+```
+
+Also works for composite primary keys:
+
+```php
+Caption::get('HR', 123);
+```
+
+To fetch all data from a table, run:
 
 ```php
 Person::objects()->fetch();
 ```
 
-The `objects()` method will return a `QuerySet` object which is used for querying data, and
-`fetch()` will form and execute the corresponding SQL query and return the results as an array of
-`Person` objects.
+The `objects()` method will return a `QuerySet` object which is used for
+querying data, and `fetch()` will form and execute the corresponding SQL query
+and return the results as an array of `Person` objects.
 
 ### Filtering data
 
@@ -114,7 +125,7 @@ In order to retrieve only selected rows, `QuerySets` can be filtered.
 
 ```php
 $records = Person::objects()
-    ->filter(f::lt('birthday', '2000-01-01'))
+    ->filter('birthday', '<' '2000-01-01')
     ->fetch();
 ```
 
@@ -124,76 +135,76 @@ Filters can be chained; chanining multiple filters will AND them
 
 ```php
 $records = Person::objects()
-    ->filter(f::lt('birthday', '2000-01-01'))
-    ->filter(f::gt('income', 10000))
+    ->filter('birthday', '<', '2000-01-01')
+    ->filter('income', '>', 10000)
     ->fetch();
 ```
 
-This will fetch Persons who are born before 2000 and who have an income greater than 10000.
+This will fetch Persons who are born before year 2000 and who have an income
+greater than 10000.
 
-`QuerySet`s are lazy - no queries will be executed on the database until `fetch()` is called.
+`QuerySet`s are lazy - no queries will be executed on the database until one of
+the fetch methods are called: `fetch()`, `count()`, `exists()` or `aggregate()`.
 
-Each time a filter is added to a `QuerySet`, a new instance is created which is not bound to the
-previous instance. Each additional filtering creates a distinct `QuerySet` object which can be
-stored and reused.
+Each time a filter is added to a `QuerySet`, a new instance is created which is
+not bound to the previous instance. Each additional filtering creates a distinct
+`QuerySet` object which can be stored and reused.
 
 #### Available filters
 
-Class `f` is a alias of `Filter` designed to make queries more compact. There is a factory method
-for each available filter condition.
-
-Each filter condition is rendered to a condition in the WHERE clause. For example,
-`f::lt('birthday', '2000-01-01')` will become `WHERE birthday < '2000-01-01'`.
-
-Available filters are:
-
-* `f::pk(<value>)` - Filter by primary key column value, same as `f::eq(<pk-column>, <value>)`
-* `f::eq(<column>, <value>)` - Equal
-* `f::neq(<column>, <value>)` - Not equal
-* `f::gt(<column>, <value>)` - Greater than
-* `f::gte(<column>, <value>)` - Greater than or equal
-* `f::lt(<column>, <value>)` - Less than
-* `f::lte(<column>, <value>)` - Less than or equal
-* `f::in(<column>, <array>)` - IN
-* `f::nin(<column>, <array>)` - NOT IN
-* `f::like(<column>, <value>)` - LIKE
-* `f::notLike(<column>, <value>)` - NOT LIKE
-* `f::between(<column>, <low-value>, <high-value>)` - BETWEEN
-* `f::isNull(<column>, <value>)` - IS NULL
-* `f::notNull(<column>, <value>)` - IS NOT NULL
+* `filter(<column>, '=',  <value>)`
+* `filter(<column>, '!=', <value>)`
+* `filter(<column>, '>',  <value>)`
+* `filter(<column>, '>=', <value>)`
+* `filter(<column>, '<',  <value>)`
+* `filter(<column>, '<=', <value>)`
+* `filter(<column>, 'IN', <array>)`
+* `filter(<column>, 'NOT IN', <array>)`
+* `filter(<column>, 'LIKE', <value>)`
+* `filter(<column>, 'NOT LIKE', <value>)`
+* `filter(<column>, 'BETWEEN', array(<low>, <high>))`
+* `filter(<column>, 'NULL')`
+* `filter(<column>, 'NOT NULL')`
 
 Fetching data
 -------------
 
-There are several methods for fetching data. All these methods perform SQL queries on the database.
+There are several methods for fetching data. All these methods perform SQL
+queries on the database.
 
 #### fetch()
 
-Fetch all records matching the given filter and returns them as an array of Model objects.
+Fetch all records matching the given filter and returns them as an array of
+Model objects.
 
 ```php
 $records = Person::objects()
-    ->filter(f::lt('birthday', '2000-01-01'))
-    ->filter(f::gt('income', 10000))
+    ->filter('birthday', '<', '2000-01-01')
+    ->filter('income', '>', 10000)
     ->fetch();
 ```
 
 #### single()
 
-Similar to `fetch()` but expects that the filter will match a single record. Returns just the single
-Model object, not an array.
+Similar to `fetch()` but expects that the filter will match a single record.
+Returns just the single Model object, not an array.
 
-This method will throw an exception if zero or multiple records are matched by the filter.
+This method will throw an exception if zero or multiple records are matched by
+the filter.
 
-Typical usage of single is for fetching objects by primary key.
+For example, to fetch the person with id = 13:
 
 ```php
 Person::objects()
-    ->filter(f::pk(13))
+    ->filter('id', '=', 13)
     ->single();
 ```
 
-Fetches the Person with id=13.
+This can also be achieved by the `get()` shorthand method:
+
+```php
+Person::get(13);
+```
 
 #### count()
 
@@ -201,11 +212,11 @@ Returns the number of records matching the given filter.
 
 ```php
 Person::objects()
-    ->filter(f::lt('income', 10000))
+    ->filter('income', '<', 10000)
     ->count();
 ```
 
-Returns the count of Persons with income under 10k.
+This returns the number of Persons with income under 10k.
 
 ### Fetch types
 
@@ -223,7 +234,7 @@ For example:
 ```php
 // Fetch person with id=13 as an object
 Person::objects()
-    ->filter(f::pk(13))
+    ->filter('id', '=', 13)
     ->single();
 
 // Fetch all people with id between 54 and 57, as array
@@ -247,28 +258,25 @@ $person->birthday = "1940-12-20";
 $person->save();
 ```
 
-If the primary key column is auto-incremented, it is not necessary to manually assign a value to
-it. The `save()` method will persist the object to the database and populate the primary key
-property of the Person object with the value assigned by the database.
+If the primary key column is auto-incremented, it is not necessary to manually
+assign a value to it. The `save()` method will persist the object to the
+database and populate the primary key property of the Person object with the
+value assigned by the database.
 
 ### Updating objects
 
-To change an single existing record, fetch it from the database, make the required changes and call
-`save()`.
+To change an single existing record, fetch it from the database, make the
+required changes and call `save()`.
 
 ```php
-// Fetch the newly created person from the database
-$person = Person::objects()
-    ->filter(f::pk(37))
-    ->single();
-
-// Perform a change and save
+$person = Person::get(37);
 $person->birthday = "1940-12-21";
 $person->save();
 ```
 
-To change multiple records at once, use the `QuerySet::update()` function. This function performs
-an update query on all records currently selected by the `QuerySet`.
+To change multiple records at once, use the `QuerySet::update()` function. This
+function performs an update query on all records currently selected by the
+`QuerySet`.
 
 ```php
 $person = Person::objects()
@@ -278,29 +286,24 @@ $person = Person::objects()
     ]);
 ```
 
-This will update all Persons whose name starts with a X and set their name to 'X-man'.
+This will update all Persons whose name starts with a X and set their name to
+'X-man'.
 
 ### Deleting objects
 
 Similar for deleting records. To delete a single person:
 
 ```php
-// Fetch a person from the database
-$person = Person::objects()
-    ->filter(f::pk(37))
-    ->single();
-
-// Delete person
-$person->delete();
+Person::get(37)->delete();
 ```
 
-To delete multiple records at once, use the `QuerySet::delete()` function. This function will delete
-all records currently selected by the `QuerySet`.
+To delete multiple records at once, use the `QuerySet::delete()` function. This
+will delete all records currently selected by the `QuerySet`.
 
 ```php
 $person = Person::objects()
-    ->filter(f::gt('salary', 100000))
+    ->filter('salary', '>', 100000)
     ->delete();
 ```
 
-This will delete all records whose salary is greater than 100k.
+This will delete all Persons whose salary is greater than 100k.

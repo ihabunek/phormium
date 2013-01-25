@@ -26,14 +26,14 @@ echo "max = $max\n";
 
 // Fetch average salary of people born before 1980
 $avg = Person::objects()
-    ->filter(f::lt('birthday', '1980-01-01'))
+    ->filter('birthday', '<', '1980-01-01')
     ->aggregate(a::avg('salary'));
 
 echo "avg = $avg\n";
 
 // Fetch sum of salaries of people whose name begins with "G"
 $sum = Person::objects()
-    ->filter(f::like('name', 'G%'))
+    ->filter('name', 'like', 'G%')
     ->aggregate(a::sum('salary'));
 
 echo "sum = $sum\n";

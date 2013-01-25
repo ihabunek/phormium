@@ -4,7 +4,7 @@ namespace Phormium\Tests;
 
 use \Phormium\a;
 use \Phormium\Aggregate;
-use \Phormium\f;
+use \Phormium\Filter;
 use \Phormium\Meta;
 use \Phormium\QuerySet;
 use \Phormium\Tests\Models\Person;
@@ -26,9 +26,9 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
 
     public function testFilterQS()
     {
-        $f = f::eq('name', 'x');
+        $f = new Filter('name', '=', 'x');
         $qs1 = Person::objects();
-        $qs2 = $qs1->filter($f);
+        $qs2 = $qs1->filter('name', '=', 'x');
 
         self::assertNotEquals($qs1, $qs2);
         self::assertNotSame($qs1, $qs2);
@@ -39,7 +39,7 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
 
         $expected = array($f);
         $actual = $qs2->getFilters();
-        self::assertSame($expected, $actual);
+        self::assertEquals($expected, $actual);
     }
 
     public function testOrderQS()
@@ -87,16 +87,16 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
             'income' => 30000
         );
 
-		self::assertFalse(Person::objects()->filter(f::eq('birthday', '2000-01-01'))->exists());
+		self::assertFalse(Person::objects()->filter('birthday', '=', '2000-01-01')->exists());
 
         Person::fromArray($p1)->save();
         Person::fromArray($p2)->save();
         Person::fromArray($p3)->save();
 
-		self::assertTrue(Person::objects()->filter(f::eq('birthday', '2000-01-01'))->exists());
+		self::assertTrue(Person::objects()->filter('birthday', '=', '2000-01-01')->exists());
 
         // Query set filtering the above created records
-        $qs = Person::objects()->filter(f::like('name', "$uniq%"));
+        $qs = Person::objects()->filter('name', 'like', "$uniq%");
 
         $count = $qs->count();
         self::assertSame(3, $count);

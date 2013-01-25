@@ -72,19 +72,16 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $id = $p->id;
 
         // Load it from the database
-        $p2 = Person::objects()->filter(f::pk($id))->single();
+        $p2 = Person::get($id);
         self::assertEquals($p, $p2);
-
-        $count = Person::objects()->filter(f::pk($id))->count();
-        self::assertEquals(1, $count);
     }
 
     public function testNewPersonAssignedPK()
     {
         $id = 100;
 
-        // Delete if person id 100 already exists
-        Person::objects()->filter(f::pk(100))->delete();
+        // Delete person id 100 if it already exists
+        Person::objects()->filter('id', '=', $id)->delete();
 
         $p = new Person();
         $p->id = $id;
@@ -95,11 +92,8 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         self::assertEquals($id, $p->id);
 
         // Load it from the database
-        $p2 = Person::objects()->filter(f::pk($id))->single();
+        $p2 = Person::get($id);
         self::assertEquals($p, $p2);
-
-        $count = Person::objects()->filter(f::pk($id))->count();
-        self::assertEquals(1, $count);
     }
 
     public function testNewPersonFromArray()
@@ -118,18 +112,15 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $id = $p->id;
 
         // Load it from the database
-        $p2 = Person::objects()->filter(f::pk($id))->single();
+        $p2 = Person::get($id);
         self::assertEquals($p, $p2);
-
-        $count = Person::objects()->filter(f::pk($id))->count();
-        self::assertEquals(1, $count);
 
         // Perform UPDATE
         $p2->email = 'peter2@peterson.com';
         $p2->save();
 
         // Load from DB
-        $p3 = Person::objects()->filter(f::pk($id))->single();
+        $p3 = Person::get($id);
         self::assertEquals($p2, $p3);
         self::assertEquals($id, $p3->id);
     }
@@ -190,7 +181,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $p->name = 'Short Lived Person';
         $p->save();
 
-        $qs = Person::objects()->filter(f::pk($p->id));
+        $qs = Person::objects()->filter('id', '=', $p->id);
 
         $p2 = $qs->single();
         self::assertEquals($p, $p2);

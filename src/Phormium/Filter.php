@@ -8,20 +8,20 @@ namespace Phormium;
 class Filter
 {
     // Operation constants
-    const OP_BETWEEN = 'between';
-    const OP_EQUALS = 'eq';
-    const OP_GREATER = 'gt';
-    const OP_GREATER_OR_EQUAL = 'gte';
-    const OP_IN = 'in';
-    const OP_IS_NULL = 'null';
-    const OP_LESSER = 'lt';
-    const OP_LESSER_OR_EQUAL = 'lte';
-    const OP_LIKE = 'like';
-    const OP_NOT_LIKE = '!like';
-    const OP_NOT_EQUALS = 'neq';
-    const OP_NOT_IN = '!in';
-    const OP_NOT_NULL = '!null';
-    const OP_PK_EQUALS = 'pk';
+    const OP_BETWEEN = 'BETWEEN';
+	const OP_EQUALS = '=';
+    const OP_GREATER = '>';
+    const OP_GREATER_OR_EQUAL = '>=';
+    const OP_IN = 'IN';
+    const OP_IS_NULL = 'NULL';
+    const OP_LESSER = '<';
+    const OP_LESSER_OR_EQUAL = '<=';
+    const OP_LIKE = 'LIKE';
+    const OP_NOT_LIKE = 'NOT LIKE';
+    const OP_NOT_EQUALS = '<>';
+    const OP_NOT_EQUALS_ALT = '!=';
+    const OP_NOT_IN = 'NOT IN';
+    const OP_NOT_NULL = 'NOT NULL';
 
     /** The filter operation, one of OP_* constants. */
     public $operation;
@@ -32,9 +32,9 @@ class Filter
     /** The value to use in filtering, depends on operation. */
     public $value;
 
-    public function __construct($operation, $column, $value = null)
+    public function __construct($column, $operation, $value = null)
     {
-        $this->operation = $operation;
+        $this->operation = strtoupper($operation);
         $this->column = $column;
         $this->value = $value;
     }
@@ -42,12 +42,13 @@ class Filter
     /**
      * Renders a WHERE condition for the given filter.
      */
-    public function render(Meta $meta)
+    public function render()
     {
         switch($this->operation)
         {
             case self::OP_EQUALS:
             case self::OP_NOT_EQUALS:
+            case self::OP_NOT_EQUALS_ALT:
             case self::OP_LIKE:
             case self::OP_NOT_LIKE:
             case self::OP_GREATER:
@@ -55,8 +56,6 @@ class Filter
             case self::OP_LESSER:
             case self::OP_LESSER_OR_EQUAL:
                 return $this->renderSimple($this->column, $this->operation, $this->value);
-            case self::OP_PK_EQUALS:
-                return $this->renderPK($meta->pk, $this->value);
             case self::OP_IN:
                 return $this->renderIn($this->column, $this->value);
             case self::OP_NOT_IN:
@@ -68,21 +67,9 @@ class Filter
             case self::OP_BETWEEN:
                 return $this->renderBetween($this->column, $this->value);
             default:
-                throw new \Exception("Render not defined for operation [{$this->operation}].");
+                throw new \Exception("Unknown filter operation [{$this->operation}].");
         }
     }
-
-    /** Maps simple operations to corresponding operators. */
-    private $simpleOps = array(
-        self::OP_EQUALS => '=',
-        self::OP_NOT_EQUALS => '<>',
-        self::OP_GREATER => '>',
-        self::OP_GREATER_OR_EQUAL => '>=',
-        self::OP_LESSER => '<',
-        self::OP_LESSER_OR_EQUAL => '<=',
-        self::OP_LIKE => 'LIKE',
-        self::OP_NOT_LIKE => 'NOT LIKE',
-    );
 
     /**
      * Renders a simple condition which can be expressed as:
@@ -90,12 +77,7 @@ class Filter
      */
     private function renderSimple($column, $operation, $value)
     {
-        if (!isset($this->simpleOps[$operation])) {
-            throw new \Exception("Operation [$operation] not defined in \$simpleOps.");
-        }
-
-        $operator = $this->simpleOps[$operation];
-        $where = "{$column} {$operator} ?";
+        $where = "{$column} {$operation} ?";
         return array($where, array($value));
     }
 
@@ -141,111 +123,5 @@ class Filter
     {
         $where = "$column IS NOT NULL";
         return array($where, array());
-    }
-
-    private function renderPK($pkColumns, $values)
-    {
-        if (count($values) !== count($pkColumns)) {
-            throw new \Exception("Number of values does not match the number of PK columns.");
-        }
-
-        $args = array();
-        $where = array();
-        foreach ($pkColumns as $key => $column) {
-            $args[] = $values[$key];
-            $where[] = "{$column} = ?";
-        }
-        $where = implode(' AND ', $where);
-        return array($where, $args);
-    }
-
-    // ******************************************
-    // *** Static factory methods             ***
-    // ******************************************
-
-    public static function __callStatic($name, $args)
-    {
-        throw new \Exception("Filter [$name] is not implemented.");
-    }
-
-    public static function pk()
-    {
-        $num = func_num_args();
-
-        if ($num == 1) {
-            $arg = func_get_arg(0);
-            $values = is_array($arg) ? array_values($arg) : array($arg);
-        } elseif ($num > 1) {
-            $values = func_get_args();
-        } else {
-            throw new \Exception("Filter pk requires at least one argument.");
-        }
-
-        return new Filter(Filter::OP_PK_EQUALS, null, $values);
-    }
-
-    public static function eq($column, $value)
-    {
-        return new Filter(Filter::OP_EQUALS, $column, $value);
-    }
-
-    public static function neq($column, $value)
-    {
-        return new Filter(Filter::OP_NOT_EQUALS, $column, $value);
-    }
-
-    public static function in($column, $value)
-    {
-        return new Filter(Filter::OP_IN, $column, $value);
-    }
-
-    public static function nin($column, $value)
-    {
-        return new Filter(Filter::OP_NOT_IN, $column, $value);
-    }
-
-    public static function like($column, $value)
-    {
-        return new Filter(Filter::OP_LIKE, $column, $value);
-    }
-
-    public static function notLike($column, $value)
-    {
-        return new Filter(Filter::OP_NOT_LIKE, $column, $value);
-    }
-
-    public static function gt($column, $value)
-    {
-        return new Filter(Filter::OP_GREATER, $column, $value);
-    }
-
-    public static function gte($column, $value)
-    {
-        return new Filter(Filter::OP_GREATER_OR_EQUAL, $column, $value);
-    }
-
-    public static function lt($column, $value)
-    {
-        return new Filter(Filter::OP_LESSER, $column, $value);
-    }
-
-    public static function lte($column, $value)
-    {
-        return new Filter(Filter::OP_LESSER_OR_EQUAL, $column, $value);
-    }
-
-    public static function between($column, $low, $high)
-    {
-        return new Filter(Filter::OP_BETWEEN, $column, array($low, $high));
-    }
-
-    public static function isNull($column)
-    {
-        return new Filter(Filter::OP_IS_NULL, $column);
-    }
-
-    public static function notNull($column)
-    {
-        return new Filter(Filter::OP_NOT_NULL, $column);
     }
 }

@@ -66,15 +66,36 @@ abstract class Model
     }
 
     /**
-     * Fetches a single record by primary key; shorthand method.
+     * Fetches a single record by primary key.
+     *
      * @param mixed The primary key, can be more than 1 param for composite keys.
      */
     public static function get()
     {
         $args = func_get_args();
-        return self::objects()
-            ->filter(f::pk($args))
-            ->single();
+        $meta = self::getMeta();
+
+        if (!isset($meta->pk)) {
+            $class = get_called_class();
+            throw new \Exception("Primary key not defined for model [$class].");
+        }
+
+        // Check correct number of columns is given
+        $countArgs = count($args);
+        $countPK = count($meta->pk);
+        if ($countArgs  !== $countPK) {
+            $class = get_called_class();
+            throw new \Exception("Model [$class] has $countPK primary key columns. $countArgs arguments given.");
+        }
+
+        // Create a queryset and filter by PK
+        $qs = self::objects();
+        foreach($meta->pk as $name) {
+            $value = array_shift($args);
+            $qs = $qs->filter($name, '=', $value);
+        }
+
+        return $qs->single();
     }
 
     /** Creates a Model instance from data in the given array. */

@@ -46,10 +46,10 @@ class QuerySet
      * Returns a new query set with the filter AND-ed to the existing one.
      * @return QuerySet
      */
-    public function filter(Filter $filter)
+    public function filter($column, $operation, $value = null)
     {
         $qs = clone $this;
-        $qs->addFilter($filter);
+        $qs->addFilter(new Filter($column, $operation, $value));
         return $qs;
     }
 

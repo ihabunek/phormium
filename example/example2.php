@@ -25,20 +25,14 @@ $person->save();
 // See that the ID was populated by save()
 print_r($person);
 
-$id = $person->id;
-
 // Fetch the newly created person from the database
-$person = Person::objects()
-    ->filter(f::pk($id))
-    ->single();
+$person = Person::get($person->id);
 
 // Perform a change and save
 $person->birthday = "1940-12-21";
 $person->save(); 
 
 // Fetch the updated person from the database
-$person = Person::objects()
-    ->filter(f::pk($id))
-    ->single();
+$person = Person::get($person->id);
 
 print_r($person);

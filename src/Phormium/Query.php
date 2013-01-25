@@ -280,7 +280,7 @@ class Query
         $where = array();
         $args = array();
         foreach ($filters as $filter) {
-            list($w, $a) = $filter->render($this->meta);
+            list($w, $a) = $filter->render();
             $where[] = $w;
             $args = array_merge($args, $a);
         }

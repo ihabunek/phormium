@@ -17,29 +17,25 @@ use \Phormium\f;
 DB::configure('config.json');
 
 // Select a single record by primary key
-$t = Person::objects()
-    ->filter(f::pk(31))
-    ->single();
-
-print_r($t);
+$t = Person::get(31);
 
 // Get number of people born before 2012
 $c = Person::objects()
-    ->filter(f::lt('birthday', '2012-01-01'))
+    ->filter('birthday', '<', '2012-01-01')
     ->count();
 
 echo "Count: $c\n";
 
 // Fetch all people whose name begins with G
 $a = Person::objects()
-    ->filter(f::like('name', 'G%'))
+    ->filter('name', 'like', 'G%')
     ->fetch();
 
 print_r($a);
 
 // Fetch all people with id between 54 and 57 as arrays
 $a = Person::objects()
-    ->filter(f::between('id', 54, 57))
+    ->filter('id', 'between', [54, 57])
     ->fetch(DB::FETCH_ARRAY);
     
 print_r($a);
