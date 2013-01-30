@@ -44,11 +44,18 @@ abstract class Model
         return new QuerySet($query, $meta);
     }
 
-    /** Creates a Model instance from data in the given array. */
+    /**
+     * Creates a Model instance from data in the given array or object.
+     * @param array|stdClass $array The input array or stdClass object.
+     */
     public static function fromArray($array)
     {
         $class = get_called_class();
         $instance = new $class();
+
+        if ($array instanceof \stdClass) {
+            $array = (array) $array;
+        }
 
         if (!is_array($array)) {
             throw new \Exception("Given argument is not an array.");
