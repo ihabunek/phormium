@@ -3,7 +3,6 @@
 namespace Phormium\Tests;
 
 use \Phormium\DB;
-use \Phormium\f;
 use \Phormium\Meta;
 use \Phormium\QuerySet;
 use \Phormium\Tests\Models\Person;

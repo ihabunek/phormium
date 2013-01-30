@@ -2,19 +2,17 @@
 
 namespace Phormium\Tests;
 
-use \Phormium\Parser;
+use \Phormium\Tests\Models\Person;
+
+use \Phormium\DB;
 use \Phormium\Filter;
-use \Phormium\f;
+use \Phormium\Parser;
 
 class FilterTest extends \PHPUnit_Framework_TestCase
 {
-    private $metaPerson;
-    private $metaTrade;
-
-    public function setUp()
+    public static function setUpBeforeClass()
     {
-        $this->metaPerson = Models\Person::getMeta();
-        $this->metaTrade = Models\Trade::getMeta();
+        DB::configure(PHORMIUM_CONFIG_FILE);
     }
 
     public function testEq()
@@ -177,5 +175,16 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new Filter('test', 'xxx');
         $filter->render();
+    }
+
+    public function testCaseInsensitiveLike()
+    {
+        $p1 = Person::fromArray(array('name' => "PERO"))->insert();
+        $p2 = Person::fromArray(array('name' => "pero"))->insert();
+        $p3 = Person::fromArray(array('name' => "Pero"))->insert();
+        $p4 = Person::fromArray(array('name' => "pERO"))->insert();
+
+        $persons = Person::objects()->filter('name', 'ilike', 'pero')->fetch();
+        self::assertCount(4, $persons);
     }
 }

@@ -4,6 +4,7 @@ namespace Phormium\Tests;
 
 use \Phormium\a;
 use \Phormium\Aggregate;
+use \Phormium\DB;
 use \Phormium\Filter;
 use \Phormium\Meta;
 use \Phormium\QuerySet;
@@ -11,6 +12,11 @@ use \Phormium\Tests\Models\Person;
 
 class QuerySetTest extends \PHPUnit_Framework_TestCase
 {
+    public static function setUpBeforeClass()
+    {
+        DB::configure(PHORMIUM_CONFIG_FILE);
+    }
+
     public function testCloneQS()
     {
         $qs1 = Person::objects();
