@@ -163,7 +163,7 @@ not bound to the previous instance. Each additional filtering creates a distinct
 * `filter(<column>, 'LIKE', <value>)`
 * `filter(<column>, 'NOT LIKE', <value>)`
 * `filter(<column>, 'BETWEEN', array(<low>, <high>))`
-* `filter(<column>, 'NULL')`
+* `filter(<column>, 'IS NULL')`
 * `filter(<column>, 'NOT NULL')`
 
 Fetching data

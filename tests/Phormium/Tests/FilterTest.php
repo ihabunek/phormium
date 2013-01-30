@@ -111,7 +111,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     public function testIsNull()
     {
-        $filter = new Filter('test', 'null');
+        $filter = new Filter('test', 'is null');
         $actual = $filter->render();
         $expected = array("test IS NULL", array());
         self::assertSame($expected, $actual);

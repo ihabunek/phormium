@@ -13,7 +13,7 @@ class Filter
     const OP_GREATER = '>';
     const OP_GREATER_OR_EQUAL = '>=';
     const OP_IN = 'IN';
-    const OP_IS_NULL = 'NULL';
+    const OP_IS_NULL = 'IS NULL';
     const OP_LESSER = '<';
     const OP_LESSER_OR_EQUAL = '<=';
     const OP_LIKE = 'LIKE';
