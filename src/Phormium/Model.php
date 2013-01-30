@@ -47,8 +47,11 @@ abstract class Model
     /**
      * Creates a Model instance from data in the given array or object.
      * @param array|stdClass $array The input array or stdClass object.
+     * @param boolean $strict If set to TRUE, will throw an exception if the
+     *      array contains a property which does not exist in the Model. Default
+     *      value is FALSE.
      */
-    public static function fromArray($array)
+    public static function fromArray($array, $strict = false)
     {
         $class = get_called_class();
         $instance = new $class();
@@ -65,7 +68,9 @@ abstract class Model
             if (property_exists($instance, $name)) {
                 $instance->{$name} = $value;
             } else {
-                throw new \Exception("Property [$name] does not exist in class [$class].");
+                if ($strict) {
+                    throw new \Exception("Property [$name] does not exist in class [$class].");
+                }
             }
         }
 
