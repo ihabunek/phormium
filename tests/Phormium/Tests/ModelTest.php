@@ -171,7 +171,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             array(
                 'name' => 'Peter Peterson',
                 'xxx' => 'peter@peterson.com' // doesn't exist
-            )
+            ), true
         );
     }
 
