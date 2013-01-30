@@ -17,6 +17,7 @@ class Filter
     const OP_LESSER = '<';
     const OP_LESSER_OR_EQUAL = '<=';
     const OP_LIKE = 'LIKE';
+    const OP_LIKE_CASE_INSENSITIVE = 'ILIKE';
     const OP_NOT_LIKE = 'NOT LIKE';
     const OP_NOT_EQUALS = '<>';
     const OP_NOT_EQUALS_ALT = '!=';
@@ -56,6 +57,8 @@ class Filter
             case self::OP_LESSER:
             case self::OP_LESSER_OR_EQUAL:
                 return $this->renderSimple($this->column, $this->operation, $this->value);
+            case self::OP_LIKE_CASE_INSENSITIVE:
+                return $this->renderLikeCaseInsensitive($this->column, $this->value);
             case self::OP_IN:
                 return $this->renderIn($this->column, $this->value);
             case self::OP_NOT_IN:
@@ -100,6 +103,12 @@ class Filter
         $qs = array_fill(0, count($values), '?');
         $where = "$column IN (" . implode(', ', $qs) . ")";
         return array($where, $values);
+    }
+
+    private function renderLikeCaseInsensitive($column, $value)
+    {
+        $where = "lower($column) LIKE lower(?)";
+        return array($where, array($value));
     }
 
     private function renderNotIn($column, $values)
