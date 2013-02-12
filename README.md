@@ -144,7 +144,8 @@ This will fetch Persons who are born before year 2000 and who have an income
 greater than 10000.
 
 `QuerySet`s are lazy - no queries will be executed on the database until one of
-the fetch methods are called: `fetch()`, `count()`, `exists()` or `aggregate()`.
+the fetch methods are called: `fetch()`, `count()`, `exists()` or one of the
+aggregate functions.
 
 Each time a filter is added to a `QuerySet`, a new instance is created which is
 not bound to the previous instance. Each additional filtering creates a distinct
@@ -218,6 +219,24 @@ Person::objects()
 
 This returns the number of Persons with income under 10k.
 
+#### Aggregates
+
+The following aggregate functions are implemented on the QuerySet object:
+* `avg(<column>)`
+* `min(<column>)`
+* `max(<column>)`
+* `sum(<column>)`
+
+Aggregates are applied after filtering. For example:
+
+```php
+Person::objects()
+    ->filter('birthday', '<', '2000-01-01')
+    ->avg('income');
+```
+
+Returns the average income of people born before year 2000.
+
 ### Fetch types
 
 By default, records are returned as intances of the Model class, in this example Person. However,
@@ -239,7 +258,7 @@ Person::objects()
 
 // Fetch all people with id between 54 and 57, as array
 Person::objects()
-    ->filter(f::between('id', 54, 57))
+    ->filter('id', 'between', array(54, 57))
     ->fetch(DB::FETCH_ARRAY);
 ```
 
@@ -280,7 +299,7 @@ function performs an update query on all records currently selected by the
 
 ```php
 $person = Person::objects()
-    ->filter(f::like('name', 'X%'))
+    ->filter('name', 'like', 'X%')
     ->update([
         'name' => 'X-man'
     ]);

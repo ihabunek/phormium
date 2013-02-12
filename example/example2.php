@@ -11,7 +11,6 @@ Phormium\Autoloader::register();
 require 'Person.php';
 
 use \Phormium\DB;
-use \Phormium\f;
 
 // Configure the database connections
 DB::configure('config.json');
