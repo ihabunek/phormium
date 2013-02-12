@@ -4,3 +4,4 @@ tmp
 php_errors.log
 composer.lock
 /.project
+/.settings
