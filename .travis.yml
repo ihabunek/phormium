@@ -7,7 +7,7 @@ php:
 env:
   - DB=mysql
   - DB=sqlite
-#  - DB=postgres # implementation not finished
+  - DB=postgres
 
 before_script:
   - composer install
