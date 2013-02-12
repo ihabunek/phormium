@@ -57,7 +57,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $actual = PkLess::getMeta();
         self::assertEquals($expected, $actual);
     }
-    
+
     public function testNewPerson()
     {
         $p = new Person();
@@ -188,5 +188,22 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         self::assertSame(1, $qs->count());
         $p->delete();
         self::assertSame(0, $qs->count());
+    }
+
+    public function testLimit()
+    {
+        $allPeople = Person::objects()
+            ->orderBy('id', 'asc')
+            ->fetch();
+
+        $offset = 2;
+        $length = 3;
+
+        $expected = array_slice($allPeople, $offset, $length);
+        $actual = Person::objects()
+            ->orderBy('id', 'asc')
+            ->fetch($length, $offset);
+
+        self::assertEquals($expected, $actual);
     }
 }

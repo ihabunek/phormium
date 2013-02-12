@@ -137,9 +137,9 @@ class QuerySet
      * Performs a SELECT query on the table, and returns rows matching the
      * current filter.
      */
-    public function fetch($type = DB::FETCH_OBJECT)
+    public function fetch($limit = null, $offset = null)
     {
-        return $this->query->select($this->filters, $this->order, $type);
+        return $this->query->select($this->filters, $this->order, $limit, $offset);
     }
 
     /**

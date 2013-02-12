@@ -179,6 +179,8 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     public function testCaseInsensitiveLike()
     {
+        Person::objects()->filter('name', 'ilike', 'pero')->delete();
+
         $p1 = Person::fromArray(array('name' => "PERO"))->insert();
         $p2 = Person::fromArray(array('name' => "pero"))->insert();
         $p3 = Person::fromArray(array('name' => "Pero"))->insert();

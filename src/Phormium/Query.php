@@ -2,6 +2,9 @@
 
 namespace Phormium;
 
+use \PDO;
+use \PDOStatement;
+
 /**
  * Generates and executes SQL queries.
  */
@@ -34,18 +37,23 @@ class Query
      * @return array An array of {@link Model} instances corresponing to given
      *      criteria.
      */
-    public function select($filters, $order, $fetchType)
+    public function select($filters, $order, $limit = null, $offset = null)
     {
         $columns = implode(", ", $this->meta->columns);
         $table = $this->meta->table;
         $class = $this->meta->class;
+        $fetchType = PDO::FETCH_CLASS; // TODO: read from config
 
+        list($limit1, $limit2) = $this->renderLimitOffset($limit, $offset);
         list($where, $args) = $this->constructWhere($filters);
         $order = $this->constructOrder($order);
 
-        $sql = "SELECT {$columns} FROM {$table}{$where}{$order};";
-        $conn = DB::getConnection($this->meta->database);
-        return $conn->execute($sql, $args, $fetchType, $class);
+        $query = "SELECT{$limit1} {$columns} FROM {$table}{$where}{$order}{$limit2};";
+        $conn = DB::getConnection($this->meta->database)->getPDO();
+
+        $stmt = $this->prepare($conn, $query, $fetchType, $class);
+        $this->execute($stmt, $args);
+        return $this->fetchAll($stmt, $fetchType);
     }
 
     /**
@@ -61,9 +69,14 @@ class Query
         $table = $this->meta->table;
         list($where, $args) = $this->constructWhere($filters);
 
-        $sql = "SELECT COUNT(*) AS count FROM {$table}{$where};";
-        $conn = DB::getConnection($this->meta->database);
-        $data = $conn->execute($sql, $args, DB::FETCH_ARRAY);
+        $query = "SELECT COUNT(*) AS count FROM {$table}{$where};";
+        $conn = DB::getConnection($this->meta->database)->getPDO();
+
+        $fetchType = PDO::FETCH_ASSOC;
+
+        $stmt = $this->prepare($conn, $query, $fetchType);
+        $this->execute($stmt, $args);
+        $data = $this->fetchAll($stmt, $fetchType);
         return (integer) $data[0]['count'];
     }
 
@@ -88,9 +101,14 @@ class Query
         list($where, $args) = $this->constructWhere($filters);
         $select = $aggregate->render();
 
-        $sql = "SELECT {$select} as aggregate FROM {$table}{$where};";
-        $conn = DB::getConnection($this->meta->database);
-        $data = $conn->execute($sql, $args, DB::FETCH_ARRAY);
+        $query = "SELECT {$select} as aggregate FROM {$table}{$where};";
+        $conn = DB::getConnection($this->meta->database)->getPDO();
+
+        $fetchType = PDO::FETCH_ASSOC;
+
+        $stmt = $this->prepare($conn, $query, $fetchType);
+        $this->execute($stmt, $args);
+        $data = $this->fetchAll($stmt, $fetchType);
         return $data[0]['aggregate'];
     }
 
@@ -132,20 +150,36 @@ class Query
             $args[] = $model->{$column};
         }
 
+        // PostgreSQL needs a RETURNING clause to get the inserted ID
+        $returning = "";
+        if ($this->driver == 'pgsql' && $pkAutogen) {
+            $pkColumn = $meta->pk[0];
+            $returning = " RETURNING $pkColumn";
+        }
+
         // Construct the query
         $query = "INSERT INTO {$meta->table} (";
         $query .= implode(', ', $columns);
         $query .= ") VALUES (";
         $query .= implode(', ', array_fill(0, count($columns), '?'));
-        $query .= ");";
+        $query .= "){$returning};";
 
-        $conn = DB::getConnection($meta->database);
-        $conn->executeNoFetch($query, $args);
+        $conn = DB::getConnection($meta->database)->getPDO();
+
+        $stmt = $this->prepare($conn, $query);
+        $this->execute($stmt, $args);
 
         // If PK is auto-generated, populate it
         if ($pkAutogen) {
             $pkColumn = $meta->pk[0];
-            $model->{$pkColumn} = $conn->getLastInsertID();
+            if ($this->driver == 'pgsql') {
+                $data = $this->fetchAll($stmt, PDO::FETCH_ASSOC);
+                $id = $data[0][$pkColumn];
+            } else {
+                $id = $conn->lastInsertId();
+            }
+
+            $model->{$pkColumn} = $id;
         }
     }
 
@@ -295,5 +329,83 @@ class Query
             return "";
         }
         return " ORDER BY " . implode(', ', $order);
+    }
+
+    private function prepare(PDO $conn, $query, $fetchType = null, $class = null)
+    {
+        if (DB::$log) {
+            echo date('Y-m-d H:i:s') . " Preparing query: $query\n";
+        }
+        $stmt = $conn->prepare($query);
+        if ($fetchType === PDO::FETCH_CLASS) {
+            $stmt->setFetchMode(PDO::FETCH_CLASS, $class);
+        }
+        return $stmt;
+    }
+
+    private function execute($stmt, $args)
+    {
+        if (DB::$log) {
+            echo date('Y-m-d H:i:s') . " Executing query with args: ";
+            var_export($args);
+            echo "\n";
+        }
+        $stmt->execute($args);
+    }
+
+    private function fetchAll($stmt, $fetchType)
+    {
+        if (DB::$log) {
+            echo date('Y-m-d H:i:s') . " Fetching data...";
+        }
+        $data = array();
+        while ($row = $stmt->fetch($fetchType)) {
+            $data[] = $row;
+        }
+        return $data;
+    }
+
+    private function renderLimitOffset($limit, $offset)
+    {
+        // Checks
+        if (isset($offset) && !is_numeric($offset)) {
+            throw new \InvalidArgumentException("Invalid offset given [$offset].");
+        }
+        if (isset($limit) && !is_numeric($limit)) {
+            throw new \InvalidArgumentException("Invalid limit given [$limit].");
+        }
+
+        // Offset should not be set without a limit
+        if (isset($offset) && !isset($limit)) {
+            throw new \InvalidArgumentException("Offset given without a limit.");
+        }
+
+        $limit1 = ""; // Inserted after SELECT (for informix)
+        $limit2 = ""; // Inserted at end of query (for others)
+
+        // Construct the query part (database dependant)
+        switch($this->driver)
+        {
+            case "informix":
+                if (isset($offset)) {
+                    $limit1 .= " SKIP $offset";
+                }
+                if (isset($limit)) {
+                    $limit1 .= " LIMIT $limit";
+                }
+                break;
+
+            // Compatible with mysql, pgsql, sqlite, and possibly others
+            default:
+                if (isset($limit)) {
+                    $limit2 .= " LIMIT $limit";
+                }
+                if (isset($offset)) {
+                    $limit2 .= " OFFSET $offset";
+                }
+                break;
+        }
+
+        return array($limit1, $limit2);
     }
 }
