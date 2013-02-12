@@ -83,6 +83,46 @@ class QuerySet
     }
 
     /**
+     * Returns the AVG aggregate on the given column, using the current filters.
+     * @param string $column
+     */
+    public function avg($column)
+    {
+        $agg = new Aggregate(Aggregate::AVERAGE, $column);
+        return $this->query->aggregate($this->filters, $agg);
+    }
+
+    /**
+     * Returns the MAX aggregate on the given column, using the current filters.
+     * @param string $column
+     */
+    public function max($column)
+    {
+        $agg = new Aggregate(Aggregate::MAX, $column);
+        return $this->query->aggregate($this->filters, $agg);
+    }
+
+    /**
+     * Returns the MIN aggregate on the given column, using the current filters.
+     * @param string $column
+     */
+    public function min($column)
+    {
+        $agg = new Aggregate(Aggregate::MIN, $column);
+        return $this->query->aggregate($this->filters, $agg);
+    }
+
+    /**
+     * Returns the SUM aggregate on the given column, using the current filters.
+     * @param string $column
+     */
+    public function sum($column)
+    {
+        $agg = new Aggregate(Aggregate::SUM, $column);
+        return $this->query->aggregate($this->filters, $agg);
+    }
+
+    /**
      * Fetches the count of records matching the current filter and returns
      * TRUE if it's greater than 0, or FALSE otherwise.
      *
@@ -124,16 +164,6 @@ class QuerySet
         }
 
         return isset($data[0]) ? $data[0] : null;
-    }
-
-    /**
-     * Performs an aggregate SELECT query and returns the result.
-     *
-     * @return string
-     */
-    public function aggregate(Aggregate $aggregate)
-    {
-        return $this->query->aggregate($this->filters, $aggregate);
     }
 
     /**

@@ -2,7 +2,6 @@
 
 namespace Phormium\Tests;
 
-use \Phormium\a;
 use \Phormium\Aggregate;
 use \Phormium\DB;
 use \Phormium\Filter;
@@ -107,30 +106,12 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         $count = $qs->count();
         self::assertSame(3, $count);
 
-        self::assertSame('2000-01-01', $qs->aggregate(a::min('birthday')));
-        self::assertSame('2002-01-01', $qs->aggregate(a::max('birthday')));
+        self::assertSame('2000-01-01', $qs->min('birthday'));
+        self::assertSame('2002-01-01', $qs->max('birthday'));
 
-        self::assertEquals(10000, $qs->aggregate(a::min('income')));
-        self::assertEquals(20000, $qs->aggregate(a::avg('income')));
-        self::assertEquals(60000, $qs->aggregate(a::sum('income')));
-        self::assertEquals(30000, $qs->aggregate(a::max('income')));
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Invalid aggregate type [foo]
-     */
-    public function testAggregatesFail1()
-    {
-        a::foo('bar');
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Invalid aggregate type [foo]
-     */
-    public function testAggregatesFail2()
-    {
-        new Aggregate('foo', 'bar');
+        self::assertEquals(10000, $qs->min('income'));
+        self::assertEquals(20000, $qs->avg('income'));
+        self::assertEquals(60000, $qs->sum('income'));
+        self::assertEquals(30000, $qs->max('income'));
     }
 }
