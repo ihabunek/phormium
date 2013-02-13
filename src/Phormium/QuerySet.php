@@ -199,7 +199,7 @@ class QuerySet
     private function addOrder($column, $direction)
     {
         if ($direction !== 'asc' && $direction !== 'desc') {
-            throw new \Exception("Invalid direction given: [$direction]. Expected 'asc' or 'desc'.");
+            throw new \Exception("Invalid order direction [$direction]. Expected 'asc' or 'desc'.");
         }
 
         if (!in_array($column, $this->meta->columns)) {
