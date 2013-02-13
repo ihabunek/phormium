@@ -150,9 +150,9 @@ class QuerySet
      * @throws \Exception If no rows are found, and {@link $allowEmpty} is set
      * to false.
      */
-    public function single($type = DB::FETCH_OBJECT)
+    public function single()
     {
-        $data = $this->fetch($type);
+        $data = $this->fetch();
         $count = count($data);
 
         if ($count > 1) {
