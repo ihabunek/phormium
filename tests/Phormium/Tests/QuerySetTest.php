@@ -236,4 +236,38 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
 
         self::assertSame($meta1, $meta2);
     }
+
+    public function testLimitedFetch()
+    {
+        // Create some sample data
+        $uniq = uniqid('limit');
+
+        $persons = array(
+            Person::fromArray(array('name' => "{$uniq}_1")),
+            Person::fromArray(array('name' => "{$uniq}_2")),
+            Person::fromArray(array('name' => "{$uniq}_3")),
+            Person::fromArray(array('name' => "{$uniq}_4")),
+            Person::fromArray(array('name' => "{$uniq}_5")),
+        );
+
+        foreach($persons as $person) {
+            $person->save();
+        }
+
+        $qs = Person::objects()
+            ->filter('name', 'like', "{$uniq}%")
+            ->orderBy('name');
+
+        self::assertEquals(array_slice($persons, 0, 2), $qs->fetch(2));
+        self::assertEquals(array_slice($persons, 0, 2), $qs->fetch(2, 0));
+        self::assertEquals(array_slice($persons, 1, 2), $qs->fetch(2, 1));
+        self::assertEquals(array_slice($persons, 2, 2), $qs->fetch(2, 2));
+        self::assertEquals(array_slice($persons, 3, 2), $qs->fetch(2, 3));
+        self::assertEquals(array_slice($persons, 0, 1), $qs->fetch(1));
+        self::assertEquals(array_slice($persons, 0, 1), $qs->fetch(1, 0));
+        self::assertEquals(array_slice($persons, 1, 1), $qs->fetch(1, 1));
+        self::assertEquals(array_slice($persons, 2, 1), $qs->fetch(1, 2));
+        self::assertEquals(array_slice($persons, 3, 1), $qs->fetch(1, 3));
+        self::assertEquals(array_slice($persons, 4, 1), $qs->fetch(1, 4));
+    }
 }
