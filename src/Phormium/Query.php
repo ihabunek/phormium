@@ -357,7 +357,13 @@ class Query
             var_export($args);
             echo "\n";
         }
+
         $stmt->execute($args);
+
+        if (DB::$log) {
+            $rc = $stmt->rowCount();
+            echo date('Y-m-d H:i:s') . " Finished execution. Row count: $rc.\n";
+        }
     }
 
     private function fetchAll($stmt, $fetchType)
