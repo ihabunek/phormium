@@ -30,12 +30,6 @@ class Connection
      */
     private $pdo;
 
-    /** Holds inserted ID of the last executed query. */
-    private $lastInsertID;
-
-    /** Holds row count of the last executed query. */
-    private $lastRowCount;
-
     public function __construct($config)
     {
         if (empty($config['dsn'])) {
@@ -65,91 +59,5 @@ class Connection
         }
 
         return $this->pdo;
-    }
-
-    /**
-     * Prepares and executes a query and fetches all returned data.
-     * @return array An array of either objects, arrays or strings, depending
-     *      on the fetch type.
-     */
-    public function execute($query, $args = array(), $fetchType = DB::FETCH_OBJECT, $class = null)
-    {
-        $pdo = $this->getPDO();
-
-        $this->logPrepare($query);
-        $stmt = $pdo->prepare($query);
-
-        $this->logExecute($args);
-        $stmt->execute($args);
-
-        // Fetch into objects or associative arrays
-        if ($fetchType === DB::FETCH_OBJECT) {
-            $data = $stmt->fetchAll(PDO::FETCH_CLASS, $class);
-        } elseif ($fetchType === DB::FETCH_ARRAY) {
-            $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } else {
-            throw new \Excepion("Unknown fetch type [$fetchType].");
-        }
-
-        $this->lastInsertID = $pdo->lastInsertId();
-        $this->lastRowCount = $stmt->rowCount();
-
-        $stmt->closeCursor();
-        $this->logFinished();
-        return $data;
-    }
-
-    /**
-     * Prepares and executes the query, but does not fetch.
-     */
-    public function executeNoFetch($query, $args = array())
-    {
-        $pdo = $this->getPDO();
-
-        $this->logPrepare($query);
-        $stmt = $pdo->prepare($query);
-
-        $this->logExecute($args);
-        $stmt->execute($args);
-
-        $this->lastInsertID = $pdo->lastInsertId();
-        $this->lastRowCount = $stmt->rowCount();
-        $stmt->closeCursor();
-        $this->logFinished();
-    }
-
-    public function getLastInsertID()
-    {
-        return $this->lastInsertID;
-    }
-
-    public function getLastRowCount()
-    {
-        return $this->lastRowCount;
-    }
-
-    private function logPrepare($query)
-    {
-        if (DB::$log) {
-            echo date('Y-m-d H:i:s') . " Preparing query: $query\n";
-        }
-    }
-
-    private function logExecute($args)
-    {
-        if (DB::$log) {
-            echo date('Y-m-d H:i:s') . " Executing query with args: ";
-            var_export($args);
-            echo "\n";
-        }
-    }
-
-    private function logFinished()
-    {
-        if (DB::$log) {
-            echo date('Y-m-d H:i:s') .
-                " Finished execution, rowCount: {$this->lastRowCount}," .
-                " lastInsertID: {$this->lastInsertID}\n";
-        }
     }
 }

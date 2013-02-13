@@ -164,8 +164,8 @@ class Query
         $query .= implode(', ', array_fill(0, count($columns), '?'));
         $query .= "){$returning};";
 
+        // Run query
         $conn = DB::getConnection($meta->database)->getPDO();
-
         $stmt = $this->prepare($conn, $query);
         $this->execute($stmt, $args);
 
@@ -222,9 +222,11 @@ class Query
         $query .= " WHERE ";
         $query .= implode(' AND ', $where);
 
-        $conn = DB::getConnection($meta->database);
-        $conn->executeNoFetch($query, $args);
-        return $conn->getLastRowCount();
+        // Run the query
+        $conn = DB::getConnection($meta->database)->getPDO();
+        $stmt = $this->prepare($conn, $query);
+        $this->execute($stmt, $args);
+        return $stmt->rowCount();
     }
 
     /**
@@ -248,11 +250,13 @@ class Query
             $args[] = $value;
         }
         $where = implode(' AND ', $where);
-
         $query = "DELETE FROM {$this->meta->table} WHERE {$where}";
-        $conn = DB::getConnection($this->meta->database);
-        $conn->executeNoFetch($query, $args);
-        return $conn->getLastRowCount();
+
+        // Run the query
+        $conn = DB::getConnection($this->meta->database)->getPDO();
+        $stmt = $this->prepare($conn, $query);
+        $this->execute($stmt, $args);
+        return $stmt->rowCount();
     }
 
     /**
@@ -261,9 +265,8 @@ class Query
      */
     public function batchUpdate($filters, $updates)
     {
-        $updateBits = array();
-
         // Check columns exist
+        $updateBits = array();
         foreach ($updates as $column => $value) {
             if (!in_array($column, $this->meta->columns)) {
                 throw new \Exception("Column [$column] does not exist in table [{$this->meta->table}].");
@@ -272,6 +275,7 @@ class Query
             $updateBits[] = "{$column} = ?";
         }
 
+        // Construct the query
         list($where, $args) = $this->constructWhere($filters);
         $args = array_merge(array_values($updates), $args);
 
@@ -279,9 +283,11 @@ class Query
         $query .= "SET " . implode(', ', $updateBits);
         $query .= $where;
 
-        $conn = DB::getConnection($this->meta->database);
-        $conn->executeNoFetch($query, $args);
-        return $conn->getLastRowCount();
+        // Run the query
+        $conn = DB::getConnection($this->meta->database)->getPDO();
+        $stmt = $this->prepare($conn, $query);
+        $this->execute($stmt, $args);
+        return $stmt->rowCount();
     }
 
     /**
@@ -291,12 +297,13 @@ class Query
     public function batchDelete($filters)
     {
         list($where, $args) = $this->constructWhere($filters);
-
         $query = "DELETE FROM {$this->meta->table}{$where}";
 
-        $conn = DB::getConnection($this->meta->database);
-        $conn->executeNoFetch($query, $args);
-        return $conn->getLastRowCount();
+        // Run the query
+        $conn = DB::getConnection($this->meta->database)->getPDO();
+        $stmt = $this->prepare($conn, $query);
+        $this->execute($stmt, $args);
+        return $stmt->rowCount();
     }
 
     // ******************************************
