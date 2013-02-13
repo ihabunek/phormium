@@ -47,6 +47,24 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         self::assertEquals($expected, $actual);
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Invalid filter: Column [x] does not exist in table [person].
+     */
+    public function testFilterInvalidColumn()
+    {
+        Person::objects()->filter('x', '=', 'x');
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Unknown filter operation [!!!].
+     */
+    public function testFilterInvalidOperation()
+    {
+        Person::objects()->filter('name', '!!!', 'x')->fetch();
+    }
+
     public function testOrderQS()
     {
         $qs1 = Person::objects();
@@ -67,6 +85,24 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         $expected = array('name desc', 'id asc');
         $actual = $qs3->getOrder();
         self::assertSame($expected, $actual);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Invalid order direction [!!!]. Expected 'asc' or 'desc'.
+     */
+    public function testOrderInvalidDirection()
+    {
+        Person::objects()->orderBy('name', '!!!')->fetch();
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Cannot order by column [xxx] because it does not exist in table [person].
+     */
+    public function testOrderInvalidColumn()
+    {
+        Person::objects()->orderBy('xxx', 'asc')->fetch();
     }
 
     public function testAggregates()
@@ -92,13 +128,13 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
             'income' => 30000
         );
 
-		self::assertFalse(Person::objects()->filter('birthday', '=', '2000-01-01')->exists());
+        self::assertFalse(Person::objects()->filter('birthday', '=', '2000-01-01')->exists());
 
         Person::fromArray($p1)->save();
         Person::fromArray($p2)->save();
         Person::fromArray($p3)->save();
 
-		self::assertTrue(Person::objects()->filter('birthday', '=', '2000-01-01')->exists());
+        self::assertTrue(Person::objects()->filter('birthday', '=', '2000-01-01')->exists());
 
         // Query set filtering the above created records
         $qs = Person::objects()->filter('name', 'like', "$uniq%");
@@ -113,5 +149,91 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         self::assertEquals(20000, $qs->avg('income'));
         self::assertEquals(60000, $qs->sum('income'));
         self::assertEquals(30000, $qs->max('income'));
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Invalid aggregate type [xxx].
+     */
+    public function testAggregatesInvalidType()
+    {
+        $agg = new Aggregate('xxx', 'yyy');
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Error forming aggregate query. Column [xxx] does not exist in table [person].
+     */
+    public function testAggregatesInvalidColumn()
+    {
+        Person::objects()->avg('xxx');
+    }
+
+    public function testBatch()
+    {
+        // Create some sample data
+        $uniq = uniqid('batch');
+
+        $p1 = array(
+            'name' => "{$uniq}_1",
+            'income' => 10000
+        );
+
+        $p2 = array(
+            'name' => "{$uniq}_2",
+            'income' => 20000
+        );
+
+        $p3 = array(
+            'name' => "{$uniq}_3",
+            'income' => 30000
+        );
+
+        $qs = Person::objects()->filter('name', 'like', "{$uniq}%");
+
+        self::assertFalse($qs->exists());
+        self::assertSame(0, $qs->count());
+
+        Person::fromArray($p1)->save();
+        Person::fromArray($p2)->save();
+        Person::fromArray($p3)->save();
+
+        self::assertTrue($qs->exists());
+        self::assertSame(3, $qs->count());
+
+        // Give everybody a raise!
+        $count = $qs->update(
+            array(
+                'income' => 5000
+            )
+        );
+
+        self::assertSame(3, $count);
+
+        $persons = $qs->fetch();
+        foreach ($persons as $person) {
+            self::assertEquals(5000, $person->income);
+        }
+
+        // Delete
+        $count = $qs->delete();
+        self::assertSame(3, $count);
+
+        // Check deleted
+        self::assertFalse($qs->exists());
+        self::assertSame(0, $qs->count());
+
+        // Repeated delete should yield 0 count
+        $count = $qs->delete();
+        self::assertSame(0, $count);
+    }
+
+    public function testGetMeta()
+    {
+        // Just to improve code coverage
+        $meta1 = Person::getMeta();
+        $meta2 = Person::objects()->getMeta();
+
+        self::assertSame($meta1, $meta2);
     }
 }
