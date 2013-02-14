@@ -250,7 +250,7 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
             Person::fromArray(array('name' => "{$uniq}_5")),
         );
 
-        foreach($persons as $person) {
+        foreach ($persons as $person) {
             $person->save();
         }
 

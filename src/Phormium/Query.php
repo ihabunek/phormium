@@ -3,7 +3,6 @@
 namespace Phormium;
 
 use \PDO;
-use \PDOStatement;
 
 /**
  * Generates and executes SQL queries.
@@ -21,8 +20,8 @@ class Query
 
     public function __construct(Meta $meta)
     {
-        $dbConfig = DB::getConnectionConfig($meta->database);
-        $this->driver = $dbConfig['driver'];
+        $database = Config::getDatabase($meta->database);
+        $this->driver = $this->getDriver($database['dsn']);
         $this->meta = $meta;
     }
 
@@ -49,7 +48,7 @@ class Query
         $order = $this->constructOrder($order);
 
         $query = "SELECT{$limit1} {$columns} FROM {$table}{$where}{$order}{$limit2};";
-        $conn = DB::getConnection($this->meta->database)->getPDO();
+        $conn = DB::getConnection($this->meta->database);
 
         $stmt = $this->prepare($conn, $query, $fetchType, $class);
         $this->execute($stmt, $args);
@@ -70,7 +69,7 @@ class Query
         list($where, $args) = $this->constructWhere($filters);
 
         $query = "SELECT COUNT(*) AS count FROM {$table}{$where};";
-        $conn = DB::getConnection($this->meta->database)->getPDO();
+        $conn = DB::getConnection($this->meta->database);
 
         $fetchType = PDO::FETCH_ASSOC;
 
@@ -102,7 +101,7 @@ class Query
         $select = $aggregate->render();
 
         $query = "SELECT {$select} as aggregate FROM {$table}{$where};";
-        $conn = DB::getConnection($this->meta->database)->getPDO();
+        $conn = DB::getConnection($this->meta->database);
 
         $fetchType = PDO::FETCH_ASSOC;
 
@@ -165,7 +164,7 @@ class Query
         $query .= "){$returning};";
 
         // Run query
-        $conn = DB::getConnection($meta->database)->getPDO();
+        $conn = DB::getConnection($meta->database);
         $stmt = $this->prepare($conn, $query);
         $this->execute($stmt, $args);
 
@@ -223,7 +222,7 @@ class Query
         $query .= implode(' AND ', $where);
 
         // Run the query
-        $conn = DB::getConnection($meta->database)->getPDO();
+        $conn = DB::getConnection($meta->database);
         $stmt = $this->prepare($conn, $query);
         $this->execute($stmt, $args);
         return $stmt->rowCount();
@@ -253,7 +252,7 @@ class Query
         $query = "DELETE FROM {$this->meta->table} WHERE {$where}";
 
         // Run the query
-        $conn = DB::getConnection($this->meta->database)->getPDO();
+        $conn = DB::getConnection($this->meta->database);
         $stmt = $this->prepare($conn, $query);
         $this->execute($stmt, $args);
         return $stmt->rowCount();
@@ -284,7 +283,7 @@ class Query
         $query .= $where;
 
         // Run the query
-        $conn = DB::getConnection($this->meta->database)->getPDO();
+        $conn = DB::getConnection($this->meta->database);
         $stmt = $this->prepare($conn, $query);
         $this->execute($stmt, $args);
         return $stmt->rowCount();
@@ -300,7 +299,7 @@ class Query
         $query = "DELETE FROM {$this->meta->table}{$where}";
 
         // Run the query
-        $conn = DB::getConnection($this->meta->database)->getPDO();
+        $conn = DB::getConnection($this->meta->database);
         $stmt = $this->prepare($conn, $query);
         $this->execute($stmt, $args);
         return $stmt->rowCount();
@@ -340,7 +339,7 @@ class Query
 
     private function prepare(PDO $conn, $query, $fetchType = null, $class = null)
     {
-        if (DB::$log) {
+        if (Config::isLoggingEnabled()) {
             echo date('Y-m-d H:i:s') . " Preparing query: $query\n";
         }
         $stmt = $conn->prepare($query);
@@ -352,7 +351,7 @@ class Query
 
     private function execute($stmt, $args)
     {
-        if (DB::$log) {
+        if (Config::isLoggingEnabled()) {
             echo date('Y-m-d H:i:s') . " Executing query with args: ";
             var_export($args);
             echo "\n";
@@ -360,7 +359,7 @@ class Query
 
         $stmt->execute($args);
 
-        if (DB::$log) {
+        if (Config::isLoggingEnabled()) {
             $rc = $stmt->rowCount();
             echo date('Y-m-d H:i:s') . " Finished execution. Row count: $rc.\n";
         }
@@ -368,7 +367,7 @@ class Query
 
     private function fetchAll($stmt, $fetchType)
     {
-        if (DB::$log) {
+        if (Config::isLoggingEnabled()) {
             echo date('Y-m-d H:i:s') . " Fetching data...";
         }
         $data = array();
@@ -420,5 +419,16 @@ class Query
         }
 
         return array($limit1, $limit2);
+    }
+
+    private function getDriver($dns)
+    {
+        $count = preg_match('/^([a-z]+):/', $dns, $matches);
+
+        if ($count !== 1) {
+            throw new \Exception("DNS should start with '<driver>:'");
+        }
+
+        return $matches[1];
     }
 }
