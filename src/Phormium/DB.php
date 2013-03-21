@@ -20,6 +20,7 @@ class DB
      */
     public static function configure($config)
     {
+        DB::disconnectAll();
         Config::load($config);
     }
 
