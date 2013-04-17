@@ -146,9 +146,8 @@ class QuerySet
      * Performs a SELECT query on the table, and returns a single row which
      * matches the current filter.
      *
-     * @throws \Exception If multiple rows are found
-     * @throws \Exception If no rows are found, and {@link $allowEmpty} is set
-     * to false.
+     * @throws \Exception If multiple rows are found.
+     * @throws \Exception If no rows are found.
      */
     public function single()
     {
@@ -164,6 +163,15 @@ class QuerySet
         }
 
         return isset($data[0]) ? $data[0] : null;
+    }
+
+    /**
+     * Performs a SELECT DISTINCT query on the given columns.
+     */
+    public function distinct()
+    {
+        $columns = func_get_args();
+        return $this->query->selectDistinct($this->filters, $this->order, $columns);
     }
 
     /**

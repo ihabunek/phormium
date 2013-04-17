@@ -56,6 +56,45 @@ class Query
     }
 
     /**
+     * Constructs and executes a SELECT DISTINCT query.
+     *
+     * @param array $filters Array of {@link Filter} instances used to form
+     *      the WHERE clause.
+     * @param array $order Array of strings used to form the ORDER BY clause.
+     * @param string $fetchType One of DB::FETCH_* constants.
+     *
+     * @return array An array of {@link Model} instances corresponing to given
+     *      criteria.
+     */
+    public function selectDistinct($filters, $order, array $columns)
+    {
+        $table = $this->meta->table;
+        $fetchType = PDO::FETCH_ASSOC;
+        if (empty($columns)) {
+            throw new \Exception("No columns given");
+        }
+
+        // Check columns exist
+        foreach($columns as $column) {
+            if (!in_array($column, $this->meta->columns)) {
+                throw new \Exception("Column [$column] does not exist in table [$table].");
+            }
+        }
+
+        $columns = implode(', ', $columns);
+
+        list($where, $args) = $this->constructWhere($filters);
+        $order = $this->constructOrder($order);
+
+        $query = "SELECT DISTINCT {$columns} FROM {$table}{$where}{$order};";
+        $conn = DB::getConnection($this->meta->database);
+
+        $stmt = $this->prepare($conn, $query, $fetchType);
+        $this->execute($stmt, $args);
+        return $this->fetchAll($stmt, $fetchType);
+    }
+
+    /**
      * Constructs and executes a SELECT COUNT(*) query.
      *
      * @param array $filters Array of {@link Filter} instances used to form

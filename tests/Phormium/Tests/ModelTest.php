@@ -297,4 +297,33 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $foo = new Trade();
         self::assertCount(2, $foo->getPK());
     }
+
+    public function testFetchDistinct()
+    {
+        $name = uniqid('foo');
+
+        Person::fromArray(array('name' => $name, 'income' => 100))->insert();
+        Person::fromArray(array('name' => $name, 'income' => 100))->insert();
+        Person::fromArray(array('name' => $name, 'income' => 100))->insert();
+        Person::fromArray(array('name' => $name, 'income' => 200))->insert();
+        Person::fromArray(array('name' => $name, 'income' => 200))->insert();
+        Person::fromArray(array('name' => $name, 'income' => 200))->insert();
+
+        $actual = Person::objects()
+            ->filter('name', '=', $name)
+            ->distinct('name', 'income');
+
+        $expected = array(
+            array(
+                'name' => $name,
+                'income' => 100,
+            ),
+            array (
+                'name' => $name,
+                'income' => 200,
+            ),
+        );
+
+        self::assertEquals($expected, $actual);
+    }
 }
