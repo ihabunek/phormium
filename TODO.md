@@ -1,28 +1,10 @@
 TODO
 ====
 
-Some ideas to implement in the future.
+Fix models with no Primary Key
+------------------------------
 
-Batch update/delete
--------------------
-
-Add update() and delete() to query set. These actions would affect all objects in current filter.
-
-e.g. Change all Johns to Mark.
-
-```php
-Person::objects()
-    ->filter(f::eq('name', 'John'))
-    ->update(['name' => 'Mark']);
-```
-
-e.g. Delete all people born before year 2000.
-
-```php
-Person::objects()
-    ->filter(f::lt('birthday', '2000-01-01'))
-    ->delete();
-```
+Writing those to database seems to be broken at the moment. Reading is fine.
 
 Make QuerySets iterable
 -----------------------
