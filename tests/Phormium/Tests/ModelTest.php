@@ -311,6 +311,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
         $actual = Person::objects()
             ->filter('name', '=', $name)
+            ->orderBy('income', 'asc')
             ->distinct('name', 'income');
 
         $expected = array(
@@ -327,7 +328,9 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
         $actual = Person::objects()
             ->filter('name', '=', $name)
+            ->orderBy('income', 'asc')
             ->distinct('income');
+
         $expected = array(100, 200);
         self::assertEquals($expected, $actual);
     }
