@@ -206,6 +206,7 @@ Aggregates
 ~~~~~~~~~~
 
 The following aggregate functions are implemented on the QuerySet object:
+
 * `avg($column)`
 * `min($column)`
 * `max($column)`
