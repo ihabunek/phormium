@@ -219,6 +219,45 @@ Person::objects()
 
 This returns the number of Persons with income under 10k.
 
+#### distinct()
+
+Returns the distinct values in given columns matching the current filter.
+
+```php
+Person::objects()
+    ->filter('birthday', '>=', '2001-01-01')
+    ->distinct('name');
+
+Person::objects()
+    ->filter('birthday', '>=', '2001-01-01')
+    ->distinct('name', 'income');
+```
+
+The first one will return an array of distinct names for all people born in this
+millenium, and the second the distinct combinations of name and income. Sample
+results:
+
+```php
+// Distinct names
+array('Ivan', 'Marko');
+
+// Distinct name + income
+array(
+	array(
+		'name' => 'Ivan',
+		'income' => '5000'
+	),
+	array(
+		'name' => 'Ivan',
+		'income' => '7000'
+	),
+	array(
+		'name' => 'Marko',
+		'income' => '3000'
+	),
+)
+```
+
 #### Aggregates
 
 The following aggregate functions are implemented on the QuerySet object:

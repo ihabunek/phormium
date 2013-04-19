@@ -31,7 +31,6 @@ class Query
      * @param array $filters Array of {@link Filter} instances used to form
      *      the WHERE clause.
      * @param array $order Array of strings used to form the ORDER BY clause.
-     * @param string $fetchType One of DB::FETCH_* constants.
      *
      * @return array An array of {@link Model} instances corresponing to given
      *      criteria.
@@ -61,10 +60,11 @@ class Query
      * @param array $filters Array of {@link Filter} instances used to form
      *      the WHERE clause.
      * @param array $order Array of strings used to form the ORDER BY clause.
-     * @param string $fetchType One of DB::FETCH_* constants.
      *
-     * @return array An array of {@link Model} instances corresponing to given
-     *      criteria.
+     * @return array An array distinct values. If multiple columns are given,
+	 *      will return an array of arrays, and each of these will have
+	 *      the distinct values indexed by column name. If a single column is
+	 *      given will return an array of distinct values for that column.
      */
     public function selectDistinct($filters, $order, array $columns)
     {
@@ -81,17 +81,29 @@ class Query
             }
         }
 
-        $columns = implode(', ', $columns);
+        $sqlColumns = implode(', ', $columns);
 
         list($where, $args) = $this->constructWhere($filters);
         $order = $this->constructOrder($order);
 
-        $query = "SELECT DISTINCT {$columns} FROM {$table}{$where}{$order};";
+        $query = "SELECT DISTINCT {$sqlColumns} FROM {$table}{$where}{$order};";
         $conn = DB::getConnection($this->meta->database);
 
         $stmt = $this->prepare($conn, $query, $fetchType);
         $this->execute($stmt, $args);
-        return $this->fetchAll($stmt, $fetchType);
+
+        // If multiple columns, return array of arrays
+        if (count($columns) > 1) {
+            return $this->fetchAll($stmt, $fetchType);
+        }
+
+        // If it's a single column then return a single array of values
+        $column = reset($columns);
+        $data = array();
+        while ($row = $stmt->fetch($fetchType)) {
+            $data[] = $row[$column];
+        }
+        return $data;
     }
 
     /**

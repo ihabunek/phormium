@@ -323,7 +323,12 @@ class ModelTest extends \PHPUnit_Framework_TestCase
                 'income' => 200,
             ),
         );
+        self::assertEquals($expected, $actual);
 
+        $actual = Person::objects()
+            ->filter('name', '=', $name)
+            ->distinct('income');
+        $expected = array(100, 200);
         self::assertEquals($expected, $actual);
     }
 }
