@@ -8,16 +8,8 @@ It's tested on informix, mysql, postgresql and sqlite.
 Could work with other relational databases which have a PDO driver, or may
 require some changes.
 
-.. caution:: This is a work in progress. Things may change. Do not use for
-   anything serious, yet.
-
-Why?
-----
-
-Why another ORM, I hear you cry! Well, first and foremost, no other ORM I found
-works with Informix, and I'm tied to Informix on my day job. It's a real pain
-writing CRUD functions by hand. Second, It's fun to try and write an ORM. Tell
-me how you like it.
+.. caution:: This is a work in progress. Test before using! Report any bugs
+   on `Github <https://github.com/ihabunek/phormium/issues>`_.
 
 Contents
 --------
