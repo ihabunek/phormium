@@ -15,10 +15,12 @@ required.
 .. code-block:: javascript
 
     {
-        "testdb": {
-            "dsn": "mysql:host=localhost;dbname=testdb",
-            "username": "myuser",
-            "password": "mypass"
+        "databases": {
+            "testdb": {
+                "dsn": "mysql:host=localhost;dbname=testdb",
+                "username": "myuser",
+                "password": "mypass"
+            }
         }
     }
 
