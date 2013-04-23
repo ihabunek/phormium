@@ -27,7 +27,7 @@ Current restrictions:
 Documentation
 -------------
 
-[The documentation](phormium.readthedocs.org/en/latest/) is hosted by
+[The documentation](http://phormium.readthedocs.org/en/latest/) is hosted by
 ReadTheDocs.org.
 
 Also have a look at some quick examples in the `examples` directory.
