@@ -15,18 +15,20 @@ Features
 
 * CRUD operations made simple
 * batch update and delete
-* chaining filters
+* filtering
 * ordering
 
-Things currently not supported by Phormium:
+Current restrictions:
 
-* no joins of any kind
+* no relationships between models
+* no transactions
 * cannot use OR in filters
 
 Documentation
 -------------
 
-[The documentation]() is hosted by ReadTheDocs.org.
+[The documentation](phormium.readthedocs.org/en/latest/) is hosted by
+ReadTheDocs.org.
 
 Also have a look at some quick examples in the `examples` directory.
 
@@ -39,6 +41,10 @@ There are two reasons:
 
 * I work a lot on Informix on my day job and no other ORM I found supports it.
 * Writing an ORM is a great experience. You should try it.
+
+Phormium is greatly inspired by other ORMs, in particular
+[Django ORM](https://docs.djangoproject.com/en/dev/topics/db/) and
+Laravel's [Eloquent ORM](http://laravel.com/docs/database/eloquent).
 
 Let me know what you think!
 
