@@ -111,7 +111,7 @@ queries on the database.
 
    * - `fetch()`_
      - Fetches records as objects.
-   * - `fetch()`_
+   * - `single()`_
      - Fetches a single record as an object.
    * - `values()`_
      - Fetches records as associative arrays (can select columns).
