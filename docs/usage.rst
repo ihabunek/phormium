@@ -158,26 +158,6 @@ Model objects.
         ->filter('income', '>', 10000)
         ->fetch();
 
-Fetch can also be limited. The following query will fetch first 50 records,
-ordered by first_name column:
-
-.. code-block:: php
-
-    Person::objects()
-        ->orderBy('first_name', 'asc')
-        ->fetch(50);
-
-Offset can be applied as the second argument:
-
-.. code-block:: php
-
-    Person::objects()
-        ->orderBy('first_name', 'asc')
-        ->fetch(50, 100);
-
-This will produce a SELECT query with `OFFSET 100 LIMIT 50`. In other words, it
-will fetch 50 people starting with the 101st person, sorted by first name.
-
 single()
 ~~~~~~~~
 
