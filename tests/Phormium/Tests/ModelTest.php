@@ -202,13 +202,14 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             ->orderBy('id', 'asc')
             ->fetch();
 
+        $limit = 3;
         $offset = 2;
-        $length = 3;
 
-        $expected = array_slice($allPeople, $offset, $length);
+        $expected = array_slice($allPeople, $offset, $limit);
         $actual = Person::objects()
             ->orderBy('id', 'asc')
-            ->fetch($length, $offset);
+            ->limit($limit, $offset)
+            ->fetch();
 
         self::assertEquals($expected, $actual);
     }
@@ -334,39 +335,39 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $expected = array(100, 200);
         self::assertEquals($expected, $actual);
     }
-    
+
     public function testFetchValues()
     {
         $name = uniqid();
-        
+
         Person::fromArray(array('name' => "$name-1", 'income' => 100))->insert();
         Person::fromArray(array('name' => "$name-2", 'income' => 200))->insert();
         Person::fromArray(array('name' => "$name-3", 'income' => 300))->insert();
-        
+
         $actual = Person::objects()
             ->filter('name', 'LIKE', "$name%")
             ->orderBy('name', 'asc')
             ->values('name', 'income');
-            
+
         $expected = array(
             array('name' => "$name-1", 'income' => 100),
             array('name' => "$name-2", 'income' => 200),
             array('name' => "$name-3", 'income' => 300),
         );
-        
+
         self::assertEquals($expected, $actual);
-        
+
         $actual = Person::objects()
             ->filter('name', 'LIKE', "$name%")
             ->orderBy('name', 'asc')
             ->valuesList('name', 'income');
-            
+
         $expected = array(
             array("$name-1", 100),
             array("$name-2", 200),
             array("$name-3", 300),
         );
-        
+
         self::assertEquals($expected, $actual);
     }
 }

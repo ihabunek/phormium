@@ -13,15 +13,17 @@ class QuerySet
      */
     private $meta;
 
-    /**
-     * Order by clauses.
-     */
+    /** Order by clauses. */
     private $order = array();
 
-    /**
-     * Array of {@link Filter} objects.
-     */
+    /** Array of Filter objects. */
     private $filters = array();
+
+    /** Maximum number of rows to fetch. */
+    private $limit = null;
+
+    /** Offset of the first row to return. */
+    private $offset = null;
 
     public function __construct(Query $query, Meta $meta)
     {
@@ -64,6 +66,26 @@ class QuerySet
     {
         $qs = clone $this;
         $qs->addOrder($column, $direction);
+        return $qs;
+    }
+
+    /**
+     * Returns a new QuerySet with the limit and offset populated with given
+     * values.
+     */
+    public function limit($limit, $offset = null)
+    {
+        if (!is_null($limit) && !is_int($limit) && !preg_match('/^[0-9]+$/', $limit)) {
+            throw new \Exception("Limit must be an integer or null.");
+        }
+
+        if (!is_null($offset) && !is_int($offset) && !preg_match('/^[0-9]+$/', $offset)) {
+            throw new \Exception("Offset must be an integer or null.");
+        }
+
+        $qs = clone $this;
+        $qs->limit = $limit;
+        $qs->offset = $offset;
         return $qs;
     }
 
@@ -137,9 +159,9 @@ class QuerySet
      * Performs a SELECT query on the table, and returns rows matching the
      * current filter.
      */
-    public function fetch($limit = null, $offset = null)
+    public function fetch()
     {
-        return $this->query->select($this->filters, $this->order, null, $limit, $offset);
+        return $this->query->select($this->filters, $this->order, null, $this->limit, $this->offset);
     }
 
     /**
@@ -164,10 +186,10 @@ class QuerySet
 
         return isset($data[0]) ? $data[0] : null;
     }
-    
+
     /**
      * Performs a SELECT query on the table, and returns rows matching the
-     * current filter as associative arrays (instead of objects which are 
+     * current filter as associative arrays (instead of objects which are
      * returned by fetch().
      *
      * One or more column names can be provided as parameters, and only these
@@ -180,13 +202,13 @@ class QuerySet
         if (empty($columns)) {
             $columns = null;
         }
-        
-        return $this->query->select($this->filters, $this->order, $columns, null, null, \PDO::FETCH_ASSOC);
+
+        return $this->query->select($this->filters, $this->order, $columns, $this->limit, $this->offset, \PDO::FETCH_ASSOC);
     }
-    
+
     /**
      * Performs a SELECT query on the table, and returns rows matching the
-     * current filter as number-indexed arrays (instead of objects which are 
+     * current filter as number-indexed arrays (instead of objects which are
      * returned by fetch().
      *
      * One or more column names can be provided as parameters, and only these
@@ -199,8 +221,8 @@ class QuerySet
         if (empty($columns)) {
             $columns = null;
         }
-        
-        return $this->query->select($this->filters, $this->order, $columns, null, null, \PDO::FETCH_NUM);
+
+        return $this->query->select($this->filters, $this->order, $columns, $this->limit, $this->offset, \PDO::FETCH_NUM);
     }
 
     /**

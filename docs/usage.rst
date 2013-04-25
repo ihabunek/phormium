@@ -99,6 +99,30 @@ Available filters:
         ->filter($column, 'IS NULL')
         ->filter($column, 'NOT NULL')
 
+Ordering data
+-------------
+
+QuerySets can also be ordered to determine the order in which matching records
+will be returned.
+
+To apply ordering:
+
+.. code-block:: php
+
+    Person::objects()
+        ->orderBy('id', 'desc')
+        ->fetch();
+
+Ordering by multiple columns:
+
+.. code-block:: php
+
+    Person::objects()
+        ->orderBy('id', 'desc')
+        ->orderBy('name', 'asc')
+        ->fetch();
+
+
 Fetching data
 -------------
 
@@ -301,6 +325,46 @@ Aggregates are applied after filtering. For example:
         ->avg('income');
 
 Returns the average income of people born before year 2000.
+
+Limited fetch
+-------------
+
+Limited fetch allows you to retrieve only a portion of results matched by a
+`QuerySet`. This will limit the data returned by `fetch()`_, `values()`_ and
+`valuesList()`_ methods. `distinct()`_ is currently unaffected.
+
+.. code-block:: php
+
+    QuerySet::limit($limit, $offset)
+
+If a `$limit` is given, that is the maximum number of records which will be
+returned by the fetch methods. It is possible fetch will return fewer records
+if the query itself yields less rows. Specifying NULL means without limit.
+
+If `$offset` is given, that is the number of rows which will be skipped from
+the matched rows.
+
+For example to return a maximum of 10 records:
+
+.. code-block:: php
+
+    Person::objects()
+        ->limit(10)
+        ->fetch();
+
+It often makes sense to use `limit()`_ in conjunction with `orderBy()`_ because
+otherwise you will get un unpredictable set of rows, depending on how the
+database decides to order them.
+
+.. code-block:: php
+
+    Person::objects()
+        ->orderBy('name')
+        ->limit(10, 20)
+        ->fetch();
+
+This request returns a maximum of 10 rows, while skipping the first 20 records
+ordered by the `name` column.
 
 Writing data
 ------------

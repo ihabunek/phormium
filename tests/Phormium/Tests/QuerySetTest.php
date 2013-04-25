@@ -258,16 +258,52 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
             ->filter('name', 'like', "{$uniq}%")
             ->orderBy('name');
 
-        self::assertEquals(array_slice($persons, 0, 2), $qs->fetch(2));
-        self::assertEquals(array_slice($persons, 0, 2), $qs->fetch(2, 0));
-        self::assertEquals(array_slice($persons, 1, 2), $qs->fetch(2, 1));
-        self::assertEquals(array_slice($persons, 2, 2), $qs->fetch(2, 2));
-        self::assertEquals(array_slice($persons, 3, 2), $qs->fetch(2, 3));
-        self::assertEquals(array_slice($persons, 0, 1), $qs->fetch(1));
-        self::assertEquals(array_slice($persons, 0, 1), $qs->fetch(1, 0));
-        self::assertEquals(array_slice($persons, 1, 1), $qs->fetch(1, 1));
-        self::assertEquals(array_slice($persons, 2, 1), $qs->fetch(1, 2));
-        self::assertEquals(array_slice($persons, 3, 1), $qs->fetch(1, 3));
-        self::assertEquals(array_slice($persons, 4, 1), $qs->fetch(1, 4));
+        self::assertEquals(array_slice($persons, 0, 2), $qs->limit(2)->fetch());
+        self::assertEquals(array_slice($persons, 0, 2), $qs->limit(2, 0)->fetch());
+        self::assertEquals(array_slice($persons, 1, 2), $qs->limit(2, 1)->fetch());
+        self::assertEquals(array_slice($persons, 2, 2), $qs->limit(2, 2)->fetch());
+        self::assertEquals(array_slice($persons, 3, 2), $qs->limit(2, 3)->fetch());
+        self::assertEquals(array_slice($persons, 0, 1), $qs->limit(1)->fetch());
+        self::assertEquals(array_slice($persons, 0, 1), $qs->limit(1, 0)->fetch());
+        self::assertEquals(array_slice($persons, 1, 1), $qs->limit(1, 1)->fetch());
+        self::assertEquals(array_slice($persons, 2, 1), $qs->limit(1, 2)->fetch());
+        self::assertEquals(array_slice($persons, 3, 1), $qs->limit(1, 3)->fetch());
+        self::assertEquals(array_slice($persons, 4, 1), $qs->limit(1, 4)->fetch());
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Limit must be an integer or null.
+     */
+    public function testLimitedFetchWrongLimit1()
+    {
+        Person::objects()->limit(1.1);
+    }
+
+/**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Limit must be an integer or null.
+     */
+    public function testLimitedFetchWrongLimit2()
+    {
+        Person::objects()->limit("a");
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Offset must be an integer or null.
+     */
+    public function testLimitedFetchWrongOffset1()
+    {
+        Person::objects()->limit(1, 1.1);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Offset must be an integer or null.
+     */
+    public function testLimitedFetchWrongOffset2()
+    {
+        Person::objects()->limit(1, "a");
     }
 }
