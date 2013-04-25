@@ -105,23 +105,22 @@ Fetching data
 There are several methods for fetching data. All these methods perform SQL
 queries on the database.
 
-Overview:
+.. list-table:: Fetch methods
+   :widths: 20 80
+   :header-rows: 1
 
-+-----------------+---------------------------------------------------------------+
-| Method          | Description                                                   |
-+=================+===============================================================+
-| `fetch()`_      | Fetches records as objects.                                   |
-+-----------------+---------------------------------------------------------------+
-| `single()`_     | Fetches a single record as an object.                         |
-+-----------------+---------------------------------------------------------------+
-| `values()`_     | Fetches records as associative arrays (can select columns).   |
-+-----------------+---------------------------------------------------------------+
-| `valuesList()`_ | Fetches records as number-indexed arrays (can select columns).|
-+-----------------+---------------------------------------------------------------+
-| `count()`_      | Returns the number of records matching the filter.            |
-+-----------------+---------------------------------------------------------------+
-| `distinct()`_   | Returns distinct values of given columns.                     |
-+-----------------+---------------------------------------------------------------+
+   * - `fetch()`_
+     - Fetches records as objects.
+   * - `fetch()`_
+     - Fetches a single record as an object.
+   * - `values()`_
+     - Fetches records as associative arrays (can select columns).
+   * - `valuesList()`_
+     - Fetches records as number-indexed arrays (can select columns).
+   * - `count()`_
+     - Returns the number of records matching the filter.
+   * - `distinct()`_
+     - Returns distinct values of given columns.
 
 fetch()
 ~~~~~~~
