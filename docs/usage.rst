@@ -105,6 +105,24 @@ Fetching data
 There are several methods for fetching data. All these methods perform SQL
 queries on the database.
 
+Overview:
+
++-----------------+---------------------------------------------------------------+
+| Method          | Description                                                   |
++=================+===============================================================+
+| `fetch()`_      | Fetches records as objects.                                   |
++-----------------+---------------------------------------------------------------+
+| `single()`_     | Fetches a single record as an object.                         |
++-----------------+---------------------------------------------------------------+
+| `values()`_     | Fetches records as associative arrays (can select columns).   |
++-----------------+---------------------------------------------------------------+
+| `valuesList()`_ | Fetches records as number-indexed arrays (can select columns).|
++-----------------+---------------------------------------------------------------+
+| `count()`_      | Returns the number of records matching the filter.            |
++-----------------+---------------------------------------------------------------+
+| `distinct()`_   | Returns distinct values of given columns.                     |
++-----------------+---------------------------------------------------------------+
+
 fetch()
 ~~~~~~~
 
@@ -160,6 +178,52 @@ This can also be achieved by the `get()` shorthand method:
 .. code-block:: php
 
     Person::get(13);
+
+values()
+~~~~~~~~
+
+Similar to fetch(), but returns records as associative arrays instead of
+objects.
+
+Additionally, it's possible to specify which columns to fetch from the database:
+
+.. code-block:: php
+
+    Person::objects()->values('id', 'name');
+
+This will return:
+
+.. code-block:: php
+
+    array(
+        array('id' => '1', 'name' => 'Ivan'),
+        array('id' => '1', 'name' => 'Marko'),
+    )
+
+If no columns are specified, all columns in the model will be fetched.
+
+valuesList()
+~~~~~~~~~~~~
+
+Similar to fetch(), but returns records as number-indexed arrays instead of
+objects.
+
+Additionally, it's possible to specify which columns to fetch from the database:
+
+.. code-block:: php
+
+    Person::objects()->valuesList('id', 'name');
+
+This will return:
+
+.. code-block:: php
+
+    array(
+        array('1', 'Ivan'),
+        array('1', 'Marko'),
+    )
+
+If no columns are specified, all columns in the model will be fetched.
 
 count()
 ~~~~~~~

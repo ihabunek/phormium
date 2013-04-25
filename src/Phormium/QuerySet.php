@@ -139,7 +139,7 @@ class QuerySet
      */
     public function fetch($limit = null, $offset = null)
     {
-        return $this->query->select($this->filters, $this->order, $limit, $offset);
+        return $this->query->select($this->filters, $this->order, null, $limit, $offset);
     }
 
     /**
@@ -163,6 +163,44 @@ class QuerySet
         }
 
         return isset($data[0]) ? $data[0] : null;
+    }
+    
+    /**
+     * Performs a SELECT query on the table, and returns rows matching the
+     * current filter as associative arrays (instead of objects which are 
+     * returned by fetch().
+     *
+     * One or more column names can be provided as parameters, and only these
+     * columns will be fetched. If no parameters are given, all columns are
+     * fetched.
+     */
+    public function values()
+    {
+        $columns = func_get_args();
+        if (empty($columns)) {
+            $columns = null;
+        }
+        
+        return $this->query->select($this->filters, $this->order, $columns, null, null, \PDO::FETCH_ASSOC);
+    }
+    
+    /**
+     * Performs a SELECT query on the table, and returns rows matching the
+     * current filter as number-indexed arrays (instead of objects which are 
+     * returned by fetch().
+     *
+     * One or more column names can be provided as parameters, and only these
+     * columns will be fetched. If no parameters are given, all columns are
+     * fetched.
+     */
+    public function valuesList()
+    {
+        $columns = func_get_args();
+        if (empty($columns)) {
+            $columns = null;
+        }
+        
+        return $this->query->select($this->filters, $this->order, $columns, null, null, \PDO::FETCH_NUM);
     }
 
     /**

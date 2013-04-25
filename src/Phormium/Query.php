@@ -35,12 +35,17 @@ class Query
      * @return array An array of {@link Model} instances corresponing to given
      *      criteria.
      */
-    public function select($filters, $order, $limit = null, $offset = null)
+    public function select($filters, $order, array $columns = null, $limit = null, $offset = null, $fetchType = PDO::FETCH_CLASS)
     {
-        $columns = implode(", ", $this->meta->columns);
+        if (isset($columns)) {
+            $this->checkColumnsExist($columns);
+        } else {
+            $columns = $this->meta->columns;
+        }
+
+        $columns = implode(", ", $columns);
         $table = $this->meta->table;
         $class = $this->meta->class;
-        $fetchType = PDO::FETCH_CLASS; // TODO: read from config
 
         list($limit1, $limit2) = $this->renderLimitOffset($limit, $offset);
         list($where, $args) = $this->constructWhere($filters);
@@ -74,12 +79,7 @@ class Query
             throw new \Exception("No columns given");
         }
 
-        // Check columns exist
-        foreach($columns as $column) {
-            if (!in_array($column, $this->meta->columns)) {
-                throw new \Exception("Column [$column] does not exist in table [$table].");
-            }
-        }
+        $this->checkColumnsExist($columns);
 
         $sqlColumns = implode(', ', $columns);
 
@@ -359,6 +359,19 @@ class Query
     // ******************************************
     // *** Private methods                    ***
     // ******************************************
+
+    /**
+     * Checks that each of the columns in $columns exists in the uderlying
+     * model.
+     */
+    private function checkColumnsExist(array $columns)
+    {
+        foreach($columns as $column) {
+            if (!in_array($column, $this->meta->columns)) {
+                throw new \Exception("Column [$column] does not exist in table [$table].");
+            }
+        }
+    }
 
     /** Constructs a WHERE clause for given filters. */
     private function constructWhere($filters)
