@@ -345,6 +345,9 @@ database decides to order them.
 This request returns a maximum of 10 rows, while skipping the first 20 records
 ordered by the `name` column.
 
+.. _orderBy(): #ordering-data
+.. _limit(): #limited-fetch
+
 Writing data
 ------------
 
