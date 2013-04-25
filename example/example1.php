@@ -11,31 +11,39 @@ Phormium\Autoloader::register();
 require 'Person.php';
 
 use \Phormium\DB;
-use \Phormium\f;
 
 // Configure the database connections
 DB::configure('config.json');
 
 // Select a single record by primary key
-$t = Person::get(31);
+$person = Person::get(31);
+
+echo "Person #31:\n";
+print_r($person);
+echo "\n";
 
 // Get number of people born before 2012
-$c = Person::objects()
+$count = Person::objects()
     ->filter('birthday', '<', '2012-01-01')
     ->count();
 
-echo "Count: $c\n";
+echo "Number of people born before 2012: $count\n\n";
 
 // Fetch all people whose name begins with G
-$a = Person::objects()
-    ->filter('name', 'like', 'G%')
+$people = Person::objects()
+    ->filter('name', 'ilike', 'g%')
     ->fetch();
 
-print_r($a);
+echo "People whose name starts with the letter G:\n";
+print_r($people);
+echo "\n";
 
-// Fetch all people with id between 54 and 57 as arrays
-$a = Person::objects()
-    ->filter('id', 'between', [54, 57])
-    ->fetch(DB::FETCH_ARRAY);
-    
-print_r($a);
+// Fetch all people with salary between 4500 and 5000 (ordered by salary desc)
+$people = Person::objects()
+    ->filter('salary', 'between', [4500, 5000])
+    ->orderBy('salary', 'desc')
+    ->fetch();
+
+echo "People with with salary between 4500 and 5000:\n";
+print_r($people);
+echo "\n";

@@ -1,7 +1,9 @@
 {
-    "myconnection": {
-        "dsn": "sqlite:target/temp/test.db",
-        "username": "",
-        "password": ""
+	"databases": {
+	    "mydb": {
+	        "dsn": "sqlite:target/temp/test.db",
+	        "username": "",
+	        "password": ""
+	    }
     }
 }

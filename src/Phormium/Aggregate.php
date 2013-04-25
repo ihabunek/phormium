@@ -4,19 +4,19 @@ namespace Phormium;
 
 class Aggregate
 {
-    const TYPE_AVERAGE = 'avg';
-    const TYPE_MAX = 'max';
-    const TYPE_MIN = 'min';
-    const TYPE_SUM = 'sum';
+    const AVERAGE = 'avg';
+    const MAX = 'max';
+    const MIN = 'min';
+    const SUM = 'sum';
 
     private $types = array(
-        self::TYPE_AVERAGE,
-        self::TYPE_MAX,
-        self::TYPE_MIN,
-        self::TYPE_SUM,
+        self::AVERAGE,
+        self::MAX,
+        self::MIN,
+        self::SUM,
     );
 
-    /** Aggregate type. One of TYPE_* constants. */
+    /** Aggregate type. One of $types constants. */
     public $type;
 
     /** Column on which to perform the aggregation. */
@@ -36,34 +36,5 @@ class Aggregate
     public function render()
     {
         return "{$this->type}({$this->column})";
-    }
-
-    // ******************************************
-    // *** Static factory methods             ***
-    // ******************************************
-
-    public static function __callStatic($name, $args)
-    {
-        throw new \Exception("Invalid aggregate type [$name]");
-    }
-
-    public static function avg($column)
-    {
-        return new Aggregate(Aggregate::TYPE_AVERAGE, $column);
-    }
-
-    public static function max($column)
-    {
-        return new Aggregate(Aggregate::TYPE_MAX, $column);
-    }
-
-    public static function min($column)
-    {
-        return new Aggregate(Aggregate::TYPE_MIN, $column);
-    }
-
-    public static function sum($column)
-    {
-        return new Aggregate(Aggregate::TYPE_SUM, $column);
     }
 }

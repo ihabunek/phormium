@@ -17,7 +17,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     public function testEq()
     {
-        $filter = new Filter('test', '=', 1) ;
+        $filter = new Filter('test', '=', 1);
         $actual = $filter->render();
         $expected = array("test = ?", array(1));
         self::assertSame($expected, $actual);
@@ -25,7 +25,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     public function testNeq1()
     {
-        $filter = new Filter('test', '!=', 1) ;
+        $filter = new Filter('test', '!=', 1);
         $actual = $filter->render();
         $expected = array("test != ?", array(1));
         self::assertSame($expected, $actual);
@@ -33,7 +33,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     public function testNeq2()
     {
-        $filter = new Filter('test', '<>', 1) ;
+        $filter = new Filter('test', '<>', 1);
         $actual = $filter->render();
         $expected = array("test <> ?", array(1));
         self::assertSame($expected, $actual);
@@ -41,7 +41,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     public function testGt()
     {
-        $filter = new Filter('test', '>', 1) ;
+        $filter = new Filter('test', '>', 1);
         $actual = $filter->render();
         $expected = array("test > ?", array(1));
         self::assertSame($expected, $actual);
@@ -49,7 +49,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     public function testGte()
     {
-        $filter = new Filter('test', '>=', 1) ;
+        $filter = new Filter('test', '>=', 1);
         $actual = $filter->render();
         $expected = array("test >= ?", array(1));
         self::assertSame($expected, $actual);
@@ -57,7 +57,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     public function testLt()
     {
-        $filter = new Filter('test', '<', 1) ;
+        $filter = new Filter('test', '<', 1);
         $actual = $filter->render();
         $expected = array("test < ?", array(1));
         self::assertSame($expected, $actual);
@@ -65,7 +65,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     public function testLte()
     {
-        $filter = new Filter('test', '<=', 1) ;
+        $filter = new Filter('test', '<=', 1);
         $actual = $filter->render();
         $expected = array("test <= ?", array(1));
         self::assertSame($expected, $actual);
@@ -73,7 +73,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     public function testIn()
     {
-        $filter = new Filter('test', 'in', array(1, 2, 3)) ;
+        $filter = new Filter('test', 'in', array(1, 2, 3));
         $actual = $filter->render();
         $expected = array("test IN (?, ?, ?)", array(1, 2, 3));
         self::assertSame($expected, $actual);
@@ -91,7 +91,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     public function testNotIn()
     {
-        $filter = new Filter('test', 'not in', array(1, 2, 3)) ;
+        $filter = new Filter('test', 'not in', array(1, 2, 3));
         $actual = $filter->render();
         $expected = array("test NOT IN (?, ?, ?)", array(1, 2, 3));
         self::assertSame($expected, $actual);
@@ -103,7 +103,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotInWrongParam()
     {
-        $filter = new Filter('test', 'not in', 1) ;
+        $filter = new Filter('test', 'not in', 1);
         $filter->render();
     }
 
@@ -179,12 +179,17 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     public function testCaseInsensitiveLike()
     {
-        $p1 = Person::fromArray(array('name' => "PERO"))->insert();
-        $p2 = Person::fromArray(array('name' => "pero"))->insert();
-        $p3 = Person::fromArray(array('name' => "Pero"))->insert();
-        $p4 = Person::fromArray(array('name' => "pERO"))->insert();
+        $qs = Person::objects()->filter('name', 'ilike', 'pero');
 
-        $persons = Person::objects()->filter('name', 'ilike', 'pero')->fetch();
-        self::assertCount(4, $persons);
+        $qs->delete();
+        self::assertFalse($qs->exists());
+
+        Person::fromArray(array('name' => "PERO"))->insert();
+        Person::fromArray(array('name' => "pero"))->insert();
+        Person::fromArray(array('name' => "Pero"))->insert();
+        Person::fromArray(array('name' => "pERO"))->insert();
+
+        self::assertSame(4, $qs->count());
+        self::assertCount(4, $qs->fetch());
     }
 }

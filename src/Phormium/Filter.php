@@ -9,7 +9,7 @@ class Filter
 {
     // Operation constants
     const OP_BETWEEN = 'BETWEEN';
-	const OP_EQUALS = '=';
+    const OP_EQUALS = '=';
     const OP_GREATER = '>';
     const OP_GREATER_OR_EQUAL = '>=';
     const OP_IN = 'IN';

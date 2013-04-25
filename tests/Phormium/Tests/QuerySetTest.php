@@ -2,7 +2,6 @@
 
 namespace Phormium\Tests;
 
-use \Phormium\a;
 use \Phormium\Aggregate;
 use \Phormium\DB;
 use \Phormium\Filter;
@@ -48,6 +47,24 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         self::assertEquals($expected, $actual);
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Invalid filter: Column [x] does not exist in table [person].
+     */
+    public function testFilterInvalidColumn()
+    {
+        Person::objects()->filter('x', '=', 'x');
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Unknown filter operation [!!!].
+     */
+    public function testFilterInvalidOperation()
+    {
+        Person::objects()->filter('name', '!!!', 'x')->fetch();
+    }
+
     public function testOrderQS()
     {
         $qs1 = Person::objects();
@@ -68,6 +85,24 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         $expected = array('name desc', 'id asc');
         $actual = $qs3->getOrder();
         self::assertSame($expected, $actual);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Invalid order direction [!!!]. Expected 'asc' or 'desc'.
+     */
+    public function testOrderInvalidDirection()
+    {
+        Person::objects()->orderBy('name', '!!!')->fetch();
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Cannot order by column [xxx] because it does not exist in table [person].
+     */
+    public function testOrderInvalidColumn()
+    {
+        Person::objects()->orderBy('xxx', 'asc')->fetch();
     }
 
     public function testAggregates()
@@ -93,13 +128,13 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
             'income' => 30000
         );
 
-		self::assertFalse(Person::objects()->filter('birthday', '=', '2000-01-01')->exists());
+        self::assertFalse(Person::objects()->filter('birthday', '=', '2000-01-01')->exists());
 
         Person::fromArray($p1)->save();
         Person::fromArray($p2)->save();
         Person::fromArray($p3)->save();
 
-		self::assertTrue(Person::objects()->filter('birthday', '=', '2000-01-01')->exists());
+        self::assertTrue(Person::objects()->filter('birthday', '=', '2000-01-01')->exists());
 
         // Query set filtering the above created records
         $qs = Person::objects()->filter('name', 'like', "$uniq%");
@@ -107,30 +142,168 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         $count = $qs->count();
         self::assertSame(3, $count);
 
-        self::assertSame('2000-01-01', $qs->aggregate(a::min('birthday')));
-        self::assertSame('2002-01-01', $qs->aggregate(a::max('birthday')));
+        self::assertSame('2000-01-01', $qs->min('birthday'));
+        self::assertSame('2002-01-01', $qs->max('birthday'));
 
-        self::assertEquals(10000, $qs->aggregate(a::min('income')));
-        self::assertEquals(20000, $qs->aggregate(a::avg('income')));
-        self::assertEquals(60000, $qs->aggregate(a::sum('income')));
-        self::assertEquals(30000, $qs->aggregate(a::max('income')));
+        self::assertEquals(10000, $qs->min('income'));
+        self::assertEquals(20000, $qs->avg('income'));
+        self::assertEquals(60000, $qs->sum('income'));
+        self::assertEquals(30000, $qs->max('income'));
     }
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Invalid aggregate type [foo]
+     * @expectedExceptionMessage Invalid aggregate type [xxx].
      */
-    public function testAggregatesFail1()
+    public function testAggregatesInvalidType()
     {
-        a::foo('bar');
+        $agg = new Aggregate('xxx', 'yyy');
     }
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Invalid aggregate type [foo]
+     * @expectedExceptionMessage Error forming aggregate query. Column [xxx] does not exist in table [person].
      */
-    public function testAggregatesFail2()
+    public function testAggregatesInvalidColumn()
     {
-        new Aggregate('foo', 'bar');
+        Person::objects()->avg('xxx');
+    }
+
+    public function testBatch()
+    {
+        // Create some sample data
+        $uniq = uniqid('batch');
+
+        $p1 = array(
+            'name' => "{$uniq}_1",
+            'income' => 10000
+        );
+
+        $p2 = array(
+            'name' => "{$uniq}_2",
+            'income' => 20000
+        );
+
+        $p3 = array(
+            'name' => "{$uniq}_3",
+            'income' => 30000
+        );
+
+        $qs = Person::objects()->filter('name', 'like', "{$uniq}%");
+
+        self::assertFalse($qs->exists());
+        self::assertSame(0, $qs->count());
+
+        Person::fromArray($p1)->save();
+        Person::fromArray($p2)->save();
+        Person::fromArray($p3)->save();
+
+        self::assertTrue($qs->exists());
+        self::assertSame(3, $qs->count());
+
+        // Give everybody a raise!
+        $count = $qs->update(
+            array(
+                'income' => 5000
+            )
+        );
+
+        self::assertSame(3, $count);
+
+        $persons = $qs->fetch();
+        foreach ($persons as $person) {
+            self::assertEquals(5000, $person->income);
+        }
+
+        // Delete
+        $count = $qs->delete();
+        self::assertSame(3, $count);
+
+        // Check deleted
+        self::assertFalse($qs->exists());
+        self::assertSame(0, $qs->count());
+
+        // Repeated delete should yield 0 count
+        $count = $qs->delete();
+        self::assertSame(0, $count);
+    }
+
+    public function testGetMeta()
+    {
+        // Just to improve code coverage
+        $meta1 = Person::getMeta();
+        $meta2 = Person::objects()->getMeta();
+
+        self::assertSame($meta1, $meta2);
+    }
+
+    public function testLimitedFetch()
+    {
+        // Create some sample data
+        $uniq = uniqid('limit');
+
+        $persons = array(
+            Person::fromArray(array('name' => "{$uniq}_1")),
+            Person::fromArray(array('name' => "{$uniq}_2")),
+            Person::fromArray(array('name' => "{$uniq}_3")),
+            Person::fromArray(array('name' => "{$uniq}_4")),
+            Person::fromArray(array('name' => "{$uniq}_5")),
+        );
+
+        foreach ($persons as $person) {
+            $person->save();
+        }
+
+        $qs = Person::objects()
+            ->filter('name', 'like', "{$uniq}%")
+            ->orderBy('name');
+
+        self::assertEquals(array_slice($persons, 0, 2), $qs->limit(2)->fetch());
+        self::assertEquals(array_slice($persons, 0, 2), $qs->limit(2, 0)->fetch());
+        self::assertEquals(array_slice($persons, 1, 2), $qs->limit(2, 1)->fetch());
+        self::assertEquals(array_slice($persons, 2, 2), $qs->limit(2, 2)->fetch());
+        self::assertEquals(array_slice($persons, 3, 2), $qs->limit(2, 3)->fetch());
+        self::assertEquals(array_slice($persons, 0, 1), $qs->limit(1)->fetch());
+        self::assertEquals(array_slice($persons, 0, 1), $qs->limit(1, 0)->fetch());
+        self::assertEquals(array_slice($persons, 1, 1), $qs->limit(1, 1)->fetch());
+        self::assertEquals(array_slice($persons, 2, 1), $qs->limit(1, 2)->fetch());
+        self::assertEquals(array_slice($persons, 3, 1), $qs->limit(1, 3)->fetch());
+        self::assertEquals(array_slice($persons, 4, 1), $qs->limit(1, 4)->fetch());
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Limit must be an integer or null.
+     */
+    public function testLimitedFetchWrongLimit1()
+    {
+        Person::objects()->limit(1.1);
+    }
+
+/**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Limit must be an integer or null.
+     */
+    public function testLimitedFetchWrongLimit2()
+    {
+        Person::objects()->limit("a");
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Offset must be an integer or null.
+     */
+    public function testLimitedFetchWrongOffset1()
+    {
+        Person::objects()->limit(1, 1.1);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Offset must be an integer or null.
+     */
+    public function testLimitedFetchWrongOffset2()
+    {
+        Person::objects()->limit(1, "a");
     }
 }

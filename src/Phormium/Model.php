@@ -102,7 +102,7 @@ abstract class Model
 
         // Create a queryset and filter by PK
         $qs = self::objects();
-        foreach($meta->pk as $name) {
+        foreach ($meta->pk as $name) {
             $value = array_shift($args);
             $qs = $qs->filter($name, '=', $value);
         }
