@@ -131,7 +131,6 @@ queries on the database.
 
 .. list-table:: Fetch methods
    :widths: 20 80
-   :header-rows: 1
 
    * - `fetch()`_
      - Fetches records as objects.
