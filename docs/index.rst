@@ -19,6 +19,7 @@ Contents
 
    install
    setup
+   configure
    usage
 
 License

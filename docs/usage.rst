@@ -8,12 +8,19 @@ start using Phormium.
 Bootstrap
 ---------
 
-To bootstrap Phormium, just include `vendor/autoload.php` in your application
-and Phormium will be autoloaded.
+If you installed Phormium via Composer, just include `vendor/autoload.php` in
+your application and Phormium will be autoloaded.
 
 .. code-block:: php
 
-    require_once __DIR__.'/../vendor/autoload.php';
+    require 'vendor/autoload.php';
+
+Alternatively, if you are not using Composer, Phormium has it's own autoloader:
+
+.. code-block:: php
+
+    require '/path/to/phormium/src/Phormium/Autoloader.php';
+    Phormium\Autoloader::register();
 
 The second step is to configure Phormium using your `configuration file
 <setup.html>`_:

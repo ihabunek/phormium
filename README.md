@@ -17,6 +17,7 @@ Features
 * batch update and delete
 * filtering
 * ordering
+* limiting
 
 Current restrictions:
 
@@ -30,7 +31,41 @@ Documentation
 [The documentation](http://phormium.readthedocs.org/en/latest/) is hosted by
 ReadTheDocs.org.
 
-Also have a look at some quick examples in the `examples` directory.
+Example
+-------
+
+After initial setup, Phormium is very easy to use.
+
+```php
+// Create a new person record
+$person = new Person();
+$person->name = "Frank Zappa";
+$person->birthday = "1940-12-20";
+$person->save();
+
+// Fetch, update, save
+$person = Person::get(10);
+$person->salary += 5000; // give the man a raise!
+$person->save();
+
+// Or delete
+Person::get(37)->delete();
+
+// Intuitive filtering, ordering and limiting
+$persons = Person::objects()
+    ->filter('salary', '>', 10000)
+    ->filter('birthday', 'between', ['2000-01-01', '2001-01-01'])
+    ->orderBy('name', 'desc')
+    ->limit(100)
+    ->fetch();
+
+// Aggregates
+Person::objects()->filter('name', 'like', 'Ivan%')->avg('salary');
+Person::objects()->filter('name', 'like', 'Marko%')->min('birthday');
+```
+
+See [documentation](http://phormium.readthedocs.org/en/latest/) for full
+reference, also check out the `example` directory for more examples.
 
 Why?
 ----

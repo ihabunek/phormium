@@ -25,8 +25,11 @@ required.
     }
 
 
-For details on database specific DSNs consult the `PHP documentation 
+For details on database specific DSNs consult the `PHP documentation
 <http://www.php.net/manual/en/pdo.construct.php>`_.
+
+A more detailed config file reference can be found in the :doc:`configuration
+chapter <configure>`.
 
 Create a database model
 -----------------------
@@ -71,17 +74,33 @@ the same as the table being mapped.
         public $salary;
     }
 
-Public properties of the Person class match the column names of the `person`
+Public properties of the `Person` class match the column names of the `person`
 database table.
 
-Additionaly, a protected static $_meta property is required which holds an array
-with the following values:
+Additionaly, a protected static `$_meta` property is required which holds an
+array with the following values:
 
-- database - name of the database, as defined in the `configuration 
-  <#configure-database-connections>`_
-- table - name of the database table
-- pk - name of the primary key column (or an array of names for composite
-  primary keys)
+`database`
+    Name of the database, as defined in the configuration.
+`table`
+    Name of the database table to which the model maps.
+`pk`
+    Name of the primary key column (or an array of names for composite primary
+    keys).
 
-Now that a database table and the corresponding PHP model are created, you can
-begin :doc:`using Phormium <usage>`.
+Try it out
+----------
+
+Create a few test rows in the database table and run the following code to fetch
+them:
+
+.. code-block:: php
+
+    require 'vendor/autoload.php';
+    require 'Person.php';
+
+    Phormium\DB::configure('config.json');
+
+    $persons = Person::objects()->fetch();
+
+Learn more about usage in the :doc:`next chapter <usage>`.
