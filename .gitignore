@@ -2,6 +2,7 @@ target
 vendor
 tmp
 php_errors.log
+composer.phar
 composer.lock
 /.project
 /.settings
