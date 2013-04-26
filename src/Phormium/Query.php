@@ -415,18 +415,37 @@ class Query
 
     private function execute($stmt, $args)
     {
-        if (Config::isLoggingEnabled()) {
-            echo date('Y-m-d H:i:s') . " Executing query with args: ";
-            var_export($args);
-            echo "\n";
-        }
-
+        $this->logExecute($args);
         $stmt->execute($args);
 
         if (Config::isLoggingEnabled()) {
             $rc = $stmt->rowCount();
             echo date('Y-m-d H:i:s') . " Finished execution. Row count: $rc.\n";
         }
+    }
+
+    private function logExecute($args)
+    {
+        if (!Config::isLoggingEnabled()) {
+            return;
+        }
+
+        foreach($args as &$arg) {
+            if ($arg === null) {
+                $arg = "NULL";
+            } elseif (is_string($arg)) {
+                $arg = '"' . $arg . '"';
+            }
+        }
+
+        echo date('Y-m-d H:i:s') . " ";
+        if(empty($args)) {
+            echo "Executing query with no args.";
+        } else {
+            echo "Executing query with args: ";
+            echo implode(', ', $args);
+        }
+        echo "\n";
     }
 
     private function fetchAll($stmt, $fetchType)

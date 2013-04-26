@@ -115,7 +115,7 @@ class Config
             }
         }
 
-        if (isset($config['logging']) && !is_boolean($config['logging'])) {
+        if (isset($config['logging']) && !is_bool($config['logging'])) {
             $type = gettype($config['logging']);
             throw new \Exception("Invalid configuration. Option 'logging' should be boolean. Given [$type].");
         }
