@@ -250,6 +250,18 @@ class QuerySet
         return $this->query->batchDelete($this->filters);
     }
 
+    /**
+     * Fetches the models matching the current filter and dumps them
+     * to the console in a human readable format.
+     *
+     * @param boolean $return If set to TRUE, will return the dump as a string,
+     *     otherwise, it will write it to the console (default).
+     */
+    public function dump($return = false)
+    {
+        return Printer::dump(clone($this), $return);
+    }
+
     // ******************************************
     // *** Private methods                    ***
     // ******************************************
