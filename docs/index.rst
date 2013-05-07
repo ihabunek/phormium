@@ -21,6 +21,7 @@ Contents
    setup
    configure
    usage
+   transactions
 
 License
 -------

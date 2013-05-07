@@ -10,7 +10,13 @@ use \PDO;
 class DB
 {
     /** An array of established database connections. */
-    private static $connections;
+    private static $connections = array();
+
+    /** Set to true when a global transaction has been triggered. */
+    private static $beginTriggered = false;
+
+    /** Array of connection names for which BEGIN has been executed. */
+    private static $inTransaction = array();
 
     /**
      * Configures database definitions.
@@ -25,7 +31,8 @@ class DB
     }
 
     /**
-     * Returns a PDO connection for the given database name.
+     * Returns a PDO connection for the given database name. If the connection
+     * does not exist, it is established.
      *
      * @param string $name Connection name.
      * @return PDO
@@ -48,20 +55,117 @@ class DB
             self::$connections[$name] = $connection;
         }
 
+        if (self::$beginTriggered && !in_array($name, self::$inTransaction)) {
+            self::$connections[$name]->beginTransaction();
+            self::$inTransaction[] = $name;
+        }
+
         return self::$connections[$name];
     }
 
+    /**
+     * Closes the database connection. If it was in transaction at the moment,
+     * rolls back the changes.
+     */
     public static function disconnect($name)
     {
+        if (isset(self::$inTransaction[$name])) {
+            self::$connections[$name]->rollBack();
+        }
+
         if (isset(self::$connections[$name])) {
             self::$connections[$name] = null;
-        } else {
-            trigger_error("Disconnect called for a non-connected connection [$name].", E_USER_WARNING);
         }
     }
 
+    /**
+     * Closes all active connections.
+     */
     public static function disconnectAll()
     {
-        self::$connections = array();
+        foreach(self::$connections as $name => $connection) {
+            self::disconnect($name);
+        }
+    }
+
+    /**
+     * Starts the global transaction. This causes any connection which is
+     * used to have "BEGIN" executed before any other transactions.
+     */
+    public static function begin()
+    {
+        if (Config::isLoggingEnabled()) {
+            echo date('Y-m-d H:i:s') . " BEGIN global transaction.\n";
+        }
+
+        if (self::$beginTriggered) {
+            throw new \Exception("Already in transaction.");
+        }
+
+        self::$beginTriggered = true;
+    }
+
+    /**
+     * Ends the global transaction by commiting all changes on all connections.
+     */
+    public static function commit()
+    {
+        if (Config::isLoggingEnabled()) {
+            echo date('Y-m-d H:i:s') . " COMMIT global transaction.\n";
+        }
+
+        if (!self::$beginTriggered) {
+            throw new \Exception("Cannot commit. Not in transaction.");
+        }
+
+        // Commit all started transactions
+        foreach (self::$inTransaction as $name) {
+            self::$connections[$name]->commit();
+        }
+
+        // End global transaction
+        self::$beginTriggered = false;
+        self::$inTransaction = array();
+    }
+
+    /**
+     * Ends the global transaction by rolling back all changes on all
+     * connections.
+     */
+    public static function rollback()
+    {
+        if (Config::isLoggingEnabled()) {
+            echo date('Y-m-d H:i:s') . " ROLLBACK global transaction.\n";
+        }
+
+        if (!self::$beginTriggered) {
+            throw new \Exception("Cannot roll back. Not in transaction.");
+        }
+
+        // Roll back all started transactions
+        foreach (self::$inTransaction as $name) {
+            self::$connections[$name]->rollBack();
+        }
+
+        // End global transaction
+        self::$beginTriggered = false;
+        self::$inTransaction = array();
+    }
+
+    /**
+     * Executes given callback within a transaction. Rolls back if an
+     * exception is thrown within the callback.
+     */
+    public static function transaction(callable $callback) {
+        self::begin();
+
+        try {
+            $callback();
+        } catch (\Exception $ex) {
+            self::rollback();
+            throw new \Exception("Transaction failed. Rolled back.", 0, $ex);
+        }
+
+        self::commit();
     }
 }
