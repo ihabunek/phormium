@@ -32,7 +32,7 @@ The configuration comprises of the following options:
 `logging` (boolean)
     If set to `true`, Phormium will write out SQL queries which it prepares and
     executes. This requires
-    `Apache log4php <http://logging.apache.org/log4php/>`. Defaults to false.
+    `Apache log4php <http://logging.apache.org/log4php/>`_. Defaults to false.
 
 .. _PDO: http://www.php.net/manual/en/pdo.construct.php
 
@@ -59,7 +59,7 @@ configuration file:
                 "dsn" => "sqlite:/path/to/db2.sqlite"
             ]
         ],
-        logging => true
+        "logging" => true
     ]);
 
 .. note:: Short array syntax `[ ... ]` requires PHP 5.4+.
