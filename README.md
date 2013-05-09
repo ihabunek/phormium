@@ -19,6 +19,7 @@ Features
 * ordering
 * limiting 
 * transactions
+* query logging (with [Apache log4php](http://logging.apache.org/log4php/))
 
 Current restrictions:
 

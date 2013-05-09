@@ -94,9 +94,7 @@ class DB
      */
     public static function begin()
     {
-        if (Config::isLoggingEnabled()) {
-            echo date('Y-m-d H:i:s') . " BEGIN global transaction.\n";
-        }
+        Log::debug("BEGIN global transaction.");
 
         if (self::$beginTriggered) {
             throw new \Exception("Already in transaction.");
@@ -110,9 +108,7 @@ class DB
      */
     public static function commit()
     {
-        if (Config::isLoggingEnabled()) {
-            echo date('Y-m-d H:i:s') . " COMMIT global transaction.\n";
-        }
+        Log::debug("COMMIT global transaction.");
 
         if (!self::$beginTriggered) {
             throw new \Exception("Cannot commit. Not in transaction.");
@@ -134,9 +130,7 @@ class DB
      */
     public static function rollback()
     {
-        if (Config::isLoggingEnabled()) {
-            echo date('Y-m-d H:i:s') . " ROLLBACK global transaction.\n";
-        }
+        Log::debug("ROLLBACK global transaction.");
 
         if (!self::$beginTriggered) {
             throw new \Exception("Cannot roll back. Not in transaction.");

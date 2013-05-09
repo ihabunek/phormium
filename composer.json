@@ -21,6 +21,9 @@
         "phing/phing": "*",
         "squizlabs/php_codesniffer": "1.4.*"
     },
+    "suggest": {
+        "apache/log4php": "Required for query logging"
+    },
     "autoload": {
         "psr-0": {"Phormium": "src/"}
     },

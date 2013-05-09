@@ -403,9 +403,8 @@ class Query
 
     private function prepare(PDO $conn, $query, $fetchType = null, $class = null)
     {
-        if (Config::isLoggingEnabled()) {
-            echo date('Y-m-d H:i:s') . " Preparing query: $query\n";
-        }
+        Log::debug("Preparing query: $query");
+
         $stmt = $conn->prepare($query);
         if ($fetchType === PDO::FETCH_CLASS) {
             $stmt->setFetchMode(PDO::FETCH_CLASS, $class);
@@ -418,10 +417,8 @@ class Query
         $this->logExecute($args);
         $stmt->execute($args);
 
-        if (Config::isLoggingEnabled()) {
-            $rc = $stmt->rowCount();
-            echo date('Y-m-d H:i:s') . " Finished execution. Row count: $rc.\n";
-        }
+        $rc = $stmt->rowCount();
+        Log::debug("Finished execution. Row count: $rc.");
     }
 
     private function logExecute($args)
@@ -438,21 +435,17 @@ class Query
             }
         }
 
-        echo date('Y-m-d H:i:s') . " ";
         if(empty($args)) {
-            echo "Executing query with no args.";
+            Log::debug("Executing query with no args.");
         } else {
-            echo "Executing query with args: ";
-            echo implode(', ', $args);
+            Log::debug("Executing query with args: " . implode(', ', $args));
         }
-        echo "\n";
     }
 
     private function fetchAll($stmt, $fetchType)
     {
-        if (Config::isLoggingEnabled()) {
-            echo date('Y-m-d H:i:s') . " Fetching data...";
-        }
+        Log::debug("Fetching data...");
+
         $data = array();
         while ($row = $stmt->fetch($fetchType)) {
             $data[] = $row;
