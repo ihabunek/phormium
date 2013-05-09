@@ -9,7 +9,10 @@ Writing those to database seems to be broken at the moment. Reading is fine.
 Make QuerySets iterable
 -----------------------
 
-Perform lazy iteration over a QuerySet, by implementing the [Iterator](http://php.net/manual/en/class.iterator.php) interface. Each record is fetched when needed, instead of fetching all and then iterating over the array.
+Perform lazy iteration over a QuerySet, by implementing the
+[Iterator](http://php.net/manual/en/class.iterator.php) interface. Each record
+is fetched when needed, instead of fetching all and then iterating over the
+array.
 
 e.g. Iterate over all Person records:
 
@@ -23,31 +26,31 @@ foreach(Person::objects() as $person)
 Make OR-able filters
 --------------------
 
-Currently all filters are joined with AND. Consider enabling OR operation on filters. 
+Currently all filters are joined with AND. Consider enabling OR operation on filters.
 
-e.g. Perhaps something like:
+Perhaps something like:
 
 ```php
 Person::objects()
-    ->filter(f::or(
-        f::gte('birthday', '2012-01-01'),
-        f::lt('birthday', '2011-01-01')
+    ->filter(Filter::or(
+        array('birthday', '=', '2012-01-01'),
+        array('birthday', '=', '2011-01-01')
     ))
 ```
 
-e.g. Nesting of f::and() f::or()
+Also consider nesting of OR and AND, maybe like:
 
 ```php
 Person::objects()
     ->filter(
-        f::or(
-            f::and(
-                f::gte('birthday', '2012-01-01'),
-                f::lt('income', 10000)
+        Filter::or(
+            Filter::and(
+                ['birthday', '=', '2012-01-01'],
+                ['income', '=', 10000)
             ),
-            f::and(
-                f::lt('birthday', '2012-01-01'),
-                f::gt('income', 10000)
+            Filter::and(
+                ['birthday', '=', '2012-01-01'),
+                ['income', '=', 10000]
             )
         )
     )

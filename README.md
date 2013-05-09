@@ -17,12 +17,12 @@ Features
 * batch update and delete
 * filtering
 * ordering
-* limiting
+* limiting 
+* transactions
 
 Current restrictions:
 
-* no relationships between models
-* no transactions
+* no relationships between models (joins)
 * cannot use OR in filters
 
 Documentation
