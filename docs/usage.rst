@@ -9,24 +9,22 @@ Bootstrap
 ---------
 
 If you installed Phormium via Composer, just include `vendor/autoload.php` in
-your application and Phormium will be autoloaded.
+your application and Phormium will be autoloaded. Afterwards, you have to
+configure Phormium using your `configuration file <setup.html>`_.
 
 .. code-block:: php
 
     require 'vendor/autoload.php';
+
+    Phormium\DB::configure('/path/to/config.json');
 
 Alternatively, if you are not using Composer, Phormium has it's own autoloader:
 
 .. code-block:: php
 
     require '/path/to/phormium/src/Phormium/Autoloader.php';
+
     Phormium\Autoloader::register();
-
-The second step is to configure Phormium using your `configuration file
-<setup.html>`_:
-
-.. code-block:: php
-
     Phormium\DB::configure('/path/to/config.json');
 
 Querying data
@@ -57,7 +55,10 @@ and return the results as an array of `Person` objects.
 Filtering data
 --------------
 
-In order to retrieve only selected rows, `QuerySets` can be filtered.
+In order to retrieve only selected rows, `QuerySets` can be filtered. Filters
+are used to consturct a WHERE clause in the resulting SQL query.
+
+For example:
 
 .. code-block:: php
 
@@ -65,7 +66,16 @@ In order to retrieve only selected rows, `QuerySets` can be filtered.
         ->filter('birthday', '<' '2000-01-01')
         ->fetch();
 
-This will fetch all Persons born before the year 2000.
+This will result in the following query:
+
+.. code-block:: sql
+
+    SELECT ... FROM person WHERE birthday < ?;
+
+Since Phormium uses
+`prepared statements <http://php.net/manual/en/pdo.prepared-statements.php>`_,
+the values for each filter are given as `?` and are passed in separately when
+executing the query. This prevents any possibility of SQL injection.
 
 Filters can be chained; chanining multiple filters will AND them
 
@@ -76,8 +86,11 @@ Filters can be chained; chanining multiple filters will AND them
         ->filter('income', '>', 10000)
         ->fetch();
 
-This will fetch Persons who are born before year 2000 and who have an income
-greater than 10000.
+This will create:
+
+.. code-block:: sql
+
+    SELECT ... FROM person WHERE birthday < ? AND income > 10000;
 
 QuerySets are lazy - no queries will be executed on the database until one of
 the `fetch methods <#fetching-data>`_ are called.
@@ -105,6 +118,50 @@ Available filters:
         ->filter($column, 'BETWEEN', array($low, $high))
         ->filter($column, 'IS NULL')
         ->filter($column, 'NOT NULL')
+
+Composite filters
+~~~~~~~~~~~~~~~~~
+
+In order to create complex where clauses, Phormium provides composite filters.
+Composite filters are collections of Column filters joined by either AND or OR
+operator.
+
+To make creating complex filters easier, two factory methods exist:
+`Filter::_and()` and `Filter::_or()`. These are prefixed by `_` because `and`
+and `or` are PHP keywords and cannot be used as method names.
+
+Composite filters can be chained and combined. For example:
+
+.. code-block:: php
+
+    Person::objects()->filter(
+        Filter::_or(
+            Filter::_and(
+                array('id', '>=', 10),
+                array('id', '<=', 20)
+            ),
+            Filter::_and(
+                array('id', '>=', 50),
+                array('id', '<=', 60)
+            ),
+            array('id', '>=', 100),
+        )
+    )->fetch();
+
+This will translate to:
+
+.. code-block:: sql
+
+    SELECT
+        ...
+    FROM
+        person
+    WHERE ((
+        (id >= ? AND id <= ?) OR
+        (id >= ? AND id <= ?) OR
+        id >= ?
+    ));
+
 
 Ordering data
 -------------
