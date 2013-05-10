@@ -1,8 +1,8 @@
 Phormium Changelog
 ==================
 
-0.2 / TBA
----------
+0.2 / 2013-05-10
+----------------
 
 * Added transactions
 * Added QuerySet::dump()
