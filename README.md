@@ -17,14 +17,14 @@ Features
 * batch update and delete
 * filtering
 * ordering
-* limiting 
+* limiting
 * transactions
-* query logging (with [Apache log4php](http://logging.apache.org/log4php/))
+* query logging (requires [Apache log4php](http://logging.apache.org/log4php/))
+*
 
-Current restrictions:
+Not yet implemented:
 
-* no relationships between models (joins)
-* cannot use OR in filters
+* relationships between models (joins)
 
 Documentation
 -------------
@@ -35,7 +35,8 @@ ReadTheDocs.org.
 Example
 -------
 
-After initial setup, Phormium is very easy to use.
+After initial setup, Phormium is very easy to use. Here's a quick overview of
+it's features:
 
 ```php
 // Create a new person record
@@ -59,6 +60,45 @@ $persons = Person::objects()
     ->orderBy('name', 'desc')
     ->limit(100)
     ->fetch();
+
+// Count records
+$count = Person::objects()
+    ->filter('salary', '>', 10000)
+    ->count();
+
+// Distinct values
+$count = Person::objects()
+    ->distinct('name', 'email');
+
+// Complex composite filters
+$persons = Person::objects()->filter(
+    Filter::_or(
+        Filter::_and(
+            array('id', '>=', 10),
+            array('id', '<=', 20)
+        ),
+        Filter::_and(
+            array('id', '>=', 50),
+            array('id', '<=', 60)
+        ),
+        array('id', '>=', 100),
+    )
+)->fetch();
+
+// Fetch a single record (otherwise throws an exeption)
+$person = Person::objects()
+    ->filter('email', '=', 'ivan@example.com')
+    ->single();
+
+// Batch update
+Person::objects()
+    ->filter('salary', '>', 10000)
+    ->update(['salary' => 5000]);
+
+// Batch delete
+Person::objects()
+    ->filter('salary', '>', 10000)
+    ->delete();
 
 // Aggregates
 Person::objects()->filter('name', 'like', 'Ivan%')->avg('salary');
