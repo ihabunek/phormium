@@ -195,14 +195,14 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     public function testFilterFromArray()
     {
-        $actual = ColumnFilter::fromArray(['id', '=', 123]);
+        $actual = ColumnFilter::fromArray(array('id', '=', 123));
 
         self::assertInstanceOf('\\Phormium\\ColumnFilter', $actual);
         self::assertSame('id', $actual->column);
         self::assertSame('=', $actual->operation);
         self::assertSame(123, $actual->value);
 
-        $actual = ColumnFilter::fromArray(['email', 'null']);
+        $actual = ColumnFilter::fromArray(array('email', 'null'));
 
         self::assertInstanceOf('\\Phormium\\ColumnFilter', $actual);
         self::assertSame('email', $actual->column);
@@ -216,7 +216,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
      */
     public function testFilterFromArrayExceptionTooMany()
     {
-        $actual = ColumnFilter::fromArray([1, 2, 3, 4, 5]);
+        $actual = ColumnFilter::fromArray(array(1, 2, 3, 4, 5));
     }
 
     /**
@@ -225,7 +225,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
      */
     public function testFilterFromArrayExceptionTooFew()
     {
-        $actual = ColumnFilter::fromArray([1]);
+        $actual = ColumnFilter::fromArray(array(1));
     }
 
     /**
