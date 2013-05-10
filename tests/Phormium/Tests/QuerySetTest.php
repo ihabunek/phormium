@@ -2,11 +2,14 @@
 
 namespace Phormium\Tests;
 
-use \Phormium\Aggregate;
-use \Phormium\DB;
 use \Phormium\Filter;
+use \Phormium\DB;
+use \Phormium\ColumnFilter;
+use \Phormium\CompositeFilter;
 use \Phormium\Meta;
+use \Phormium\Aggregate;
 use \Phormium\QuerySet;
+
 use \Phormium\Tests\Models\Person;
 
 class QuerySetTest extends \PHPUnit_Framework_TestCase
@@ -23,27 +26,29 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
 
         self::assertEquals($qs1, $qs2);
         self::assertNotSame($qs1, $qs2);
-        self::assertEmpty($qs1->getFilters());
-        self::assertEmpty($qs2->getFilters());
+        self::assertNull($qs1->getFilter());
+        self::assertNull($qs2->getFilter());
         self::assertEmpty($qs1->getOrder());
         self::assertEmpty($qs2->getOrder());
     }
 
     public function testFilterQS()
     {
-        $f = new Filter('name', '=', 'x');
+        $f = new ColumnFilter('name', '=', 'x');
         $qs1 = Person::objects();
         $qs2 = $qs1->filter('name', '=', 'x');
 
         self::assertNotEquals($qs1, $qs2);
         self::assertNotSame($qs1, $qs2);
 
-        self::assertEmpty($qs1->getFilters());
+        self::assertInstanceOf("\\Phormium\\CompositeFilter", $qs2->getFilter());
+        self::assertCount(1, $qs2->getFilter()->getFilters());
+
         self::assertEmpty($qs1->getOrder());
         self::assertEmpty($qs2->getOrder());
 
-        $expected = array($f);
-        $actual = $qs2->getFilters();
+        $expected = Filter::_and($f);
+        $actual = $qs2->getFilter();
         self::assertEquals($expected, $actual);
     }
 
@@ -73,9 +78,10 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         self::assertNotEquals($qs1, $qs2);
         self::assertNotSame($qs1, $qs2);
 
-        self::assertEmpty($qs1->getFilters());
+        self::assertNull($qs1->getFilter());
+        self::assertNull($qs2->getFilter());
+
         self::assertEmpty($qs1->getOrder());
-        self::assertEmpty($qs2->getFilters());
 
         $expected = array('name desc');
         $actual = $qs2->getOrder();

@@ -101,4 +101,24 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     {
         DB::transaction(10);
     }
+
+    public function testDisconnectRollsBackTransaction()
+    {
+        $person = new Person();
+        $person->name = 'Bruce Dickinson';
+        $person->income = 12345;
+        $person->save();
+
+        $id = $person->id;
+
+        DB::begin();
+
+        $p = Person::get($id);
+        $p->income = 54321;
+        $p->save();
+
+        DB::disconnectAll();
+
+        self::assertEquals(12345, Person::get($id)->income);
+    }
 }
