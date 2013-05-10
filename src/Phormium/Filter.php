@@ -21,7 +21,7 @@ abstract class Filter
     public static function _or()
     {
         return new CompositeFilter(
-            CompositeFilter::OP_AND,
+            CompositeFilter::OP_OR,
             func_get_args()
         );
     }
