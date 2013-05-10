@@ -19,7 +19,9 @@ Contents
 
    install
    setup
+   configure
    usage
+   transactions
 
 License
 -------

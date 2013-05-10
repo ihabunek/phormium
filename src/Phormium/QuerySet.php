@@ -16,14 +16,13 @@ class QuerySet
     /** Order by clauses. */
     private $order = array();
 
-    /** Array of Filter objects. */
-    private $filters = array();
+    private $filter;
 
     /** Maximum number of rows to fetch. */
-    private $limit = null;
+    private $limit;
 
     /** Offset of the first row to return. */
-    private $offset = null;
+    private $offset;
 
     public function __construct(Query $query, Meta $meta)
     {
@@ -45,13 +44,38 @@ class QuerySet
     }
 
     /**
-     * Returns a new query set with the filter AND-ed to the existing one.
+     * Returns a new query set with the given filter AND-ed to the existing
+     * ones.
+     *
+     * Accepts either:
+     *   - an instance of the Filter class
+     *   - an array with two values [$column, $operation] for filters which
+     *     don't require an value
+     *   - an array with three values [$column, $operation, $value]
+     *
      * @return QuerySet
      */
-    public function filter($column, $operation, $value = null)
+    public function filter()
     {
+        $args = func_get_args();
+        $count = func_num_args();
+
+        if ($count == 1) {
+            $arg = $args[0];
+
+            if ($arg instanceof Filter) {
+                $filter = $arg;
+            } elseif (is_array($arg)) {
+                $filter = ColumnFilter::fromArray($arg);
+            } else {
+                throw new \Exception("Invalid arguments given.");
+            }
+        } else {
+            $filter = ColumnFilter::fromArray($args);
+        }
+
         $qs = clone $this;
-        $qs->addFilter(new Filter($column, $operation, $value));
+        $qs->addFilter($filter);
         return $qs;
     }
 
@@ -101,7 +125,7 @@ class QuerySet
      */
     public function count()
     {
-        return $this->query->count($this->filters);
+        return $this->query->count($this->filter);
     }
 
     /**
@@ -111,7 +135,7 @@ class QuerySet
     public function avg($column)
     {
         $agg = new Aggregate(Aggregate::AVERAGE, $column);
-        return $this->query->aggregate($this->filters, $agg);
+        return $this->query->aggregate($this->filter, $agg);
     }
 
     /**
@@ -121,7 +145,7 @@ class QuerySet
     public function max($column)
     {
         $agg = new Aggregate(Aggregate::MAX, $column);
-        return $this->query->aggregate($this->filters, $agg);
+        return $this->query->aggregate($this->filter, $agg);
     }
 
     /**
@@ -131,7 +155,7 @@ class QuerySet
     public function min($column)
     {
         $agg = new Aggregate(Aggregate::MIN, $column);
-        return $this->query->aggregate($this->filters, $agg);
+        return $this->query->aggregate($this->filter, $agg);
     }
 
     /**
@@ -141,7 +165,7 @@ class QuerySet
     public function sum($column)
     {
         $agg = new Aggregate(Aggregate::SUM, $column);
-        return $this->query->aggregate($this->filters, $agg);
+        return $this->query->aggregate($this->filter, $agg);
     }
 
     /**
@@ -152,7 +176,7 @@ class QuerySet
      */
     public function exists()
     {
-        return $this->query->count($this->filters) > 0;
+        return $this->query->count($this->filter) > 0;
     }
 
     /**
@@ -161,7 +185,7 @@ class QuerySet
      */
     public function fetch()
     {
-        return $this->query->select($this->filters, $this->order, null, $this->limit, $this->offset);
+        return $this->query->select($this->filter, $this->order, null, $this->limit, $this->offset);
     }
 
     /**
@@ -203,7 +227,7 @@ class QuerySet
             $columns = null;
         }
 
-        return $this->query->select($this->filters, $this->order, $columns, $this->limit, $this->offset, \PDO::FETCH_ASSOC);
+        return $this->query->select($this->filter, $this->order, $columns, $this->limit, $this->offset, \PDO::FETCH_ASSOC);
     }
 
     /**
@@ -222,7 +246,7 @@ class QuerySet
             $columns = null;
         }
 
-        return $this->query->select($this->filters, $this->order, $columns, $this->limit, $this->offset, \PDO::FETCH_NUM);
+        return $this->query->select($this->filter, $this->order, $columns, $this->limit, $this->offset, \PDO::FETCH_NUM);
     }
 
     /**
@@ -231,7 +255,7 @@ class QuerySet
     public function distinct()
     {
         $columns = func_get_args();
-        return $this->query->selectDistinct($this->filters, $this->order, $columns);
+        return $this->query->selectDistinct($this->filter, $this->order, $columns);
     }
 
     /**
@@ -239,7 +263,7 @@ class QuerySet
      */
     public function update($updates)
     {
-        return $this->query->batchUpdate($this->filters, $updates);
+        return $this->query->batchUpdate($this->filter, $updates);
     }
 
     /**
@@ -247,21 +271,64 @@ class QuerySet
      */
     public function delete()
     {
-        return $this->query->batchDelete($this->filters);
+        return $this->query->batchDelete($this->filter);
+    }
+
+    /**
+     * Fetches the models matching the current filter and dumps them
+     * to the console in a human readable format.
+     *
+     * @param boolean $return If set to TRUE, will return the dump as a string,
+     *     otherwise, it will write it to the console (default).
+     */
+    public function dump($return = false)
+    {
+        return Printer::dump(clone($this), $return);
     }
 
     // ******************************************
     // *** Private methods                    ***
     // ******************************************
 
+    /**
+     * Adds a new filter to the queryset. If multiple filters are added, they
+     * will be joined by an AND composite filter.
+     */
     private function addFilter(Filter $filter)
     {
-        $column = $filter->column;
-        if (isset($filter->column) && !in_array($column, $this->meta->columns)) {
-            $table = $this->meta->table;
-            throw new \Exception("Invalid filter: Column [$column] does not exist in table [$table].");
+        // Start with an empty AND composite filter
+        if (!isset($this->filter)) {
+            $this->filter = Filter::_and();
         }
-        $this->filters[] = $filter;
+
+        $this->checkFilter($filter);
+        $this->filter->add($filter);
+    }
+
+    private function checkFilter(Filter $filter)
+    {
+        if ($filter instanceof ColumnFilter) {
+            $this->checkColumnFilter($filter);
+        }
+
+        if ($filter instanceof CompositeFilter) {
+            $this->checkCompositeFilter($filter);
+        }
+    }
+
+    private function checkColumnFilter(ColumnFilter $filter)
+    {
+        if (isset($filter->column) && !in_array($filter->column, $this->meta->columns)) {
+            $table = $this->meta->table;
+            throw new \Exception("Invalid filter: Column [$filter->column] does not exist in table [$table].");
+        }
+    }
+
+    private function checkCompositeFilter(CompositeFilter $filter)
+    {
+        foreach($filter->getFilters() as $filter) {
+            $this->checkFilter($filter);
+        }
     }
 
     private function addOrder($column, $direction)
@@ -282,9 +349,9 @@ class QuerySet
     // *** Accessors                          ***
     // ******************************************
 
-    public function getFilters()
+    public function getFilter()
     {
-        return $this->filters;
+        return $this->filter;
     }
 
     public function getOrder()

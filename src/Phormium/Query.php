@@ -7,15 +7,14 @@ use \PDO;
 /**
  * Generates and executes SQL queries.
  */
-class Query
-{
+class Query{
     /**
      * Meta data of the model which the Query will handle.
      * @var \Phormium\Meta
      */
-    private $meta;
+     private $meta;
 
-    /** The database driver used. Used to tailor custom queries when needed.*/
+     /** The database driver used. Used to tailor custom queries when needed.*/
     private $driver;
 
     public function __construct(Meta $meta)
@@ -28,14 +27,13 @@ class Query
     /**
      * Constructs and executes a SELECT query.
      *
-     * @param array $filters Array of {@link Filter} instances used to form
-     *      the WHERE clause.
+     * @param Filter $filter A filter instance used to form the WHERE clause.
      * @param array $order Array of strings used to form the ORDER BY clause.
      *
      * @return array An array of {@link Model} instances corresponing to given
      *      criteria.
      */
-    public function select($filters, $order, array $columns = null, $limit = null, $offset = null, $fetchType = PDO::FETCH_CLASS)
+    public function select($filter, $order, array $columns = null, $limit = null, $offset = null, $fetchType = PDO::FETCH_CLASS)
     {
         if (isset($columns)) {
             $this->checkColumnsExist($columns);
@@ -48,7 +46,7 @@ class Query
         $class = $this->meta->class;
 
         list($limit1, $limit2) = $this->renderLimitOffset($limit, $offset);
-        list($where, $args) = $this->constructWhere($filters);
+        list($where, $args) = $this->constructWhere($filter);
         $order = $this->constructOrder($order);
 
         $query = "SELECT{$limit1} {$columns} FROM {$table}{$where}{$order}{$limit2};";
@@ -62,8 +60,7 @@ class Query
     /**
      * Constructs and executes a SELECT DISTINCT query.
      *
-     * @param array $filters Array of {@link Filter} instances used to form
-     *      the WHERE clause.
+     * @param Filter $filter A filter instance used to form the WHERE clause.
      * @param array $order Array of strings used to form the ORDER BY clause.
      *
      * @return array An array distinct values. If multiple columns are given,
@@ -71,7 +68,7 @@ class Query
 	 *      the distinct values indexed by column name. If a single column is
 	 *      given will return an array of distinct values for that column.
      */
-    public function selectDistinct($filters, $order, array $columns)
+    public function selectDistinct($filter, $order, array $columns)
     {
         $table = $this->meta->table;
         $fetchType = PDO::FETCH_ASSOC;
@@ -83,7 +80,7 @@ class Query
 
         $sqlColumns = implode(', ', $columns);
 
-        list($where, $args) = $this->constructWhere($filters);
+        list($where, $args) = $this->constructWhere($filter);
         $order = $this->constructOrder($order);
 
         $query = "SELECT DISTINCT {$sqlColumns} FROM {$table}{$where}{$order};";
@@ -109,15 +106,14 @@ class Query
     /**
      * Constructs and executes a SELECT COUNT(*) query.
      *
-     * @param array $filters Array of {@link Filter} instances used to form
-     *      the WHERE clause.
+     * @param Filter $filter A filter instance used to form the WHERE clause.
      *
      * @return integer Number of records which match the given filter.
      */
-    public function count($filters)
+    public function count($filter)
     {
         $table = $this->meta->table;
-        list($where, $args) = $this->constructWhere($filters);
+        list($where, $args) = $this->constructWhere($filter);
 
         $query = "SELECT COUNT(*) AS count FROM {$table}{$where};";
         $conn = DB::getConnection($this->meta->database);
@@ -133,12 +129,11 @@ class Query
     /**
      * Constructs and executes a SELECT aggregate query.
      *
-     * @param array $filters Array of {@link Filter} instances used to form
-     *      the WHERE clause.
+     * @param Filter $filter A filter instance used to form the WHERE clause.
      * @param Aggregate $aggregate The aggregate to perform.
      * @return string Result of the aggregate query.
      */
-    public function aggregate($filters, $aggregate)
+    public function aggregate($filter, $aggregate)
     {
         $table = $this->meta->table;
         $type = $aggregate->type;
@@ -148,7 +143,7 @@ class Query
             throw new \Exception("Error forming aggregate query. Column [$column] does not exist in table [$table].");
         }
 
-        list($where, $args) = $this->constructWhere($filters);
+        list($where, $args) = $this->constructWhere($filter);
         $select = $aggregate->render();
 
         $query = "SELECT {$select} as aggregate FROM {$table}{$where};";
@@ -313,7 +308,7 @@ class Query
      * Constructs and executes an UPDATE statement for all records matching
      * the given filters.
      */
-    public function batchUpdate($filters, $updates)
+    public function batchUpdate($filter, $updates)
     {
         // Check columns exist
         $updateBits = array();
@@ -326,7 +321,7 @@ class Query
         }
 
         // Construct the query
-        list($where, $args) = $this->constructWhere($filters);
+        list($where, $args) = $this->constructWhere($filter);
         $args = array_merge(array_values($updates), $args);
 
         $query  = "UPDATE {$this->meta->table} ";
@@ -344,9 +339,9 @@ class Query
      * Constructs and executes a DELETE statement for all records matching
      * the given filters.
      */
-    public function batchDelete($filters)
+    public function batchDelete($filter)
     {
-        list($where, $args) = $this->constructWhere($filters);
+        list($where, $args) = $this->constructWhere($filter);
         $query = "DELETE FROM {$this->meta->table}{$where}";
 
         // Run the query
@@ -373,22 +368,20 @@ class Query
         }
     }
 
-    /** Constructs a WHERE clause for given filters. */
-    private function constructWhere($filters)
+    /** Constructs a WHERE clause for a given filter. */
+    private function constructWhere($filter)
     {
-        if (empty($filters)) {
+        if ($filter === null) {
             return array("", array());
         }
 
-        // Accumulate the where clauses and arguments from each filter
-        $where = array();
-        $args = array();
-        foreach ($filters as $filter) {
-            list($w, $a) = $filter->render();
-            $where[] = $w;
-            $args = array_merge($args, $a);
+        list($where, $args) = $filter->render();
+
+        if (empty($where)) {
+            return array("", array());
         }
-        $where = " WHERE " . implode(" AND ", $where);
+
+        $where = " WHERE $where";
         return array($where, $args);
     }
 
@@ -403,9 +396,8 @@ class Query
 
     private function prepare(PDO $conn, $query, $fetchType = null, $class = null)
     {
-        if (Config::isLoggingEnabled()) {
-            echo date('Y-m-d H:i:s') . " Preparing query: $query\n";
-        }
+        Log::debug("Preparing query: $query");
+
         $stmt = $conn->prepare($query);
         if ($fetchType === PDO::FETCH_CLASS) {
             $stmt->setFetchMode(PDO::FETCH_CLASS, $class);
@@ -415,25 +407,38 @@ class Query
 
     private function execute($stmt, $args)
     {
-        if (Config::isLoggingEnabled()) {
-            echo date('Y-m-d H:i:s') . " Executing query with args: ";
-            var_export($args);
-            echo "\n";
-        }
-
+        $this->logExecute($args);
         $stmt->execute($args);
 
-        if (Config::isLoggingEnabled()) {
-            $rc = $stmt->rowCount();
-            echo date('Y-m-d H:i:s') . " Finished execution. Row count: $rc.\n";
+        $rc = $stmt->rowCount();
+        Log::debug("Finished execution. Row count: $rc.");
+    }
+
+    private function logExecute($args)
+    {
+        if (!Config::isLoggingEnabled()) {
+            return;
+        }
+
+        foreach($args as &$arg) {
+            if ($arg === null) {
+                $arg = "NULL";
+            } elseif (is_string($arg)) {
+                $arg = '"' . $arg . '"';
+            }
+        }
+
+        if(empty($args)) {
+            Log::debug("Executing query with no args.");
+        } else {
+            Log::debug("Executing query with args: " . implode(', ', $args));
         }
     }
 
     private function fetchAll($stmt, $fetchType)
     {
-        if (Config::isLoggingEnabled()) {
-            echo date('Y-m-d H:i:s') . " Fetching data...";
-        }
+        Log::debug("Fetching data...");
+
         $data = array();
         while ($row = $stmt->fetch($fetchType)) {
             $data[] = $row;
