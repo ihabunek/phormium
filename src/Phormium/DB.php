@@ -64,28 +64,16 @@ class DB
     }
 
     /**
-     * Closes the database connection. If it was in transaction at the moment,
-     * rolls back the changes.
-     */
-    public static function disconnect($name)
-    {
-        if (isset(self::$inTransaction[$name])) {
-            self::$connections[$name]->rollBack();
-        }
-
-        if (isset(self::$connections[$name])) {
-            self::$connections[$name] = null;
-        }
-    }
-
-    /**
-     * Closes all active connections.
+     * Closes all active connections. If in global transaction, the transaction
+     * is rolled back.
      */
     public static function disconnectAll()
     {
-        foreach(self::$connections as $name => $connection) {
-            self::disconnect($name);
+        if (self::$beginTriggered) {
+            self::rollback();
         }
+
+        self::$connections = array();
     }
 
     /**
