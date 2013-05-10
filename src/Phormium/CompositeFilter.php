@@ -26,7 +26,7 @@ class CompositeFilter extends Filter
     {
         if (!in_array($operation, $this->operations)) {
             $operations = implode(', ', $this->operations);
-            throw new \Exception("Invalid composite filter operation. [$operation]. Expected one of: $operations");
+            throw new \Exception("Invalid composite filter operation [$operation]. Expected one of: $operations");
         }
 
         $this->operation = $operation;
@@ -42,9 +42,6 @@ class CompositeFilter extends Filter
 
     public function add(Filter $filter)
     {
-        if (!($filter instanceof Filter)) {
-            throw new \Exception("Invalid filter given to composite filter.");
-        }
         $this->filters[] = $filter;
     }
 

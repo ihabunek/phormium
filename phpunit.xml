@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <phpunit bootstrap="tests/bootstrap.php"
     colors="true"
-    stopOnError="false"
-    stopOnFailure="false">
+    stopOnError="true"
+    stopOnFailure="true">
 
     <testsuite name="Phormium test suite">
         <directory>tests/Phormium/Tests</directory>

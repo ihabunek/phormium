@@ -6,6 +6,8 @@ use \Phormium\Tests\Models\Person;
 
 use \Phormium\DB;
 use \Phormium\ColumnFilter;
+use \Phormium\Filter;
+use \Phormium\CompositeFilter;
 use \Phormium\Parser;
 
 class FilterTest extends \PHPUnit_Framework_TestCase
@@ -234,5 +236,77 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     public function testFilterFromArrayExceptionWrongType()
     {
         $actual = ColumnFilter::fromArray(1);
+    }
+
+    public function testFactoryAndOr()
+    {
+        $actual = Filter::_and();
+        $expected = new CompositeFilter(CompositeFilter::OP_AND);
+        self::assertEquals($expected, $actual);
+
+        $actual = Filter::_or();
+        $expected = new CompositeFilter(CompositeFilter::OP_OR);
+        self::assertEquals($expected, $actual);
+    }
+
+    public function testCompositeFilter1()
+    {
+        $filter = new CompositeFilter(
+            CompositeFilter::OP_OR,
+            array(
+                ColumnFilter::fromArray(array('id', '=', 1)),
+                ColumnFilter::fromArray(array('id', '=', 2)),
+                ColumnFilter::fromArray(array('id', '=', 3)),
+            )
+        );
+
+        $actual = $filter->render();
+        $expected = array("(id = ? OR id = ? OR id = ?)", array(1, 2, 3));
+        self::assertSame($expected, $actual);
+    }
+
+    public function testCompositeFilter2()
+    {
+        $filter = new CompositeFilter(
+            CompositeFilter::OP_OR,
+            array(
+                array('id', '=', 1),
+                array('id', '=', 2),
+                array('id', '=', 3),
+            )
+        );
+
+        $actual = $filter->render();
+        $expected = array("(id = ? OR id = ? OR id = ?)", array(1, 2, 3));
+        self::assertSame($expected, $actual);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Invalid composite filter operation [foo]. Expected one of: AND, OR
+     */
+    public function testCompositeFilterInvalidOperation()
+    {
+        $filter = new CompositeFilter('foo');
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Argument 1 passed to Phormium\CompositeFilter::add() must be an instance of Phormium\Filter, integer given
+     */
+    public function testCompositeFilterAddInvalid()
+    {
+        $filter = new CompositeFilter("AND");
+        $filter->add(1);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Canot render composite filter. No filters defined.
+     */
+    public function testCompositeFilterRenderEmpty()
+    {
+        $filter = new CompositeFilter("AND");
+        $filter->render();
     }
 }

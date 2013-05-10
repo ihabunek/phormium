@@ -370,4 +370,36 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
         self::assertEquals($expected, $actual);
     }
+
+    public function testModelToJsonToArray()
+    {
+        $person = Person::fromArray(array(
+            'name' => "Michael Kiske",
+            'email' => "miki@example.com",
+            'income' => 100000,
+        ));
+
+        $json = '{"id":null,"name":"Michael Kiske","email":"miki@example.com","birthday":null,"created":null,"income":100000}';
+        $array = array(
+            'id' => null,
+            'name' => 'Michael Kiske',
+            'email' => 'miki@example.com',
+            'birthday' => null,
+            'created' => null,
+            'income' => 100000
+        );
+
+        self::assertSame($json, $person->toJSON());
+        self::assertSame($array, $person->toArray());
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Model not writable because primary key is not defined in _meta.
+     */
+    public function testSaveModelWithoutPrimaryKey()
+    {
+        $pkl = new PkLess();
+        $pkl->save();
+    }
 }

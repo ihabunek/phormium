@@ -37,6 +37,16 @@ class Log
         self::getLogger()->warn($msg);
     }
 
+    public static function error($msg)
+    {
+        self::getLogger()->error($msg);
+    }
+
+    public static function fatal($msg)
+    {
+        self::getLogger()->fatal($msg);
+    }
+
     protected static function createLogger()
     {
         if (Config::isLoggingEnabled()) {
