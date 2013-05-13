@@ -369,6 +369,19 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         );
 
         self::assertEquals($expected, $actual);
+
+        $actual = Person::objects()
+            ->filter('name', 'LIKE', "$name%")
+            ->orderBy('name', 'asc')
+            ->valuesFlat('name');
+
+         $expected = array(
+            "$name-1",
+            "$name-2",
+            "$name-3",
+        );
+
+        self::assertEquals($expected, $actual);
     }
 
     public function testModelToJsonToArray()

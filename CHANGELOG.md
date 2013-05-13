@@ -4,6 +4,7 @@ Phormium Changelog
 0.3 / TBA
 ---------
 
+* Added QuerySet::valuesFlat()
 
 0.2 / 2013-05-10
 ----------------

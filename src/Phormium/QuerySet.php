@@ -250,6 +250,27 @@ class QuerySet
     }
 
     /**
+     * Performs a SELECT query on the table, and returns the values of a single
+     * column for rows which match the current filter.
+     *
+     * Similar to calling values() with a single column, but returns a 1D array,
+     * where values() would return a 2D array.
+     *
+     * @param $column string The name of the column to fetch
+     */
+    public function valuesFlat($column)
+    {
+        $data = $this->query->select($this->filter, $this->order, array($column), $this->limit, $this->offset, \PDO::FETCH_NUM);
+
+        foreach($data as &$item) {
+            $item = $item[0];
+        }
+        unset($item);
+
+        return $data;
+    }
+
+    /**
      * Performs a SELECT DISTINCT query on the given columns.
      */
     public function distinct()

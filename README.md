@@ -20,7 +20,6 @@ Features
 * limiting
 * transactions
 * query logging (requires [Apache log4php](http://logging.apache.org/log4php/))
-*
 
 Not yet implemented:
 
