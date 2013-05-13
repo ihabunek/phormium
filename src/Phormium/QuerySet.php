@@ -192,19 +192,24 @@ class QuerySet
      * Performs a SELECT query on the table, and returns a single row which
      * matches the current filter.
      *
+     * @param $allowEmpty boolean If set to FALSE (default), will throw an
+     * exception if query matches zero rows. If set to TRUE, will return null if
+     * query matches zero rows.
+     *
      * @throws \Exception If multiple rows are found.
-     * @throws \Exception If no rows are found.
+     * @throws \Exception If no rows are found and $allowEmpty is FALSE.
+     * @return Model
      */
-    public function single()
+    public function single($allowEmpty = false)
     {
         $data = $this->fetch();
         $count = count($data);
 
         if ($count > 1) {
-            throw new \Exception("Query returned multiple rows ($count). Requested a single row.");
+            throw new \Exception("Query returned $count rows. Requested a single row.");
         }
 
-        if ($count == 0) {
+        if ($count == 0 && !$allowEmpty) {
             throw new \Exception("Query returned 0 rows. Requested a single row.");
         }
 
