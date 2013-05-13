@@ -363,6 +363,7 @@ class Query{
     {
         foreach($columns as $column) {
             if (!in_array($column, $this->meta->columns)) {
+                $table = $this->meta->table;
                 throw new \Exception("Column [$column] does not exist in table [$table].");
             }
         }
