@@ -8,8 +8,17 @@ namespace Phormium;
 abstract class Filter
 {
     /** Renders the filter to SQL. */
-    public abstract function render();
+    abstract public function render();
 
+    /**
+     * Creates a new AND composite filter from given filter components.
+     *
+     * @param mixed One or more Filter objects or array($column, $op, $value)
+     *      triplets which will be coverted to corresponding ColumnFilter
+     *      objects.
+     *
+     * @return CompositeFilter
+     */
     public static function _and()
     {
         return new CompositeFilter(
@@ -18,6 +27,15 @@ abstract class Filter
         );
     }
 
+    /**
+     * Creates a new OR composite filter from given filter components.
+     *
+     * @param mixed One or more Filter objects or array($column, $op, $value)
+     *      triplets which will be coverted to corresponding ColumnFilter
+     *      objects.
+     *
+     * @return CompositeFilter
+     */
     public static function _or()
     {
         return new CompositeFilter(

@@ -2,6 +2,8 @@
 
 namespace Phormium;
 
+use PDO;
+
 /**
  * Performs lazy database lookup for sets of objects.
  */
@@ -232,7 +234,14 @@ class QuerySet
             $columns = null;
         }
 
-        return $this->query->select($this->filter, $this->order, $columns, $this->limit, $this->offset, \PDO::FETCH_ASSOC);
+        return $this->query->select(
+            $this->filter,
+            $this->order,
+            $columns,
+            $this->limit,
+            $this->offset,
+            PDO::FETCH_ASSOC
+        );
     }
 
     /**
@@ -251,7 +260,14 @@ class QuerySet
             $columns = null;
         }
 
-        return $this->query->select($this->filter, $this->order, $columns, $this->limit, $this->offset, \PDO::FETCH_NUM);
+        return $this->query->select(
+            $this->filter,
+            $this->order,
+            $columns,
+            $this->limit,
+            $this->offset,
+            PDO::FETCH_NUM
+        );
     }
 
     /**
@@ -265,9 +281,16 @@ class QuerySet
      */
     public function valuesFlat($column)
     {
-        $data = $this->query->select($this->filter, $this->order, array($column), $this->limit, $this->offset, \PDO::FETCH_NUM);
+        $data = $this->query->select(
+            $this->filter,
+            $this->order,
+            array($column),
+            $this->limit,
+            $this->offset,
+            PDO::FETCH_NUM
+        );
 
-        foreach($data as &$item) {
+        foreach ($data as &$item) {
             $item = $item[0];
         }
         unset($item);
@@ -352,7 +375,7 @@ class QuerySet
 
     private function checkCompositeFilter(CompositeFilter $filter)
     {
-        foreach($filter->getFilters() as $filter) {
+        foreach ($filter->getFilters() as $filter) {
             $this->checkFilter($filter);
         }
     }

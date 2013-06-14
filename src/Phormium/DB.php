@@ -138,7 +138,8 @@ class DB
      * Executes given callback within a transaction. Rolls back if an
      * exception is thrown within the callback.
      */
-    public static function transaction($callback) {
+    public static function transaction($callback)
+    {
         if (!is_callable($callback)) {
             throw new \Exception("Given argument is not callable.");
         }
