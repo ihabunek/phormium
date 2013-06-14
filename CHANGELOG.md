@@ -1,8 +1,8 @@
 Phormium Changelog
 ==================
 
-0.3 / TBA
----------
+0.3 / 2013-06-14
+----------------
 
 * Added QuerySet::valuesFlat()
 * Added optional parameter $allowEmpty to QuerySet::single()
