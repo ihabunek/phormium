@@ -31,7 +31,7 @@ class CompositeFilter extends Filter
 
         $this->operation = $operation;
 
-        foreach($filters as $filter) {
+        foreach ($filters as $filter) {
             if (is_array($filter)) {
                 $filter = ColumnFilter::fromArray($filter);
             }
@@ -54,7 +54,7 @@ class CompositeFilter extends Filter
         $where = array();
         $args = array();
 
-        foreach($this->filters as $filter) {
+        foreach ($this->filters as $filter) {
             list($w, $a) = $filter->render();
             $args = array_merge($args, $a);
             $where[] = $w;

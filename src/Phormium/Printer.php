@@ -23,7 +23,7 @@ class Printer
      *
      * @param array $array Input array.
      * @param array $return If set to true, the dump will be returned as string
-     * 		instead of printing it.
+     *         instead of printing it.
      */
     public static function dump(QuerySet $querySet, $return = false)
     {
@@ -43,13 +43,13 @@ class Printer
         }
 
         // Process data for display and record data lengths
-        foreach($data as $model) {
+        foreach ($data as $model) {
 
             if (!($model instanceof Model)) {
                 throw new \Exception("Invalid input for dump().");
             }
 
-            foreach($model as $key => $value) {
+            foreach ($model as $key => $value) {
                 $model->$key = self::prepareValue($value);
 
                 if (mb_strlen($value) > $lengths[$key]) {
@@ -71,7 +71,7 @@ class Printer
         $output = "";
 
         // Print the titles
-        foreach($columns as $column) {
+        foreach ($columns as $column) {
             $output .= self::strpad($column, $lengths[$column]);
             $output .= str_repeat(" ", self::COLUMN_PADDING);
         }
@@ -123,8 +123,7 @@ class Printer
         $value = @trim(strval($value));
 
         // Trim to max allowed length
-        if (mb_strlen($value) > self::COLUMN_MAX_LENGTH)
-        {
+        if (mb_strlen($value) > self::COLUMN_MAX_LENGTH) {
             $value = mb_substr($value, 0, self::COLUMN_MAX_LENGTH - 3) . '...';
         }
 

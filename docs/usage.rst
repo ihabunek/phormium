@@ -201,9 +201,11 @@ queries on the database.
    * - `single()`_
      - Fetches a single record as an object.
    * - `values()`_
-     - Fetches records as associative arrays (can select columns).
+     - Fetches records as associative arrays (for given columns).
    * - `valuesList()`_
-     - Fetches records as number-indexed arrays (can select columns).
+     - Fetches records as number-indexed arrays (for given columns).
+   * - `valuesFlat()`_
+     - Fetches values from a single column.
    * - `count()`_
      - Returns the number of records matching the filter.
    * - `distinct()`_
@@ -290,6 +292,27 @@ This will return:
     )
 
 If no columns are specified, all columns in the model will be fetched.
+
+valuesFlat()
+~~~~~~~~~~~~
+
+Fetches values from a single column.
+
+Similar to calling `values()` with a single column, but returns a 1D array,
+where `values()` would return a 2D array.
+
+.. code-block:: php
+
+    Person::objects()->valuesFlat('name');
+
+This will return:
+
+.. code-block:: php
+
+    array(
+        'Ivan',
+        'Marko'
+    )
 
 count()
 ~~~~~~~

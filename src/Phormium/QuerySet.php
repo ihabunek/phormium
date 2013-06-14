@@ -2,6 +2,8 @@
 
 namespace Phormium;
 
+use PDO;
+
 /**
  * Performs lazy database lookup for sets of objects.
  */
@@ -192,19 +194,24 @@ class QuerySet
      * Performs a SELECT query on the table, and returns a single row which
      * matches the current filter.
      *
+     * @param $allowEmpty boolean If set to FALSE (default), will throw an
+     * exception if query matches zero rows. If set to TRUE, will return null if
+     * query matches zero rows.
+     *
      * @throws \Exception If multiple rows are found.
-     * @throws \Exception If no rows are found.
+     * @throws \Exception If no rows are found and $allowEmpty is FALSE.
+     * @return Model
      */
-    public function single()
+    public function single($allowEmpty = false)
     {
         $data = $this->fetch();
         $count = count($data);
 
         if ($count > 1) {
-            throw new \Exception("Query returned multiple rows ($count). Requested a single row.");
+            throw new \Exception("Query returned $count rows. Requested a single row.");
         }
 
-        if ($count == 0) {
+        if ($count == 0 && !$allowEmpty) {
             throw new \Exception("Query returned 0 rows. Requested a single row.");
         }
 
@@ -227,7 +234,14 @@ class QuerySet
             $columns = null;
         }
 
-        return $this->query->select($this->filter, $this->order, $columns, $this->limit, $this->offset, \PDO::FETCH_ASSOC);
+        return $this->query->select(
+            $this->filter,
+            $this->order,
+            $columns,
+            $this->limit,
+            $this->offset,
+            PDO::FETCH_ASSOC
+        );
     }
 
     /**
@@ -246,7 +260,42 @@ class QuerySet
             $columns = null;
         }
 
-        return $this->query->select($this->filter, $this->order, $columns, $this->limit, $this->offset, \PDO::FETCH_NUM);
+        return $this->query->select(
+            $this->filter,
+            $this->order,
+            $columns,
+            $this->limit,
+            $this->offset,
+            PDO::FETCH_NUM
+        );
+    }
+
+    /**
+     * Performs a SELECT query on the table, and returns the values of a single
+     * column for rows which match the current filter.
+     *
+     * Similar to calling values() with a single column, but returns a 1D array,
+     * where values() would return a 2D array.
+     *
+     * @param $column string The name of the column to fetch
+     */
+    public function valuesFlat($column)
+    {
+        $data = $this->query->select(
+            $this->filter,
+            $this->order,
+            array($column),
+            $this->limit,
+            $this->offset,
+            PDO::FETCH_NUM
+        );
+
+        foreach ($data as &$item) {
+            $item = $item[0];
+        }
+        unset($item);
+
+        return $data;
     }
 
     /**
@@ -326,7 +375,7 @@ class QuerySet
 
     private function checkCompositeFilter(CompositeFilter $filter)
     {
-        foreach($filter->getFilters() as $filter) {
+        foreach ($filter->getFilters() as $filter) {
             $this->checkFilter($filter);
         }
     }

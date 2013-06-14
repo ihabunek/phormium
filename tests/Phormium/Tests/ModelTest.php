@@ -230,10 +230,22 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         Person::objects()->filter('name', '=', 'Hrvoje')->single();
     }
 
+    public function testSingleZeroAllowed()
+    {
+        $qs = Person::objects()->filter('name', '=', 'Hrvoje');
+        $qs->delete();
+
+        self::assertSame(0, $qs->count());
+        self::assertFalse($qs->exists());
+
+        $actual = Person::objects()->filter('name', '=', 'Hrvoje')->single(true);
+        self::assertNull($actual);
+    }
+
     /**
      * Check single() fails when multiple records match.
      * @expectedException \Exception
-     * @expectedExceptionMessage Query returned multiple rows (3). Requested a single row.
+     * @expectedExceptionMessage Query returned 3 rows. Requested a single row.
      */
     public function testSingleMultiple()
     {
@@ -366,6 +378,19 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             array("$name-1", 100),
             array("$name-2", 200),
             array("$name-3", 300),
+        );
+
+        self::assertEquals($expected, $actual);
+
+        $actual = Person::objects()
+            ->filter('name', 'LIKE', "$name%")
+            ->orderBy('name', 'asc')
+            ->valuesFlat('name');
+
+         $expected = array(
+            "$name-1",
+            "$name-2",
+            "$name-3",
         );
 
         self::assertEquals($expected, $actual);

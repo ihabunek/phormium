@@ -29,6 +29,10 @@ abstract class Model
         );
     }
 
+    /**
+     * Returns the Query object used to run queries for this model.
+     * @return Query
+     */
     public static function getQuery()
     {
         return new Query(self::getMeta());
@@ -36,6 +40,7 @@ abstract class Model
 
     /**
      * Constructs a QuerySet for the model.
+     * @return QuerySet
      */
     public static function objects()
     {
@@ -50,6 +55,7 @@ abstract class Model
      * @param boolean $strict If set to TRUE, will throw an exception if the
      *      array contains a property which does not exist in the Model. Default
      *      value is FALSE.
+     * @return Model
      */
     public static function fromArray($array, $strict = false)
     {
@@ -110,7 +116,10 @@ abstract class Model
         return $qs->single();
     }
 
-    /** Creates a Model instance from data in the given array. */
+    /**
+     * Creates a Model instance from data in the given array.
+     * @return Model
+     */
     public static function fromJSON($json)
     {
         $array = json_decode($json);
@@ -166,6 +175,7 @@ abstract class Model
 
     /**
      * Returns the PK columns with their values as an associative array.
+     * @return array The PK columns.
      */
     public function getPK()
     {

@@ -7,7 +7,8 @@ use \PDO;
 /**
  * Generates and executes SQL queries.
  */
-class Query{
+class Query
+{
     /**
      * Meta data of the model which the Query will handle.
      * @var \Phormium\Meta
@@ -64,9 +65,9 @@ class Query{
      * @param array $order Array of strings used to form the ORDER BY clause.
      *
      * @return array An array distinct values. If multiple columns are given,
-	 *      will return an array of arrays, and each of these will have
-	 *      the distinct values indexed by column name. If a single column is
-	 *      given will return an array of distinct values for that column.
+     *      will return an array of arrays, and each of these will have
+     *      the distinct values indexed by column name. If a single column is
+     *      given will return an array of distinct values for that column.
      */
     public function selectDistinct($filter, $order, array $columns)
     {
@@ -361,8 +362,9 @@ class Query{
      */
     private function checkColumnsExist(array $columns)
     {
-        foreach($columns as $column) {
+        foreach ($columns as $column) {
             if (!in_array($column, $this->meta->columns)) {
+                $table = $this->meta->table;
                 throw new \Exception("Column [$column] does not exist in table [$table].");
             }
         }
@@ -420,7 +422,7 @@ class Query{
             return;
         }
 
-        foreach($args as &$arg) {
+        foreach ($args as &$arg) {
             if ($arg === null) {
                 $arg = "NULL";
             } elseif (is_string($arg)) {
@@ -428,7 +430,7 @@ class Query{
             }
         }
 
-        if(empty($args)) {
+        if (empty($args)) {
             Log::debug("Executing query with no args.");
         } else {
             Log::debug("Executing query with args: " . implode(', ', $args));
