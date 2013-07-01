@@ -35,7 +35,7 @@ class DB
      * does not exist, it is established.
      *
      * @param string $name Connection name.
-     * @return PDO
+     * @return Connection
      */
     public static function getConnection($name)
     {
@@ -60,7 +60,7 @@ class DB
             self::$inTransaction[] = $name;
         }
 
-        return self::$connections[$name];
+        return new Connection(self::$connections[$name]);
     }
 
     /**
