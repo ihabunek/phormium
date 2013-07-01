@@ -2,6 +2,7 @@
 
 namespace Phormium\Tests;
 
+use Phormium\Connection;
 use \Phormium\DB;
 use \Phormium\Meta;
 use \Phormium\QuerySet;
@@ -69,7 +70,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     /**
      * @param $connection
      */
-    public function recreatePersons($connection) {
+    public function recreatePersons(Connection $connection) {
         $connection->execute("DELETE FROM person");
 
         $p = new Person();
@@ -89,8 +90,6 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $p->email = 'test.person3@example.com';
         $p->save();
         self::assertNotNull($p->id);
-
-        $updateId = $p->id;
 
         $p = new Person();
         $p->name = 'Test Person 4';
