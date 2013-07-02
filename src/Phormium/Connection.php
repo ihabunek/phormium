@@ -52,6 +52,20 @@ class Connection
     }
 
     /**
+     * Executed a prepared statement which do not have
+     * return values, like INSERT or DELETE
+     *
+     * @param $query the query to execute
+     * @param null $arguments
+     * @return bool
+     */
+    public function preparedExecute($query, $arguments = null)
+    {
+        $stmt = $this->pdoConnection->prepare($query);
+        return $stmt->execute($arguments);
+    }
+
+    /**
      * A query without preparing the statement.
      * If queries are repeated the preparedQuery
      * is most often the better method from performance
