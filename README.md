@@ -20,6 +20,7 @@ Features
 * limiting
 * transactions
 * query logging (requires [Apache log4php](http://logging.apache.org/log4php/))
+* custom queries
 
 Not yet implemented:
 
@@ -102,6 +103,11 @@ Person::objects()
 // Aggregates
 Person::objects()->filter('name', 'like', 'Ivan%')->avg('salary');
 Person::objects()->filter('name', 'like', 'Marko%')->min('birthday');
+
+// Custom queries
+$conn = DB::getConnection('myconn');
+$data1 = $conn->query("SELECT * FROM mytable;");
+$data2 = $conn->preparedQuery("SELECT * FROM mytable WHERE mycol > :value", array("value" => 10))
 ```
 
 See [documentation](http://phormium.readthedocs.org/en/latest/) for full
