@@ -55,7 +55,7 @@ class Connection
      * Executed a prepared statement which do not have
      * return values, like INSERT or DELETE
      *
-     * @param $query the query to execute
+     * @param $query string the query to execute
      * @param null $arguments
      * @return bool
      */
