@@ -12,16 +12,16 @@ use PDO;
 class Connection
 {
     /** the wrapped PDO connection */
-    private $pdoConnection;
+    private $pdo;
 
     /**
      * Constructs a new wrapper with the given PDO connection
      *
-     * @param PDO $connection
+     * @param PDO $pdo
      */
-    public function __construct(PDO $connection)
+    public function __construct(PDO $pdo)
     {
-        $this->pdoConnection = $connection;
+        $this->pdo = $pdo;
     }
 
     /**
@@ -37,7 +37,7 @@ class Connection
      */
     public function preparedQuery($query, $arguments = null, $fetchType = null, $class = null)
     {
-        $stmt = $this->pdoConnection->prepare($query);
+        $stmt = $this->pdo->prepare($query);
 
         if ($fetchType === PDO::FETCH_CLASS) {
             $stmt->setFetchMode(PDO::FETCH_CLASS, $class);
@@ -63,7 +63,7 @@ class Connection
      */
     public function query($query, $fetchStyle = PDO::FETCH_BOTH)
     {
-        $stmt = $this->pdoConnection->query($query);
+        $stmt = $this->pdo->query($query);
 
         $rc = $stmt->rowCount();
         Log::debug("Finished query execution. Row count: $rc.");
@@ -81,7 +81,7 @@ class Connection
      */
     public function execute($query)
     {
-        $affectedRows = $this->pdoConnection->exec($query);
+        $affectedRows = $this->pdo->exec($query);
         Log::debug("Executed query. Affected rows: $affectedRows.");
         return $affectedRows;
     }
@@ -91,8 +91,8 @@ class Connection
      *
      * @return PDO
      */
-    public function getPdoConnection()
+    public function getPDO()
     {
-        return $this->pdoConnection;
+        return $this->pdo;
     }
 }

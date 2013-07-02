@@ -51,7 +51,7 @@ class Query
         $order = $this->constructOrder($order);
 
         $query = "SELECT{$limit1} {$columns} FROM {$table}{$where}{$order}{$limit2};";
-        $conn = DB::getConnection($this->meta->database)->getPdoConnection();
+        $conn = DB::getConnection($this->meta->database)->getPDO();
 
         $stmt = $this->prepare($conn, $query, $fetchType, $class);
         $this->execute($stmt, $args);
@@ -85,7 +85,7 @@ class Query
         $order = $this->constructOrder($order);
 
         $query = "SELECT DISTINCT {$sqlColumns} FROM {$table}{$where}{$order};";
-        $conn = DB::getConnection($this->meta->database)->getPdoConnection();
+        $conn = DB::getConnection($this->meta->database)->getPDO();
 
         $stmt = $this->prepare($conn, $query, $fetchType);
         $this->execute($stmt, $args);
@@ -117,7 +117,7 @@ class Query
         list($where, $args) = $this->constructWhere($filter);
 
         $query = "SELECT COUNT(*) AS count FROM {$table}{$where};";
-        $conn = DB::getConnection($this->meta->database)->getPdoConnection();
+        $conn = DB::getConnection($this->meta->database)->getPDO();
 
         $fetchType = PDO::FETCH_ASSOC;
 
@@ -148,7 +148,7 @@ class Query
         $select = $aggregate->render();
 
         $query = "SELECT {$select} as aggregate FROM {$table}{$where};";
-        $conn = DB::getConnection($this->meta->database)->getPdoConnection();
+        $conn = DB::getConnection($this->meta->database)->getPDO();
 
         $fetchType = PDO::FETCH_ASSOC;
 
@@ -211,7 +211,7 @@ class Query
         $query .= "){$returning};";
 
         // Run query
-        $conn = DB::getConnection($meta->database)->getPdoConnection();
+        $conn = DB::getConnection($meta->database)->getPDO();
         $stmt = $this->prepare($conn, $query);
         $this->execute($stmt, $args);
 
@@ -269,7 +269,7 @@ class Query
         $query .= implode(' AND ', $where);
 
         // Run the query
-        $conn = DB::getConnection($meta->database)->getPdoConnection();
+        $conn = DB::getConnection($meta->database)->getPDO();
         $stmt = $this->prepare($conn, $query);
         $this->execute($stmt, $args);
         return $stmt->rowCount();
@@ -299,7 +299,7 @@ class Query
         $query = "DELETE FROM {$this->meta->table} WHERE {$where}";
 
         // Run the query
-        $conn = DB::getConnection($this->meta->database)->getPdoConnection();
+        $conn = DB::getConnection($this->meta->database)->getPDO();
         $stmt = $this->prepare($conn, $query);
         $this->execute($stmt, $args);
         return $stmt->rowCount();
@@ -330,7 +330,7 @@ class Query
         $query .= $where;
 
         // Run the query
-        $conn = DB::getConnection($this->meta->database)->getPdoConnection();
+        $conn = DB::getConnection($this->meta->database)->getPDO();
         $stmt = $this->prepare($conn, $query);
         $this->execute($stmt, $args);
         return $stmt->rowCount();
@@ -346,7 +346,7 @@ class Query
         $query = "DELETE FROM {$this->meta->table}{$where}";
 
         // Run the query
-        $conn = DB::getConnection($this->meta->database)->getPdoConnection();
+        $conn = DB::getConnection($this->meta->database)->getPDO();
         $stmt = $this->prepare($conn, $query);
         $this->execute($stmt, $args);
         return $stmt->rowCount();
