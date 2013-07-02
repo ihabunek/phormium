@@ -95,4 +95,22 @@ class Connection
     {
         return $this->pdo;
     }
+
+    /** Calls BEGIN on the underlying PDO connection */
+    public function beginTransaction()
+    {
+        $this->pdo->beginTransaction();
+    }
+
+    /** Calls COMMIT on the underlying PDO connection */
+    public function commit()
+    {
+        $this->pdo->commit();
+    }
+
+    /** Calls ROLLBACK on the underlying PDO connection */
+    public function rollback()
+    {
+        $this->pdo->rollback();
+    }
 }
