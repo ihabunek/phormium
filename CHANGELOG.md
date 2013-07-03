@@ -3,7 +3,8 @@ Phormium Changelog
 
 0.4 / TBA
 ---------
-
+* Added support for custom queries via Connection object
+* Added Model->merge()
 
 0.3 / 2013-06-14
 ----------------
