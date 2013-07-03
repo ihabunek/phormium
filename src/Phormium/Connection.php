@@ -5,41 +5,39 @@ namespace Phormium;
 use PDO;
 
 /**
- * Wrapper for a pdo connection, which enables direct
- * SQL executions and access to the Phormium constructed
- * PDO object.
+ * Wrapper for a PDO connection, which enables direct SQL executions and access
+ * to the underlying PDO connection object.
  */
 class Connection
 {
-    /** the wrapped PDO connection */
-    private $pdoConnection;
+    /** The wrapped PDO connection */
+    private $pdo;
 
     /**
      * Constructs a new wrapper with the given PDO connection
      *
-     * @param PDO $connection
+     * @param PDO $pdo
      */
-    public function __construct(PDO $connection)
+    public function __construct(PDO $pdo)
     {
-        $this->pdoConnection = $connection;
+        $this->pdo = $pdo;
     }
 
     /**
-     * Creates and executes a prepared query based
-     * on the given SQL and arguments. The result
-     * will be completely fetched and returned.
+     * Prepares and executes an SQL query using the given SQL and arguments.
+     * Fetches and returns the resulting data.
      *
-     * @param $query
-     * @param null $arguments
-     * @param null $fetchType
-     * @param null $class
-     * @return array
+     * @param string $query The SQL query to execute, may contain named params.
+     * @param array $arguments The arguments used to substitute params.
+     * @param integer $fetchType One of PDO::FETCH_* constants.
+     * @param string $class When using PDO::FETCH_CLASS, class to fetch into.
+     * @return array The resulting data.
      */
-    public function preparedQuery($query, $arguments = null, $fetchType = null, $class = null)
+    public function preparedQuery($query, $arguments = null, $fetchType = PDO::FETCH_ASSOC, $class = null)
     {
-        $stmt = $this->pdoConnection->prepare($query);
+        $stmt = $this->pdo->prepare($query);
 
-        if ($fetchType === PDO::FETCH_CLASS) {
+        if ($fetchType === PDO::FETCH_CLASS && isset($class)) {
             $stmt->setFetchMode(PDO::FETCH_CLASS, $class);
         }
 
@@ -52,32 +50,19 @@ class Connection
     }
 
     /**
-     * Executed a prepared statement which do not have
-     * return values, like INSERT or DELETE
+     * Executes a query without preparing the statement. Fetches and returns the
+     * resulting data.
      *
-     * @param $query string the query to execute
-     * @param null $arguments
-     * @return bool
-     */
-    public function preparedExecute($query, $arguments = null)
-    {
-        $stmt = $this->pdoConnection->prepare($query);
-        return $stmt->execute($arguments);
-    }
-
-    /**
-     * A query without preparing the statement.
-     * If queries are repeated the preparedQuery
-     * is most often the better method from performance
-     * perspective
+     * If queries are repeated it's often the better to use preparedQuery()
+     * from performance perspective.
      *
-     * @param $query the query to execute
-     * @param int $fetchStyle
-     * @return array
+     * @param $query The SQL query to execute.
+     * @param integer $fetchType One of PDO::FETCH_* constants.
+     * @return array The resulting data.
      */
-    public function query($query, $fetchStyle = PDO::FETCH_BOTH)
+    public function query($query, $fetchStyle = PDO::FETCH_ASSOC)
     {
-        $stmt = $this->pdoConnection->query($query);
+        $stmt = $this->pdo->query($query);
 
         $rc = $stmt->rowCount();
         Log::debug("Finished query execution. Row count: $rc.");
@@ -95,7 +80,7 @@ class Connection
      */
     public function execute($query)
     {
-        $affectedRows = $this->pdoConnection->exec($query);
+        $affectedRows = $this->pdo->exec($query);
         Log::debug("Executed query. Affected rows: $affectedRows.");
         return $affectedRows;
     }
@@ -105,8 +90,26 @@ class Connection
      *
      * @return PDO
      */
-    public function getPdoConnection()
+    public function getPDO()
     {
-        return $this->pdoConnection;
+        return $this->pdo;
+    }
+
+    /** Calls BEGIN on the underlying PDO connection */
+    public function beginTransaction()
+    {
+        $this->pdo->beginTransaction();
+    }
+
+    /** Calls COMMIT on the underlying PDO connection */
+    public function commit()
+    {
+        $this->pdo->commit();
+    }
+
+    /** Calls ROLLBACK on the underlying PDO connection */
+    public function rollback()
+    {
+        $this->pdo->rollback();
     }
 }

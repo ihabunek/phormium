@@ -246,7 +246,7 @@ class QuerySet
 
     /**
      * Performs a SELECT query on the table, and returns rows matching the
-     * current filter as number-indexed arrays (instead of objects which are
+     * current filter as number-indqexed arrays (instead of objects which are
      * returned by fetch().
      *
      * One or more column names can be provided as parameters, and only these

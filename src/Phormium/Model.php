@@ -60,26 +60,9 @@ abstract class Model
     public static function fromArray($array, $strict = false)
     {
         $class = get_called_class();
+
         $instance = new $class();
-
-        if ($array instanceof \stdClass) {
-            $array = (array) $array;
-        }
-
-        if (!is_array($array)) {
-            throw new \Exception("Given argument is not an array.");
-        }
-
-        foreach ($array as $name => $value) {
-            if (property_exists($instance, $name)) {
-                $instance->{$name} = $value;
-            } else {
-                if ($strict) {
-                    throw new \Exception("Property [$name] does not exist in class [$class].");
-                }
-            }
-        }
-
+        $instance->merge($array, $strict);
         return $instance;
     }
 
@@ -205,6 +188,35 @@ abstract class Model
     public function delete()
     {
         return self::getQuery()->delete($this);
+    }
+
+    /**
+     * Merges values from an associative array into the model.
+     *
+     * @param array|stdClass $values Associative array (or stdClass object)
+     *      where keys are names of properties of the model, and values are
+     *      desired values for those properties.
+     */
+    public function merge($values, $strict = false)
+    {
+        if ($values instanceof \stdClass) {
+            $values = (array) $values;
+        }
+
+        if (!is_array($values)) {
+            throw new \Exception("Given argument is not an array.");
+        }
+
+        foreach ($values as $name => $value) {
+            if (property_exists($this, $name)) {
+                $this->{$name} = $value;
+            } else {
+                if ($strict) {
+                    $class = get_class($this);
+                    throw new \Exception("Property [$name] does not exist in class [$class].");
+                }
+            }
+        }
     }
 
     public function toJSON()
