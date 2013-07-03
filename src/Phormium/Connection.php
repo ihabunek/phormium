@@ -56,8 +56,8 @@ class Connection
      * If queries are repeated it's often the better to use preparedQuery()
      * from performance perspective.
      *
-     * @param $query The SQL query to execute.
-     * @param integer $fetchType One of PDO::FETCH_* constants.
+     * @param string $query the SQL query to execute.
+     * @param integer $fetchStyle One of PDO::FETCH_* constants.
      * @return array The resulting data.
      */
     public function query($query, $fetchStyle = PDO::FETCH_ASSOC)
