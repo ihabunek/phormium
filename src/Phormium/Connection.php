@@ -25,19 +25,20 @@ class Connection
 
     /**
      * Prepares and executes an SQL query using the given SQL and arguments.
+     *
      * Fetches and returns the resulting data.
      *
      * @param string $query The SQL query to execute, may contain named params.
      * @param array $arguments The arguments used to substitute params.
-     * @param integer $fetchType One of PDO::FETCH_* constants.
+     * @param integer $fetchStyle One of PDO::FETCH_* constants.
      * @param string $class When using PDO::FETCH_CLASS, class to fetch into.
      * @return array The resulting data.
      */
-    public function preparedQuery($query, $arguments = null, $fetchType = PDO::FETCH_ASSOC, $class = null)
+    public function preparedQuery($query, $arguments = null, $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
         $stmt = $this->pdo->prepare($query);
 
-        if ($fetchType === PDO::FETCH_CLASS && isset($class)) {
+        if ($fetchStyle === PDO::FETCH_CLASS && isset($class)) {
             $stmt->setFetchMode(PDO::FETCH_CLASS, $class);
         }
 
@@ -57,12 +58,16 @@ class Connection
      * from performance perspective.
      *
      * @param $query The SQL query to execute.
-     * @param integer $fetchType One of PDO::FETCH_* constants.
+     * @param integer $fetchStyle One of PDO::FETCH_* constants.
      * @return array The resulting data.
      */
-    public function query($query, $fetchStyle = PDO::FETCH_ASSOC)
+    public function query($query, $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
         $stmt = $this->pdo->query($query);
+
+        if ($fetchStyle === PDO::FETCH_CLASS && isset($class)) {
+            $stmt->setFetchMode(PDO::FETCH_CLASS, $class);
+        }
 
         $rc = $stmt->rowCount();
         Log::debug("Finished query execution. Row count: $rc.");
@@ -75,8 +80,8 @@ class Connection
      * The method is useful for updates or deletes, which do
      * not return anything.
      *
-     * @param $query
-     * @return int
+     * @param $query The SQL query to execute.
+     * @return integer Number of rows affected by the query.
      */
     public function execute($query)
     {
