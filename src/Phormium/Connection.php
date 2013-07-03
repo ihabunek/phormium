@@ -71,6 +71,20 @@ class Connection
     }
 
     /**
+     * Executed a prepared statement which do not have
+     * return values, like INSERT or DELETE
+     *
+     * @param $query the query to execute
+     * @param null $arguments
+     * @return bool
+     */
+    public function preparedExecute($query, $arguments = null)
+    {
+        $stmt = $this->pdoConnection->prepare($query);
+        return $stmt->execute($arguments);
+    }
+
+    /**
      * Executes a statement and returns the number of affected rows.
      * The method is useful for updates or deletes, which do
      * not return anything.
