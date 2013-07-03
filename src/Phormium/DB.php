@@ -60,7 +60,7 @@ class DB
             self::$inTransaction[] = $name;
         }
 
-        return new Connection(self::$connections[$name]);
+        return self::$connections[$name];
     }
 
     /**
