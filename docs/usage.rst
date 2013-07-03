@@ -446,7 +446,6 @@ To create a new record in `person`, just create a new `Person` object and
 
 .. code-block:: php
 
-    // Create a new person and save it to the database
     $person = new Person();
     $person->name = "Frank Zappa";
     $person->birthday = "1940-12-20";
@@ -456,6 +455,18 @@ If the primary key column is auto-incremented, it is not necessary to manually
 assign a value to it. The `save()` method will persist the object to the
 database and populate the primary key property of the Person object with the
 value assigned by the database.
+
+It is also possible to create a model from data contained within an array (or
+object) by using the static `fromArray()` method.
+
+.. code-block:: php
+
+    // This is quivalent to the above example
+    $personData = array(
+        "name" => "Frank Zappa",
+        "birthday" => "1940-12-20"
+    );
+    Person::fromArray($personData)->save();
 
 Updating records
 ~~~~~~~~~~~~~~~~
@@ -467,6 +478,22 @@ required changes and call `save()`.
 
     $person = Person::get(37);
     $person->birthday = "1940-12-21";
+    $person->salary = 10000;
+    $person->save();
+
+If you have an associative array (or object) containing the data which you want
+to modify in a model instance, you can use the `merge()` method.
+
+.. code-block:: php
+
+    // This is quivalent to the above example
+    $updates = array(
+        "birthday" => "1940-12-21"
+        "salary" => 10000
+    );
+
+    $person = Person::get(37);
+    $person->merge($updates);
     $person->save();
 
 To change multiple records at once, use the `QuerySet::update()` function. This
@@ -478,11 +505,11 @@ function performs an update query on all records currently selected by the
     $person = Person::objects()
         ->filter('name', 'like', 'X%')
         ->update([
-            'name' => 'X-man'
+            'name' => 'Xavier'
         ]);
 
 This will update all Persons whose name starts with a X and set their name to
-'X-man'.
+'Xavier'.
 
 Deleting records
 ~~~~~~~~~~~~~~~~
