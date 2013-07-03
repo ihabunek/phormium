@@ -33,7 +33,7 @@ class Connection
      * @param string $class When using PDO::FETCH_CLASS, class to fetch into.
      * @return array The resulting data.
      */
-    public function preparedQuery($query, $arguments = null, $fetchType = null, $class = null)
+    public function preparedQuery($query, $arguments = null, $fetchType = PDO::FETCH_ASSOC, $class = null)
     {
         $stmt = $this->pdo->prepare($query);
 
@@ -60,7 +60,7 @@ class Connection
      * @param integer $fetchType One of PDO::FETCH_* constants.
      * @return array The resulting data.
      */
-    public function query($query, $fetchStyle = PDO::FETCH_BOTH)
+    public function query($query, $fetchStyle = PDO::FETCH_ASSOC)
     {
         $stmt = $this->pdo->query($query);
 
