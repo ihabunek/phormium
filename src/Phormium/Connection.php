@@ -5,13 +5,12 @@ namespace Phormium;
 use PDO;
 
 /**
- * Wrapper for a pdo connection, which enables direct
- * SQL executions and access to the Phormium constructed
- * PDO object.
+ * Wrapper for a PDO connection, which enables direct SQL executions and access
+ * to the underlying PDO connection object.
  */
 class Connection
 {
-    /** the wrapped PDO connection */
+    /** The wrapped PDO connection */
     private $pdo;
 
     /**
@@ -25,21 +24,20 @@ class Connection
     }
 
     /**
-     * Creates and executes a prepared query based
-     * on the given SQL and arguments. The result
-     * will be completely fetched and returned.
+     * Prepares and executes an SQL query using the given SQL and arguments.
+     * Fetches and returns the resulting data.
      *
-     * @param $query
-     * @param null $arguments
-     * @param null $fetchType
-     * @param null $class
-     * @return array
+     * @param string $query The SQL query to execute, may contain named params.
+     * @param array $arguments The arguments used to substitute params.
+     * @param integer $fetchType One of PDO::FETCH_* constants.
+     * @param string $class When using PDO::FETCH_CLASS, class to fetch into.
+     * @return array The resulting data.
      */
     public function preparedQuery($query, $arguments = null, $fetchType = null, $class = null)
     {
         $stmt = $this->pdo->prepare($query);
 
-        if ($fetchType === PDO::FETCH_CLASS) {
+        if ($fetchType === PDO::FETCH_CLASS && isset($class)) {
             $stmt->setFetchMode(PDO::FETCH_CLASS, $class);
         }
 
@@ -52,14 +50,15 @@ class Connection
     }
 
     /**
-     * A query without preparing the statement.
-     * If queries are repeated the preparedQuery
-     * is most often the better method from performance
-     * perspective
+     * Executes a query without preparing the statement. Fetches and returns the
+     * resulting data.
      *
-     * @param $query the query to execute
-     * @param int $fetchStyle
-     * @return array
+     * If queries are repeated it's often the better to use preparedQuery()
+     * from performance perspective.
+     *
+     * @param $query The SQL query to execute.
+     * @param integer $fetchType One of PDO::FETCH_* constants.
+     * @return array The resulting data.
      */
     public function query($query, $fetchStyle = PDO::FETCH_BOTH)
     {
