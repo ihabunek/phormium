@@ -34,8 +34,9 @@ class Connection
      * @param string $class When using PDO::FETCH_CLASS, class to fetch into.
      * @return array The resulting data.
      */
-    public function preparedQuery($query, $arguments = null, $fetchStyle = PDO::FETCH_ASSOC, $class = null)
+    public function preparedQuery($query, $arguments = array(), $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
+        Log::debug("Preparing query: $query");
         $stmt = $this->pdo->prepare($query);
 
         if ($fetchStyle === PDO::FETCH_CLASS && isset($class)) {
@@ -44,10 +45,7 @@ class Connection
 
         $stmt->execute($arguments);
 
-        $rc = $stmt->rowCount();
-        Log::debug("Finished prepared query execution. Row count: $rc.");
-
-        return $stmt->fetchAll();
+        return $this->fetchAll($stmt, $fetchStyle);
     }
 
     /**
@@ -57,22 +55,20 @@ class Connection
      * If queries are repeated it's often the better to use preparedQuery()
      * from performance perspective.
      *
-     * @param $query The SQL query to execute.
+     * @param string $query The SQL query to execute.
      * @param integer $fetchStyle One of PDO::FETCH_* constants.
      * @return array The resulting data.
      */
     public function query($query, $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
+        Log::debug("Executing query: $query");
         $stmt = $this->pdo->query($query);
 
         if ($fetchStyle === PDO::FETCH_CLASS && isset($class)) {
             $stmt->setFetchMode(PDO::FETCH_CLASS, $class);
         }
 
-        $rc = $stmt->rowCount();
-        Log::debug("Finished query execution. Row count: $rc.");
-
-        return $stmt->fetchAll($fetchStyle);
+        return $this->fetchAll($stmt, $fetchStyle);
     }
 
     /**
@@ -85,9 +81,27 @@ class Connection
      */
     public function execute($query)
     {
-        $affectedRows = $this->pdo->exec($query);
-        Log::debug("Executed query. Affected rows: $affectedRows.");
-        return $affectedRows;
+        return $this->pdo->exec($query);
+    }
+
+    /**
+     * Prepares, then executes a statement and returns the number of affected
+     * rows.
+     *
+     * The method is useful for updates or deletes, which do
+     * not return anything.
+     *
+     * @param string $query The SQL query to execute.
+     * @param array $arguments The arguments used to substitute params.
+     * @return integer Number of rows affected by the query.
+     */
+    public function preparedExecute($query, $arguments = array())
+    {
+        Log::debug("Preparing query: $query");
+        $stmt = $this->pdo->prepare($query);
+
+        $stmt->execute($arguments);
+        return $stmt->rowCount();
     }
 
     /**
@@ -116,5 +130,42 @@ class Connection
     public function rollback()
     {
         $this->pdo->rollback();
+    }
+
+    /**
+     * Fetches all resulting records from a PDO statement.
+     *
+     * This method uses fetch() in a loop instead of fetchAll(), because the
+     * latter method has problems on Informix: If a record is locked, fetchAll()
+     * will only return records upto the locked record, without raising an
+     * error. Fetch, on the other hand will produce an error.
+     */
+    private function fetchAll($stmt, $fetchStyle)
+    {
+        $data = array();
+        while ($row = $stmt->fetch($fetchStyle)) {
+            $data[] = $row;
+        }
+        return $data;
+    }
+
+    /** Logs the execute arguments if logging is enabled. */
+    public function logExecute($args)
+    {
+        if (Config::isLoggingEnabled()) {
+            foreach ($args as &$arg) {
+                if ($arg === null) {
+                    $arg = "NULL";
+                } elseif (is_string($arg)) {
+                    $arg = '"' . $arg . '"';
+                }
+            }
+
+            if (empty($args)) {
+                Log::debug("Executing query with no args.");
+            } else {
+                Log::debug("Executing query with args: " . implode(', ', $args));
+            }
+        }
     }
 }
