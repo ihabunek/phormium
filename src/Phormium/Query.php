@@ -194,16 +194,22 @@ class Query
 
         // Run query
         $conn = DB::getConnection($meta->database);
-        $conn->preparedExecute($query, $args);
+        $pdo = $conn->getPDO();
+
+        Log::debug("Preparing query: $query");
+        $stmt = $pdo->prepare($query);
+
+        $conn->logExecute($args);
+        $stmt->execute($args);
 
         // If PK is auto-generated, populate it
         if ($pkAutogen) {
             $pkColumn = $meta->pk[0];
             if ($this->driver == 'pgsql') {
-                $data = $this->fetchAll($stmt, PDO::FETCH_ASSOC);
-                $id = $data[0][$pkColumn];
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                $id = $row[$pkColumn];
             } else {
-                $id = $conn->getPDO()->lastInsertId();
+                $id = $pdo->lastInsertId();
             }
 
             $model->{$pkColumn} = $id;
