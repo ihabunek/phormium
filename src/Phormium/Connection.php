@@ -80,7 +80,7 @@ class Connection
      */
     public function preparedExecute($query, $arguments = null)
     {
-        $stmt = $this->pdoConnection->prepare($query);
+        $stmt = $this->pdo->prepare($query);
         return $stmt->execute($arguments);
     }
 
