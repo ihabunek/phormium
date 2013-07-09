@@ -114,6 +114,12 @@ class Connection
         return $this->pdo;
     }
 
+    /** Returns the name of the driver for the underlying PDO connection. */
+    public function getDriver()
+    {
+        return $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+    }
+
     /** Calls BEGIN on the underlying PDO connection */
     public function beginTransaction()
     {
