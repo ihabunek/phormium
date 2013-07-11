@@ -13,9 +13,9 @@ class Query
      * Meta data of the model which the Query will handle.
      * @var \Phormium\Meta
      */
-     private $meta;
+    private $meta;
 
-     /** The database driver used. Used to tailor custom queries when needed.*/
+    /** The database driver used. Used to tailor custom queries when needed.*/
     private $driver;
 
     public function __construct(Meta $meta)
@@ -46,16 +46,14 @@ class Query
         $table = $this->meta->table;
         $class = $this->meta->class;
 
-        list($limit1, $limit2) = $this->renderLimitOffset($limit, $offset);
+        list($limit1, $limit2) = $this->constructLimitOffset($limit, $offset);
         list($where, $args) = $this->constructWhere($filter);
         $order = $this->constructOrder($order);
 
         $query = "SELECT{$limit1} {$columns} FROM {$table}{$where}{$order}{$limit2};";
-        $conn = DB::getConnection($this->meta->database)->getPDO();
 
-        $stmt = $this->prepare($conn, $query, $fetchType, $class);
-        $this->execute($stmt, $args);
-        return $this->fetchAll($stmt, $fetchType);
+        $conn = DB::getConnection($this->meta->database);
+        return $conn->preparedQuery($query, $args, $fetchType, $class);
     }
 
     /**
@@ -72,7 +70,7 @@ class Query
     public function selectDistinct($filter, $order, array $columns)
     {
         $table = $this->meta->table;
-        $fetchType = PDO::FETCH_ASSOC;
+
         if (empty($columns)) {
             throw new \Exception("No columns given");
         }
@@ -85,23 +83,16 @@ class Query
         $order = $this->constructOrder($order);
 
         $query = "SELECT DISTINCT {$sqlColumns} FROM {$table}{$where}{$order};";
-        $conn = DB::getConnection($this->meta->database)->getPDO();
 
-        $stmt = $this->prepare($conn, $query, $fetchType);
-        $this->execute($stmt, $args);
-
-        // If multiple columns, return array of arrays
         if (count($columns) > 1) {
-            return $this->fetchAll($stmt, $fetchType);
+            // If multiple columns, return array of arrays
+            $conn = DB::getConnection($this->meta->database);
+            return $conn->preparedQuery($query, $args);
+        } else {
+            // If single column, return array of strings
+            $column = reset($columns);
+            return $this->singleColumnQuery($query, $args, $column);
         }
-
-        // If it's a single column then return a single array of values
-        $column = reset($columns);
-        $data = array();
-        while ($row = $stmt->fetch($fetchType)) {
-            $data[] = $row[$column];
-        }
-        return $data;
     }
 
     /**
@@ -117,13 +108,9 @@ class Query
         list($where, $args) = $this->constructWhere($filter);
 
         $query = "SELECT COUNT(*) AS count FROM {$table}{$where};";
-        $conn = DB::getConnection($this->meta->database)->getPDO();
+        $conn = DB::getConnection($this->meta->database);
 
-        $fetchType = PDO::FETCH_ASSOC;
-
-        $stmt = $this->prepare($conn, $query, $fetchType);
-        $this->execute($stmt, $args);
-        $data = $this->fetchAll($stmt, $fetchType);
+        $data = $conn->preparedQuery($query, $args);
         return (integer) $data[0]['count'];
     }
 
@@ -137,9 +124,8 @@ class Query
     public function aggregate($filter, $aggregate)
     {
         $table = $this->meta->table;
-        $type = $aggregate->type;
-
         $column = $aggregate->column;
+
         if (!in_array($column, $this->meta->columns)) {
             throw new \Exception("Error forming aggregate query. Column [$column] does not exist in table [$table].");
         }
@@ -148,13 +134,9 @@ class Query
         $select = $aggregate->render();
 
         $query = "SELECT {$select} as aggregate FROM {$table}{$where};";
-        $conn = DB::getConnection($this->meta->database)->getPDO();
 
-        $fetchType = PDO::FETCH_ASSOC;
-
-        $stmt = $this->prepare($conn, $query, $fetchType);
-        $this->execute($stmt, $args);
-        $data = $this->fetchAll($stmt, $fetchType);
+        $conn = DB::getConnection($this->meta->database);
+        $data = $conn->preparedQuery($query, $args);
         return $data[0]['aggregate'];
     }
 
@@ -211,18 +193,23 @@ class Query
         $query .= "){$returning};";
 
         // Run query
-        $conn = DB::getConnection($meta->database)->getPDO();
-        $stmt = $this->prepare($conn, $query);
-        $this->execute($stmt, $args);
+        $conn = DB::getConnection($meta->database);
+        $pdo = $conn->getPDO();
+
+        Log::debug("Preparing query: $query");
+        $stmt = $pdo->prepare($query);
+
+        $conn->logExecute($args);
+        $stmt->execute($args);
 
         // If PK is auto-generated, populate it
         if ($pkAutogen) {
             $pkColumn = $meta->pk[0];
             if ($this->driver == 'pgsql') {
-                $data = $this->fetchAll($stmt, PDO::FETCH_ASSOC);
-                $id = $data[0][$pkColumn];
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                $id = $row[$pkColumn];
             } else {
-                $id = $conn->lastInsertId();
+                $id = $pdo->lastInsertId();
             }
 
             $model->{$pkColumn} = $id;
@@ -269,10 +256,8 @@ class Query
         $query .= implode(' AND ', $where);
 
         // Run the query
-        $conn = DB::getConnection($meta->database)->getPDO();
-        $stmt = $this->prepare($conn, $query);
-        $this->execute($stmt, $args);
-        return $stmt->rowCount();
+        $conn = DB::getConnection($meta->database);
+        return $conn->preparedExecute($query, $args);
     }
 
     /**
@@ -299,10 +284,8 @@ class Query
         $query = "DELETE FROM {$this->meta->table} WHERE {$where}";
 
         // Run the query
-        $conn = DB::getConnection($this->meta->database)->getPDO();
-        $stmt = $this->prepare($conn, $query);
-        $this->execute($stmt, $args);
-        return $stmt->rowCount();
+        $conn = DB::getConnection($this->meta->database);
+        return $conn->preparedExecute($query, $args);
     }
 
     /**
@@ -330,10 +313,8 @@ class Query
         $query .= $where;
 
         // Run the query
-        $conn = DB::getConnection($this->meta->database)->getPDO();
-        $stmt = $this->prepare($conn, $query);
-        $this->execute($stmt, $args);
-        return $stmt->rowCount();
+        $conn = DB::getConnection($this->meta->database);
+        return $conn->preparedExecute($query, $args);
     }
 
     /**
@@ -342,14 +323,13 @@ class Query
      */
     public function batchDelete($filter)
     {
+        // Construct the query
         list($where, $args) = $this->constructWhere($filter);
         $query = "DELETE FROM {$this->meta->table}{$where}";
 
         // Run the query
-        $conn = DB::getConnection($this->meta->database)->getPDO();
-        $stmt = $this->prepare($conn, $query);
-        $this->execute($stmt, $args);
-        return $stmt->rowCount();
+        $conn = DB::getConnection($this->meta->database);
+        return $conn->preparedExecute($query, $args);
     }
 
     // ******************************************
@@ -368,6 +348,26 @@ class Query
                 throw new \Exception("Column [$column] does not exist in table [$table].");
             }
         }
+    }
+
+    /** Performs a prepared query and returns only a single column. */
+    private function singleColumnQuery($query, $args, $column)
+    {
+        $conn = DB::getConnection($this->meta->database);
+        $pdo = $conn->getPDO();
+
+        Log::debug("Preparing query: $query");
+        $stmt = $pdo->prepare($query);
+
+        $conn->logExecute($args);
+        $stmt->execute($args);
+
+        $data = array();
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $data[] = $row[$column];
+        }
+
+        return $data;
     }
 
     /** Constructs a WHERE clause for a given filter. */
@@ -396,59 +396,8 @@ class Query
         return " ORDER BY " . implode(', ', $order);
     }
 
-    private function prepare(PDO $conn, $query, $fetchType = null, $class = null)
-    {
-        Log::debug("Preparing query: $query");
-
-        $stmt = $conn->prepare($query);
-        if ($fetchType === PDO::FETCH_CLASS) {
-            $stmt->setFetchMode(PDO::FETCH_CLASS, $class);
-        }
-        return $stmt;
-    }
-
-    private function execute($stmt, $args)
-    {
-        $this->logExecute($args);
-        $stmt->execute($args);
-
-        $rc = $stmt->rowCount();
-        Log::debug("Finished execution. Row count: $rc.");
-    }
-
-    private function logExecute($args)
-    {
-        if (!Config::isLoggingEnabled()) {
-            return;
-        }
-
-        foreach ($args as &$arg) {
-            if ($arg === null) {
-                $arg = "NULL";
-            } elseif (is_string($arg)) {
-                $arg = '"' . $arg . '"';
-            }
-        }
-
-        if (empty($args)) {
-            Log::debug("Executing query with no args.");
-        } else {
-            Log::debug("Executing query with args: " . implode(', ', $args));
-        }
-    }
-
-    private function fetchAll($stmt, $fetchType)
-    {
-        Log::debug("Fetching data...");
-
-        $data = array();
-        while ($row = $stmt->fetch($fetchType)) {
-            $data[] = $row;
-        }
-        return $data;
-    }
-
-    private function renderLimitOffset($limit, $offset)
+    /** Constructs the LIMIT/OFFSET clause. */
+    private function constructLimitOffset($limit, $offset)
     {
         // Checks
         if (isset($offset) && !is_numeric($offset)) {
@@ -492,6 +441,7 @@ class Query
         return array($limit1, $limit2);
     }
 
+    /** Parses the DSN and extracts the driver name. */
     private function getDriver($dns)
     {
         $count = preg_match('/^([a-z]+):/', $dns, $matches);
