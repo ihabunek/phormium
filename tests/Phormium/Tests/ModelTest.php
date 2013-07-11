@@ -196,6 +196,29 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         self::assertSame(0, $count);
     }
 
+    /**
+     * This test case currently fails on MySQL.
+     * The $update instance holds a "string" id, but
+     * update requires an int id.
+     *
+     * For MySQL it needs to read:
+     *
+     * $update = Person::get($person1->id);
+     * $update->id = (int)$update->id;
+     * ...
+     * $update->save();
+     */
+    public function testSelectAndUpdate()
+    {
+        $person1 = new Person();
+        $person1->name = 'Short Lived Person';
+        $person1->save();
+
+        $update = Person::get($person1->id);
+        $update->name = 'Long Lived Person';
+        $update->save();
+    }
+
     public function testLimit()
     {
         $allPeople = Person::objects()
