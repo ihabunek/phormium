@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Phormium by ihabunek</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Phormium</h1>
+        <h2>Phormium is a minimal ORM for PHP (which incidentally works with Informix)</h2>
+        <a href="https://github.com/ihabunek/phormium" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a name="phormium" class="anchor" href="#phormium"><span class="octicon octicon-link"></span></a>Phormium</h1>
+
+<p>Phormium is a minimalist ORM for PHP.</p>
+
+<p>Tested on Informix, MySQL, PosgreSQL and SQLite. Might work on other databases
+with a PDO driver or may require some work.</p>
+
+<p>Warning: This is a work in progress. Test before using! Report any bugs
+<a href="https://github.com/ihabunek/phormium/issues">here</a>.</p>
+
+<p><a href="https://travis-ci.org/ihabunek/phormium"><img src="https://travis-ci.org/ihabunek/phormium.png" alt="Build Status"></a></p>
+
+<h2>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<ul>
+<li>CRUD operations made simple</li>
+<li>batch update and delete</li>
+<li>filtering</li>
+<li>ordering</li>
+<li>limiting</li>
+<li>transactions</li>
+<li>query logging (requires <a href="http://logging.apache.org/log4php/">Apache log4php</a>)</li>
+</ul><p>Not yet implemented:</p>
+
+<ul>
+<li>relationships between models (joins)</li>
+</ul><h2>
+<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h2>
+
+<p><a href="http://phormium.readthedocs.org/en/latest/">The documentation</a> is hosted by
+ReadTheDocs.org.</p>
+
+<h2>
+<a name="example" class="anchor" href="#example"><span class="octicon octicon-link"></span></a>Example</h2>
+
+<p>After initial setup, Phormium is very easy to use. Here's a quick overview of
+some features:</p>
+
+<div class="highlight"><pre><span class="c1">// Create a new person record</span>
+<span class="nv">$person</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Person</span><span class="p">();</span>
+<span class="nv">$person</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">=</span> <span class="s2">"Frank Zappa"</span><span class="p">;</span>
+<span class="nv">$person</span><span class="o">-&gt;</span><span class="na">birthday</span> <span class="o">=</span> <span class="s2">"1940-12-20"</span><span class="p">;</span>
+<span class="nv">$person</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">();</span>
+
+<span class="c1">// Fetch, update, save</span>
+<span class="nv">$person</span> <span class="o">=</span> <span class="nx">Person</span><span class="o">::</span><span class="na">get</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+<span class="nv">$person</span><span class="o">-&gt;</span><span class="na">salary</span> <span class="o">+=</span> <span class="mi">5000</span><span class="p">;</span> <span class="c1">// give the man a raise!</span>
+<span class="nv">$person</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">();</span>
+
+<span class="c1">// Or delete</span>
+<span class="nx">Person</span><span class="o">::</span><span class="na">get</span><span class="p">(</span><span class="mi">37</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">();</span>
+
+<span class="c1">// Intuitive filtering, ordering and limiting</span>
+<span class="nv">$persons</span> <span class="o">=</span> <span class="nx">Person</span><span class="o">::</span><span class="na">objects</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">'salary'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">'birthday'</span><span class="p">,</span> <span class="s1">'between'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'2000-01-01'</span><span class="p">,</span> <span class="s1">'2001-01-01'</span><span class="p">])</span>
+    <span class="o">-&gt;</span><span class="na">orderBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'desc'</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">limit</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">fetch</span><span class="p">();</span>
+
+<span class="c1">// Count records</span>
+<span class="nv">$count</span> <span class="o">=</span> <span class="nx">Person</span><span class="o">::</span><span class="na">objects</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">'salary'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">count</span><span class="p">();</span>
+
+<span class="c1">// Distinct values</span>
+<span class="nv">$count</span> <span class="o">=</span> <span class="nx">Person</span><span class="o">::</span><span class="na">objects</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">distinct</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'email'</span><span class="p">);</span>
+
+<span class="c1">// Complex composite filters</span>
+<span class="nv">$persons</span> <span class="o">=</span> <span class="nx">Person</span><span class="o">::</span><span class="na">objects</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span>
+    <span class="nx">Filter</span><span class="o">::</span><span class="na">_or</span><span class="p">(</span>
+        <span class="nx">Filter</span><span class="o">::</span><span class="na">_and</span><span class="p">(</span>
+            <span class="k">array</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="s1">'&gt;='</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+            <span class="k">array</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="s1">'&lt;='</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+        <span class="p">),</span>
+        <span class="nx">Filter</span><span class="o">::</span><span class="na">_and</span><span class="p">(</span>
+            <span class="k">array</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="s1">'&gt;='</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+            <span class="k">array</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="s1">'&lt;='</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="s1">'&gt;='</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+    <span class="p">)</span>
+<span class="p">)</span><span class="o">-&gt;</span><span class="na">fetch</span><span class="p">();</span>
+
+<span class="c1">// Fetch a single record (otherwise throws an exeption)</span>
+<span class="nv">$person</span> <span class="o">=</span> <span class="nx">Person</span><span class="o">::</span><span class="na">objects</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">'email'</span><span class="p">,</span> <span class="s1">'='</span><span class="p">,</span> <span class="s1">'ivan@example.com'</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">single</span><span class="p">();</span>
+
+<span class="c1">// Batch update</span>
+<span class="nx">Person</span><span class="o">::</span><span class="na">objects</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">'salary'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">update</span><span class="p">([</span><span class="s1">'salary'</span> <span class="o">=&gt;</span> <span class="mi">5000</span><span class="p">]);</span>
+
+<span class="c1">// Batch delete</span>
+<span class="nx">Person</span><span class="o">::</span><span class="na">objects</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">'salary'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">delete</span><span class="p">();</span>
+
+<span class="c1">// Aggregates</span>
+<span class="nx">Person</span><span class="o">::</span><span class="na">objects</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'like'</span><span class="p">,</span> <span class="s1">'Ivan%'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">avg</span><span class="p">(</span><span class="s1">'salary'</span><span class="p">);</span>
+<span class="nx">Person</span><span class="o">::</span><span class="na">objects</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'like'</span><span class="p">,</span> <span class="s1">'Marko%'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">min</span><span class="p">(</span><span class="s1">'birthday'</span><span class="p">);</span>
+</pre></div>
+
+<p>See <a href="http://phormium.readthedocs.org/en/latest/">documentation</a> for full
+reference, also check out the <code>example</code> directory for more examples.</p>
+
+<h2>
+<a name="why" class="anchor" href="#why"><span class="octicon octicon-link"></span></a>Why?</h2>
+
+<p>"Why another ORM?!?", I hear you cry.</p>
+
+<p>There are two reasons:</p>
+
+<ul>
+<li>I work a lot on Informix on my day job and no other ORM I found supports it.</li>
+<li>Writing an ORM is a great experience. You should try it.</li>
+</ul><p>Phormium is greatly inspired by other ORMs, in particular
+<a href="https://docs.djangoproject.com/en/dev/topics/db/">Django ORM</a> and
+Laravel's <a href="http://laravel.com/docs/database/eloquent">Eloquent ORM</a>.</p>
+
+<p>Let me know what you think!</p>
+
+<p>Ivan Habunek <a href="http://twitter.com/ihabunek">@ihabunek</a></p>
+
+<h2>
+<a name="praise" class="anchor" href="#praise"><span class="octicon octicon-link"></span></a>Praise</h2>
+
+<p>If you like it, buy me a beer (in Croatia, that's around €2 or $3).</p>
+
+<p><a href="http://flattr.com/thing/1204532/ihabunekphormium-on-GitHub"><img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this"></a></p>
+
+<h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>Licensed under the MIT license. <code>See LICENSE.md</code>.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/ihabunek/phormium/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/ihabunek/phormium/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/ihabunek/phormium"></a> is maintained by <a href="https://github.com/ihabunek">ihabunek</a>.</p>
+
+          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
