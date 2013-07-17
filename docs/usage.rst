@@ -40,7 +40,14 @@ Also works for composite primary keys:
 
 .. code-block:: php
 
-    Caption::get('HR', 123);
+    Trade::get('2013-01-01', 123);
+
+Primary key can be given as an array:
+
+.. code-block:: php
+
+    $tradeID = array('2013-01-01', 123);
+    Trade::get($tradeID);
 
 To fetch all data from a table, run:
 
@@ -564,7 +571,7 @@ query()
 
     Connection::query($query[, $fetchStyle[, $class]])
 
-Executes the given SQL without preparing it. Fetches all rows returned by the 
+Executes the given SQL without preparing it. Fetches all rows returned by the
 query. Useful for SELECT queries without arguments.
 
 * `$fetchStyle` can be set to one of PDO::FETCH_* constants, and it determines

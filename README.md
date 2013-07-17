@@ -45,12 +45,19 @@ $person->name = "Frank Zappa";
 $person->birthday = "1940-12-20";
 $person->save();
 
+// Load record by primary key
+$person = Person::get(10);
+
+// Also works for composite PK, two variants:
+$trade = Trade::get('2013-01-01', 100);
+$trade = Trade::get(array('2013-01-01', 100));
+
 // Fetch, update, save
 $person = Person::get(10);
 $person->salary += 5000; // give the man a raise!
 $person->save();
 
-// Or delete
+// Fetch, delete
 Person::get(37)->delete();
 
 // Intuitive filtering, ordering and limiting

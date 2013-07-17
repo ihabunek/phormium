@@ -73,6 +73,43 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         // Load it from the database
         $p2 = Person::get($id);
         self::assertEquals($p, $p2);
+
+        // Alternative get
+        $p3 = Person::get(array($id));
+        self::assertEquals($p, $p3);
+    }
+
+    public function testNewTrade()
+    {
+        $date = '2013-07-17';
+        $no = 12345;
+
+        // Delete if it exists
+        Trade::objects()
+            ->filter('tradedate', '=', $date)
+            ->filter('tradeno', '=', $no)
+            ->delete();
+
+        $t = new Trade();
+        $t->tradedate = $date;
+        $t->tradeno = $no;
+        $t->price = 123.45;
+        $t->quantity = 321;
+
+        // Check insert does not change the object
+        $t0 = clone $t;
+
+        $t->insert();
+
+        $this->assertEquals($t, $t0);
+
+        // Load it from the database
+        $t2 = Trade::get($date, $no);
+        self::assertEquals($t, $t2);
+
+        // Alternative get
+        $t3 = Trade::get(array($date, $no));
+        self::assertEquals($t, $t3);
     }
 
     public function testNewPersonAssignedPK()

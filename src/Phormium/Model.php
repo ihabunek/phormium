@@ -74,6 +74,13 @@ abstract class Model
     public static function get()
     {
         $args = func_get_args();
+        $count = func_num_args();
+
+        // Allow passing the PK as an array
+        if ($count == 1 && is_array($args[0])) {
+            $args = $args[0];
+        }
+
         $meta = self::getMeta();
 
         if (!isset($meta->pk)) {
