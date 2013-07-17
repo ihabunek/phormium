@@ -6,6 +6,11 @@ use \Phormium\Tests\Models\Person;
 
 class PrinterTest extends \PHPUnit_Framework_TestCase
 {
+    public static function setUpBeforeClass()
+    {
+        DB::configure(PHORMIUM_CONFIG_FILE);
+    }
+
     public function testDumpReturn()
     {
         $name = "Freddy Mercury";
