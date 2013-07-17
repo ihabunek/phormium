@@ -3,6 +3,7 @@
 namespace Phormium\Tests;
 
 use \Phormium\Tests\Models\Person;
+use \Phormium\DB;
 
 class PrinterTest extends \PHPUnit_Framework_TestCase
 {
