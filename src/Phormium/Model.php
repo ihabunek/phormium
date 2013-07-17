@@ -204,15 +204,17 @@ abstract class Model
             }
         }
 
-        // If primary key value is not set, do an INSERT
-        if (!$pkSet) {
-            $this->insert();
-        } else {
-            // Otherwise, try to UPDATE, and if nothing is updated then INSERT
-            $count = $this->update();
-            if ($count == 0) {
+        // If primary key is populated, check whether the record with given
+        // primary key exists, and update it if it does. Otherwise insert.
+        if ($pkSet) {
+            $exists = static::exists($this->getPK());
+            if ($exists) {
+                $this->update();
+            } else {
                 $this->insert();
             }
+        } else {
+            $this->insert();
         }
     }
 
