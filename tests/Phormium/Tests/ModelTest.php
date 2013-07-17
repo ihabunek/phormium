@@ -359,6 +359,40 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         Person::get(1, 2, 3);
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage [Phormium\Tests\Models\Person] record with primary key [12345678] does not exist.
+     */
+    public function testGetErrorModelDoesNotExist()
+    {
+        Person::get(12345678);
+    }
+
+    public function testFind()
+    {
+        self::assertNull(Person::find(12345678));
+
+        $p = new Person();
+        $p->name = "Jimmy Hendrix";
+        $p->insert();
+
+        $p2 = Person::find($p->id);
+        self::assertNotNull($p2);
+        self::assertEquals($p, $p2);
+    }
+
+    public function testExists()
+    {
+        self::assertFalse(Person::exists(12345678));
+
+        $p = new Person();
+        $p->name = "Jimmy Page";
+        $p->insert();
+
+        $actual = Person::exists($p->id);
+        self::assertTrue($actual);
+    }
+
     public function testGetPK()
     {
         $foo = new Person();

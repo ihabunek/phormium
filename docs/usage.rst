@@ -27,20 +27,34 @@ Alternatively, if you are not using Composer, Phormium has it's own autoloader:
     Phormium\Autoloader::register();
     Phormium\DB::configure('/path/to/config.json');
 
-Querying data
--------------
+Querying individual records
+---------------------------
 
-Fetching a single record by primary key:
+Fetch a single record by primary key; throws exception if it doesn't exist.
 
 .. code-block:: php
 
     Person::get(13);
+
+Fetch a single record by primary key; return null if it doesn't exist.
+
+.. code-block:: php
+
+    Person::find(13);
+
+Check if a record exists with the given primary key.
+
+.. code-block:: php
+
+    Person::exists(13);
 
 Also works for composite primary keys:
 
 .. code-block:: php
 
     Trade::get('2013-01-01', 123);
+    Trade::find('2013-01-01', 123);
+    Trade::exists('2013-01-01', 123);
 
 Primary key can be given as an array:
 
@@ -48,6 +62,11 @@ Primary key can be given as an array:
 
     $tradeID = array('2013-01-01', 123);
     Trade::get($tradeID);
+    Trade::find($tradeID);
+    Trade::exists($tradeID);
+
+Querying multiple records
+-------------------------
 
 To fetch all data from a table, run:
 

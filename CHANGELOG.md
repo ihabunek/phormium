@@ -5,6 +5,9 @@ Phormium Changelog
 ---------
 * Added support for custom queries via Connection object
 * Added Model->merge()
+* Changed Model::get() to accept PK as an array
+* Added Model::find()
+* Added Model::exists()
 
 0.3 / 2013-06-14
 ----------------

@@ -32,8 +32,8 @@ Documentation
 [The documentation](http://phormium.readthedocs.org/en/latest/) is hosted by
 ReadTheDocs.org.
 
-Example
--------
+Showcase
+--------
 
 After initial setup, Phormium is very easy to use. Here's a quick overview of
 it's features:
@@ -45,12 +45,23 @@ $person->name = "Frank Zappa";
 $person->birthday = "1940-12-20";
 $person->save();
 
-// Load record by primary key
-$person = Person::get(10);
+// Get record by primary key
+Person::get(10);   // Throws exception if the model doesn't exist
+Person::find(10);  // Returns null if the model doesn't exist
 
-// Also works for composite PK, two variants:
-$trade = Trade::get('2013-01-01', 100);
-$trade = Trade::get(array('2013-01-01', 100));
+// Check record exists by primary key
+Person::exists(10);
+
+// Also works for composite primary keys
+Trade::get('2013-01-01', 100);
+Trade::find('2013-01-01', 100);
+Trade::exists('2013-01-01', 100);
+
+// Primary keys can also be given as arrays
+$tradePK = array('2013-01-01', 100);
+Trade::get($tradePK);
+Trade::find($tradePK);
+Trade::exists($tradePK);
 
 // Fetch, update, save
 $person = Person::get(10);
