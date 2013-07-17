@@ -27,20 +27,46 @@ Alternatively, if you are not using Composer, Phormium has it's own autoloader:
     Phormium\Autoloader::register();
     Phormium\DB::configure('/path/to/config.json');
 
-Querying data
--------------
+Querying individual records
+---------------------------
 
-Fetching a single record by primary key:
+Fetch a single record by primary key; throws exception if it doesn't exist.
 
 .. code-block:: php
 
     Person::get(13);
 
+Fetch a single record by primary key; return null if it doesn't exist.
+
+.. code-block:: php
+
+    Person::find(13);
+
+Check if a record exists with the given primary key.
+
+.. code-block:: php
+
+    Person::exists(13);
+
 Also works for composite primary keys:
 
 .. code-block:: php
 
-    Caption::get('HR', 123);
+    Trade::get('2013-01-01', 123);
+    Trade::find('2013-01-01', 123);
+    Trade::exists('2013-01-01', 123);
+
+Primary key can be given as an array:
+
+.. code-block:: php
+
+    $tradeID = array('2013-01-01', 123);
+    Trade::get($tradeID);
+    Trade::find($tradeID);
+    Trade::exists($tradeID);
+
+Querying multiple records
+-------------------------
 
 To fetch all data from a table, run:
 
@@ -446,7 +472,6 @@ To create a new record in `person`, just create a new `Person` object and
 
 .. code-block:: php
 
-    // Create a new person and save it to the database
     $person = new Person();
     $person->name = "Frank Zappa";
     $person->birthday = "1940-12-20";
@@ -456,6 +481,18 @@ If the primary key column is auto-incremented, it is not necessary to manually
 assign a value to it. The `save()` method will persist the object to the
 database and populate the primary key property of the Person object with the
 value assigned by the database.
+
+It is also possible to create a model from data contained within an array (or
+object) by using the static `fromArray()` method.
+
+.. code-block:: php
+
+    // This is quivalent to the above example
+    $personData = array(
+        "name" => "Frank Zappa",
+        "birthday" => "1940-12-20"
+    );
+    Person::fromArray($personData)->save();
 
 Updating records
 ~~~~~~~~~~~~~~~~
@@ -467,6 +504,22 @@ required changes and call `save()`.
 
     $person = Person::get(37);
     $person->birthday = "1940-12-21";
+    $person->salary = 10000;
+    $person->save();
+
+If you have an associative array (or object) containing the data which you want
+to modify in a model instance, you can use the `merge()` method.
+
+.. code-block:: php
+
+    // This is quivalent to the above example
+    $updates = array(
+        "birthday" => "1940-12-21"
+        "salary" => 10000
+    );
+
+    $person = Person::get(37);
+    $person->merge($updates);
     $person->save();
 
 To change multiple records at once, use the `QuerySet::update()` function. This
@@ -478,11 +531,11 @@ function performs an update query on all records currently selected by the
     $person = Person::objects()
         ->filter('name', 'like', 'X%')
         ->update([
-            'name' => 'X-man'
+            'name' => 'Xavier'
         ]);
 
 This will update all Persons whose name starts with a X and set their name to
-'X-man'.
+'Xavier'.
 
 Deleting records
 ~~~~~~~~~~~~~~~~
@@ -503,3 +556,107 @@ will delete all records currently selected by the `QuerySet`.
         ->delete();
 
 This will delete all Persons whose salary is greater than 100k.
+
+Custom queries
+--------------
+
+Every ORM has it's limits, and that goes double for Phormium. Sometime it's
+necessary to write the SQL by hand. This is done by fetching the desired
+`Connection` object and using provided methods.
+
+execute()
+~~~~~~~~~~~~~~~
+
+.. code-block:: php
+
+    Connection::execute($query)
+
+Executes the given SQL without preparing it. Does not fetch. Useful for INSERT,
+UPDATE or DELETE queries which do not return data.
+
+.. code-block:: php
+
+    // Lowercase all names in the person table
+    $query = "UPDATE person SET name = LOWER(name);
+    $conn = DB::getConnection('myconn');
+    $numRows = $conn->execute($query);
+
+Where `myconn` is a connection defined in the config file.
+
+query()
+~~~~~~~
+
+.. code-block:: php
+
+    Connection::query($query[, $fetchStyle[, $class]])
+
+Executes the given SQL without preparing it. Fetches all rows returned by the
+query. Useful for SELECT queries without arguments.
+
+* `$fetchStyle` can be set to one of PDO::FETCH_* constants, and it determines
+  how data is returned to the user. This argument is optional and defaults to
+  `PDO::FETCH_ASSOC`.
+
+* `$class` is used in conjunction with PDO::FETCH_CLASS fetch style. Optional.
+  If set, the records will be returned as instances of this class.
+
+For more info, see `PDOStatement`_ documentation.
+
+.. _PDOStatement: http://www.php.net/manual/en/pdostatement.fetch.php
+
+.. code-block:: php
+
+    $query = "SELET * FROM x JOIN y ON x.pk = y.fk";
+    $conn = DB::getConnection('myconn');
+    $data = $conn->query($query);
+
+preparedQuery()
+~~~~~~~~~~~~~~~
+
+.. code-block:: php
+
+    Connection::preparedQuery($query[, $arguments[, $fetchType[, $class]]])
+
+Prepares the given SQL query, and executes it using the provided arguments.
+Fetches and returns all data returned by the query. Useful for queries which
+have arguments.
+
+* `$arguments` is an array of values with as many elements as there are bound
+  parameters in the SQL statement being executed. Can be ommitted if no
+  arguments are required.
+
+* `$fetchStyle` and `$class` are the same as for `query()`_.
+
+The arguments can either be unnamed:
+
+.. code-block:: php
+
+    $query = "SELET * FROM x JOIN y ON x.pk = y.fk WHERE col1 > ? AND col2 < ?";
+    $arguments = array(10, 20);
+    $conn = DB::getConnection('myconn');
+    $data = $conn->preparedQuery($query);
+
+Or they can be named:
+
+.. code-block:: php
+
+    $query = "SELET * FROM x JOIN y ON x.pk = y.fk WHERE col1 > :val1 AND col2 < :val2";
+    $arguments = array(
+        "val1" => 10,
+        "val2" => 20
+    );
+    $conn = DB::getConnection('myconn');
+    $data = $conn->preparedQuery($query);
+
+Direct PDO access
+~~~~~~~~~~~~~~~~~
+
+If all else fails, you can fetch the underlying PDO connection object and work
+with it as you like.
+
+.. code-block:: php
+
+    $pdo = DB::getConnection('myconn')->getPDO();
+    $stmt = $pdo->prepare($query);
+    $stmt->execute($args);
+    $data = $stmt->fetchAll();

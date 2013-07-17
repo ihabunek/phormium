@@ -35,7 +35,7 @@ class DB
      * does not exist, it is established.
      *
      * @param string $name Connection name.
-     * @return PDO
+     * @return Connection
      */
     public static function getConnection($name)
     {
@@ -44,15 +44,15 @@ class DB
             $db = Config::getDatabase($name);
 
             // Establish a connection
-            $connection = new PDO($db['dsn'], $db['username'], $db['password']);
+            $pdo = new PDO($db['dsn'], $db['username'], $db['password']);
 
             // Force lower case column names
-            $connection->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
+            $pdo->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
 
             // Force an exception to be thrown on error
-            $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            self::$connections[$name] = $connection;
+            self::$connections[$name] = new Connection($pdo);
         }
 
         if (self::$beginTriggered && !in_array($name, self::$inTransaction)) {

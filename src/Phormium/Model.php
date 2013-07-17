@@ -60,60 +60,103 @@ abstract class Model
     public static function fromArray($array, $strict = false)
     {
         $class = get_called_class();
+
         $instance = new $class();
-
-        if ($array instanceof \stdClass) {
-            $array = (array) $array;
-        }
-
-        if (!is_array($array)) {
-            throw new \Exception("Given argument is not an array.");
-        }
-
-        foreach ($array as $name => $value) {
-            if (property_exists($instance, $name)) {
-                $instance->{$name} = $value;
-            } else {
-                if ($strict) {
-                    throw new \Exception("Property [$name] does not exist in class [$class].");
-                }
-            }
-        }
-
+        $instance->merge($array, $strict);
         return $instance;
     }
 
+
     /**
-     * Fetches a single record by primary key.
+     * Fetches a single record by primary key, throws an exception if the model
+     * is not found. This method requires the model to have a PK defined.
      *
-     * @param mixed The primary key, can be more than 1 param for composite keys.
+     * @param mixed The primary key value, either as one or several arguments,
+     *      or as an array of one or several values.
+     * @return Model
      */
     public static function get()
     {
-        $args = func_get_args();
-        $meta = self::getMeta();
+        $argv = func_get_args();
+        $argc = func_num_args();
 
+        $qs = self::getQuerySetForPK($argv, $argc);
+        $model = $qs->single(true);
+
+        if ($model === null) {
+            $class = get_called_class();
+            $pk = implode(',', $argv);
+            throw new \Exception("[$class] record with primary key [$pk] does not exist.");
+        }
+
+        return $model;
+    }
+
+    /**
+     * Fetches a single record by primary key, returns NULL if the model is not
+     * found. This method requires the model to have a PK defined.
+     *
+     * @param mixed The primary key value, either as one or several arguments,
+     *      or as an array of one or several values.
+     * @return Model|null The Model instance or NULL if not found.
+     */
+    public static function find()
+    {
+        $argv = func_get_args();
+        $argc = func_num_args();
+
+        $qs = self::getQuerySetForPK($argv, $argc);
+        return $qs->single(true);
+    }
+
+    /**
+     * Checks whether a record with the given Primary Key exists in the
+     * database. This method requires the model to have a PK defined.
+     *
+     * @param mixed The primary key value, either as one or several arguments,
+     *      or as an array of one or several values.
+     * @return boolean
+     */
+    public static function exists()
+    {
+        $argv = func_get_args();
+        $argc = func_num_args();
+
+        $qs = self::getQuerySetForPK($argv, $argc);
+        return $qs->exists();
+    }
+
+    /** Inner method used by get(), search() and exists(). */
+    private static function getQuerySetForPK($argv, $argc)
+    {
+        // Allow passing the PK as an array
+        if ($argc == 1 && is_array($argv[0])) {
+            $argv = $argv[0];
+            $argc = count($argv);
+        }
+
+        // Model must have PK defined
+        $meta = self::getMeta();
         if (!isset($meta->pk)) {
             $class = get_called_class();
             throw new \Exception("Primary key not defined for model [$class].");
         }
 
         // Check correct number of columns is given
-        $countArgs = count($args);
         $countPK = count($meta->pk);
-        if ($countArgs  !== $countPK) {
+        if ($argc !== $countPK) {
             $class = get_called_class();
-            throw new \Exception("Model [$class] has $countPK primary key columns. $countArgs arguments given.");
+            throw new \Exception("Model [$class] has $countPK primary key columns. $argc arguments given.");
         }
 
         // Create a queryset and filter by PK
         $qs = self::objects();
         foreach ($meta->pk as $name) {
-            $value = array_shift($args);
+            $value = array_shift($argv);
             $qs = $qs->filter($name, '=', $value);
         }
 
-        return $qs->single();
+        return $qs;
     }
 
     /**
@@ -161,15 +204,17 @@ abstract class Model
             }
         }
 
-        // If primary key value is not set, do an INSERT
-        if (!$pkSet) {
-            $this->insert();
-        } else {
-            // Otherwise, try to UPDATE, and if nothing is updated then INSERT
-            $count = $this->update();
-            if ($count == 0) {
+        // If primary key is populated, check whether the record with given
+        // primary key exists, and update it if it does. Otherwise insert.
+        if ($pkSet) {
+            $exists = static::exists($this->getPK());
+            if ($exists) {
+                $this->update();
+            } else {
                 $this->insert();
             }
+        } else {
+            $this->insert();
         }
     }
 
@@ -205,6 +250,35 @@ abstract class Model
     public function delete()
     {
         return self::getQuery()->delete($this);
+    }
+
+    /**
+     * Merges values from an associative array into the model.
+     *
+     * @param array|stdClass $values Associative array (or stdClass object)
+     *      where keys are names of properties of the model, and values are
+     *      desired values for those properties.
+     */
+    public function merge($values, $strict = false)
+    {
+        if ($values instanceof \stdClass) {
+            $values = (array) $values;
+        }
+
+        if (!is_array($values)) {
+            throw new \Exception("Given argument is not an array.");
+        }
+
+        foreach ($values as $name => $value) {
+            if (property_exists($this, $name)) {
+                $this->{$name} = $value;
+            } else {
+                if ($strict) {
+                    $class = get_class($this);
+                    throw new \Exception("Property [$name] does not exist in class [$class].");
+                }
+            }
+        }
     }
 
     public function toJSON()

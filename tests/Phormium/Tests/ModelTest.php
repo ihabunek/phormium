@@ -73,6 +73,43 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         // Load it from the database
         $p2 = Person::get($id);
         self::assertEquals($p, $p2);
+
+        // Alternative get
+        $p3 = Person::get(array($id));
+        self::assertEquals($p, $p3);
+    }
+
+    public function testNewTrade()
+    {
+        $date = '2013-07-17';
+        $no = 12345;
+
+        // Delete if it exists
+        Trade::objects()
+            ->filter('tradedate', '=', $date)
+            ->filter('tradeno', '=', $no)
+            ->delete();
+
+        $t = new Trade();
+        $t->tradedate = $date;
+        $t->tradeno = $no;
+        $t->price = 123.45;
+        $t->quantity = 321;
+
+        // Check insert does not change the object
+        $t0 = clone $t;
+
+        $t->insert();
+
+        $this->assertEquals($t, $t0);
+
+        // Load it from the database
+        $t2 = Trade::get($date, $no);
+        self::assertEquals($t, $t2);
+
+        // Alternative get
+        $t3 = Trade::get(array($date, $no));
+        self::assertEquals($t, $t3);
     }
 
     public function testNewPersonAssignedPK()
@@ -196,6 +233,29 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         self::assertSame(0, $count);
     }
 
+    /**
+     * This test case currently fails on MySQL.
+     * The $update instance holds a "string" id, but
+     * update requires an int id.
+     *
+     * For MySQL it needs to read:
+     *
+     * $update = Person::get($person1->id);
+     * $update->id = (int)$update->id;
+     * ...
+     * $update->save();
+     */
+    public function testSelectAndUpdate()
+    {
+        $person1 = new Person();
+        $person1->name = 'Short Lived Person';
+        $person1->save();
+
+        $update = Person::get($person1->id);
+        $update->name = 'Long Lived Person';
+        $update->save();
+    }
+
     public function testLimit()
     {
         $allPeople = Person::objects()
@@ -297,6 +357,40 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     public function testGetErrorWrongPKCount()
     {
         Person::get(1, 2, 3);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage [Phormium\Tests\Models\Person] record with primary key [12345678] does not exist.
+     */
+    public function testGetErrorModelDoesNotExist()
+    {
+        Person::get(12345678);
+    }
+
+    public function testFind()
+    {
+        self::assertNull(Person::find(12345678));
+
+        $p = new Person();
+        $p->name = "Jimmy Hendrix";
+        $p->insert();
+
+        $p2 = Person::find($p->id);
+        self::assertNotNull($p2);
+        self::assertEquals($p, $p2);
+    }
+
+    public function testExists()
+    {
+        self::assertFalse(Person::exists(12345678));
+
+        $p = new Person();
+        $p->name = "Jimmy Page";
+        $p->insert();
+
+        $actual = Person::exists($p->id);
+        self::assertTrue($actual);
     }
 
     public function testGetPK()

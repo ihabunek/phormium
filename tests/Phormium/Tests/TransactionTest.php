@@ -7,6 +7,11 @@ use \Phormium\Tests\Models\Person;
 
 class TransactionTest extends \PHPUnit_Framework_TestCase
 {
+    public static function setUpBeforeClass()
+    {
+        DB::configure(PHORMIUM_CONFIG_FILE);
+    }
+
     public function testManualBeginCommit()
     {
         $person = new Person();

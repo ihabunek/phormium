@@ -21,6 +21,7 @@ Features
 * limiting
 * transactions
 * query logging (requires [Apache log4php](http://logging.apache.org/log4php/))
+* custom queries
 
 Not yet implemented:
 
@@ -32,8 +33,8 @@ Documentation
 [The documentation](http://phormium.readthedocs.org/en/latest/) is hosted by
 ReadTheDocs.org.
 
-Example
--------
+Showcase
+--------
 
 After initial setup, Phormium is very easy to use. Here's a quick overview of
 it's features:
@@ -45,12 +46,30 @@ $person->name = "Frank Zappa";
 $person->birthday = "1940-12-20";
 $person->save();
 
+// Get record by primary key
+Person::get(10);   // Throws exception if the model doesn't exist
+Person::find(10);  // Returns null if the model doesn't exist
+
+// Check record exists by primary key
+Person::exists(10);
+
+// Also works for composite primary keys
+Trade::get('2013-01-01', 100);
+Trade::find('2013-01-01', 100);
+Trade::exists('2013-01-01', 100);
+
+// Primary keys can also be given as arrays
+$tradePK = array('2013-01-01', 100);
+Trade::get($tradePK);
+Trade::find($tradePK);
+Trade::exists($tradePK);
+
 // Fetch, update, save
 $person = Person::get(10);
 $person->salary += 5000; // give the man a raise!
 $person->save();
 
-// Or delete
+// Fetch, delete
 Person::get(37)->delete();
 
 // Intuitive filtering, ordering and limiting
@@ -103,6 +122,11 @@ Person::objects()
 // Aggregates
 Person::objects()->filter('name', 'like', 'Ivan%')->avg('salary');
 Person::objects()->filter('name', 'like', 'Marko%')->min('birthday');
+
+// Custom queries
+$conn = DB::getConnection('myconn');
+$data1 = $conn->query("SELECT * FROM mytable;");
+$data2 = $conn->preparedQuery("SELECT * FROM mytable WHERE mycol > :value", array("value" => 10))
 ```
 
 See [documentation](http://phormium.readthedocs.org/en/latest/) for full
