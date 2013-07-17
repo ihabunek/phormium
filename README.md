@@ -1,14 +1,15 @@
 Phormium
 ========
+
 Phormium is a minimalist ORM for PHP.
 
-Works on informix, mysql, posgresql and sqlite. Might work on other databases
-with a PDO driver.
-
-[![Build Status](https://travis-ci.org/ihabunek/phormium.png)](https://travis-ci.org/ihabunek/phormium)
+Tested on Informix, MySQL, PosgreSQL and SQLite. Might work on other databases
+with a PDO driver or may require some work.
 
 Warning: This is a work in progress. Test before using! Report any bugs
 [here](https://github.com/ihabunek/phormium/issues).
+
+[![Build Status](https://travis-ci.org/ihabunek/phormium.png)](https://travis-ci.org/ihabunek/phormium)
 
 Features
 --------
@@ -148,6 +149,13 @@ Laravel's [Eloquent ORM](http://laravel.com/docs/database/eloquent).
 Let me know what you think!
 
 Ivan Habunek [@ihabunek](http://twitter.com/ihabunek)
+
+Praise
+------
+
+If you like it, buy me a beer (in Croatia, that's around €2 or $3).
+
+[![Flattr this](http://api.flattr.com/button/flattr-badge-large.png)](http://flattr.com/thing/1204532/ihabunekphormium-on-GitHub)
 
 License
 -------
