@@ -26,16 +26,29 @@ class Query
     }
 
     /**
-     * Constructs and executes a SELECT query.
+     * Constructs and executes a SELECT query based on the given parameters.
+     * Returns an array of data fetched from the database.
      *
      * @param Filter $filter A filter instance used to form the WHERE clause.
-     * @param array $order Array of strings used to form the ORDER BY clause.
+     * @param array $order Array of [<column>, <direction>] pairs used to form
+     *      the ORDER BY clause.
+     * @param array $columns Array of columns to fetch, or NULL for all columns.
+     * @param integer $limit The max. number of rows to fetch.
+     * @param integer $offset The number of rows to skip from beginning.
+     * @param integer $fetchType Fetch type; one of PDO::FETCH_* constants.
      *
-     * @return array An array of {@link Model} instances corresponing to given
-     *      criteria.
+     * @return array An array of {@link Model} instances when using
+     *      PDO::FETCH_CLASS, an array of associative arrays when using
+     *      PDO::FETCH_ASSOC.
      */
-    public function select($filter, $order, array $columns = null, $limit = null, $offset = null, $fetchType = PDO::FETCH_CLASS)
-    {
+    public function select(
+        Filter $filter = null,
+        array $order = null,
+        array $columns = null,
+        $limit = null,
+        $offset = null,
+        $fetchType = PDO::FETCH_CLASS
+    ) {
         if (isset($columns)) {
             $this->checkColumnsExist($columns);
         } else {
@@ -192,7 +205,7 @@ class Query
         $query .= implode(', ', array_fill(0, count($columns), '?'));
         $query .= "){$returning};";
 
-        // Run query
+        // Run query manually (fetch is performed only for postgres)
         $conn = DB::getConnection($meta->database);
         $pdo = $conn->getPDO();
 
@@ -200,7 +213,7 @@ class Query
         $stmt = $pdo->prepare($query);
 
         $conn->logExecute($args);
-        $stmt->execute($args);
+        $count = $stmt->execute($args);
 
         // If PK is auto-generated, populate it
         if ($pkAutogen) {
@@ -214,6 +227,8 @@ class Query
 
             $model->{$pkColumn} = $id;
         }
+
+        return $count;
     }
 
     /**

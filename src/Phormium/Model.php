@@ -126,6 +126,26 @@ abstract class Model
         return $qs->exists();
     }
 
+    /**
+     * Creates a Model instance from data in the given array.
+     * @return Model
+     */
+    public static function fromJSON($json)
+    {
+        $array = json_decode($json);
+
+        $error = json_last_error();
+        if ($error !== JSON_ERROR_NONE) {
+            throw new \Exception("Invalid JSON string. Error code [$error].");
+        }
+
+        if (is_object($array)) {
+            $array = (array) $array;
+        }
+
+        return self::fromArray($array);
+    }
+
     /** Inner method used by get(), search() and exists(). */
     private static function getQuerySetForPK($argv, $argc)
     {
@@ -159,33 +179,17 @@ abstract class Model
         return $qs;
     }
 
-    /**
-     * Creates a Model instance from data in the given array.
-     * @return Model
-     */
-    public static function fromJSON($json)
-    {
-        $array = json_decode($json);
-
-        $error = json_last_error();
-        if ($error !== JSON_ERROR_NONE) {
-            throw new \Exception("Invalid JSON string. Error code [$error].");
-        }
-
-        if (is_object($array)) {
-            $array = (array) $array;
-        }
-
-        return self::fromArray($array);
-    }
-
     // ******************************************
     // *** Dynamics                           ***
     // ******************************************
 
     /**
-     * Saves the current Model.
-     * If it already exists, performs an UPDATE, otherwise an INSERT.
+     * Saves the current Model to the database. If it already exists, performs
+     * an UPDATE, otherwise an INSERT.
+     *
+     * This method can be sub-optimal since it may do an additional query to
+     * determine if the model exists in the database. If performance is
+     * important, use update() and insert() explicitely.
      */
     public function save()
     {
@@ -219,8 +223,37 @@ abstract class Model
     }
 
     /**
-     * Returns the PK columns with their values as an associative array.
-     * @return array The PK columns.
+     * Performs an INSERT query with the data from the model.
+     */
+    public function insert()
+    {
+        return self::getQuery()->insert($this);
+    }
+
+    /**
+     * Performs an UPDATE query with the data from the model.
+     *
+     * @returns integer The number of affected rows.
+     */
+    public function update()
+    {
+        return self::getQuery()->update($this);
+    }
+
+    /**
+     * Performs an DELETE query filtering by model's primary key.
+     *
+     * @returns integer The number of affected rows.
+     */
+    public function delete()
+    {
+        return self::getQuery()->delete($this);
+    }
+
+    /**
+     * Returns the model's primary key value as an associative array.
+     *
+     * @return array The primary key.
      */
     public function getPK()
     {
@@ -235,21 +268,6 @@ abstract class Model
             $pk[$column] = $this->{$column};
         }
         return $pk;
-    }
-
-    public function insert()
-    {
-        return self::getQuery()->insert($this);
-    }
-
-    public function update()
-    {
-        return self::getQuery()->update($this);
-    }
-
-    public function delete()
-    {
-        return self::getQuery()->delete($this);
     }
 
     /**
@@ -281,11 +299,21 @@ abstract class Model
         }
     }
 
+    /**
+     * Returns the model's JSON representation.
+     *
+     * @return string
+     */
     public function toJSON()
     {
         return json_encode($this);
     }
 
+    /**
+     * Returns the model's Array representation.
+     *
+     * @return array
+     */
     public function toArray()
     {
         return (array) $this;
