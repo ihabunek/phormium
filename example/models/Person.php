@@ -7,7 +7,7 @@ class Person extends Phormium\Model
         'table' => 'person',
         'pk' => 'id'
     );
-    
+
     public $id;
     public $name;
     public $birthday;
