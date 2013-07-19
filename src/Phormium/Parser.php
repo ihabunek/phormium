@@ -35,7 +35,7 @@ class Parser
         $meta->class = $class;
         $meta->database = $_meta['database'];
         $meta->table = $_meta['table'];
-        $meta->pk = self::parsePK($_meta);
+        $meta->pk = self::parsePK($class, $_meta);
         $meta->columns = array();
 
         // Fetch class' public properties which correspond to column names
@@ -71,7 +71,7 @@ class Parser
         return $meta;
     }
 
-    private static function parsePK($meta)
+    private static function parsePK($class, $meta)
     {
         if (!isset($meta['pk'])) {
             return null;
@@ -85,6 +85,6 @@ class Parser
             return $meta['pk'];
         }
 
-        throw new \Exception("Invalid {$meta['class']}::\$_meta['pk']. Not a string or array.");
+        throw new \Exception("Invalid $class::\$_meta['pk']. Not a string or array.");
     }
 }
