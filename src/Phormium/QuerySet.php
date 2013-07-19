@@ -119,8 +119,11 @@ class QuerySet
     // ******************************************
 
     /**
-     * Performs a SELECT COUNT(*) and returns the number of records matching
+     * Performs a SELECT COUNT() and returns the number of records matching
      * the current filter.
+     *
+     * @param string $column If given, will query COUNT($column), if not will
+     *      query COUNT(*).
      *
      * @return integer
      */
