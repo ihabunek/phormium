@@ -253,13 +253,13 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testSingleZeroAllowed()
     {
-        $qs = Person::objects()->filter('name', '=', 'Hrvoje');
+        $qs = Person::objects()->filter('name', '=', 'The Invisible Man');
         $qs->delete();
 
         $this->assertSame(0, $qs->count());
         $this->assertFalse($qs->exists());
 
-        $actual = Person::objects()->filter('name', '=', 'Hrvoje')->single(true);
+        $actual = $qs->single(true);
         $this->assertNull($actual);
     }
 
@@ -276,9 +276,10 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(0, $qs->count());
         $this->assertFalse($qs->exists());
 
-        Person::fromArray(array('name' => 'Hrvoje'))->save();
-        Person::fromArray(array('name' => 'Hrvoje'))->save();
-        Person::fromArray(array('name' => 'Hrvoje'))->save();
+        $data = array('name' => 'Hrvoje');
+        Person::fromArray($data)->save();
+        Person::fromArray($data)->save();
+        Person::fromArray($data)->save();
 
         $this->assertSame(3, $qs->count());
         $this->assertTrue($qs->exists());
