@@ -109,25 +109,6 @@ class Query
     }
 
     /**
-     * Constructs and executes a SELECT COUNT(*) query.
-     *
-     * @param Filter $filter A filter instance used to form the WHERE clause.
-     *
-     * @return integer Number of records which match the given filter.
-     */
-    public function count($filter)
-    {
-        $table = $this->meta->table;
-        list($where, $args) = $this->constructWhere($filter);
-
-        $query = "SELECT COUNT(*) AS count FROM {$table}{$where};";
-        $conn = DB::getConnection($this->meta->database);
-
-        $data = $conn->preparedQuery($query, $args);
-        return (integer) $data[0]['count'];
-    }
-
-    /**
      * Constructs and executes a SELECT aggregate query.
      *
      * @param Filter $filter A filter instance used to form the WHERE clause.
@@ -138,9 +119,12 @@ class Query
     {
         $table = $this->meta->table;
         $column = $aggregate->column;
+        $type = $aggregate->type;
 
         if (!in_array($column, $this->meta->columns)) {
-            throw new \Exception("Error forming aggregate query. Column [$column] does not exist in table [$table].");
+            if (!($aggregate->type === Aggregate::COUNT && $column === '*')) {
+                throw new \Exception("Error forming aggregate query. Column [$column] does not exist in table [$table].");
+            }
         }
 
         list($where, $args) = $this->constructWhere($filter);

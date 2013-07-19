@@ -124,9 +124,10 @@ class QuerySet
      *
      * @return integer
      */
-    public function count()
+    public function count($column = null)
     {
-        return $this->query->count($this->filter);
+        $agg = new Aggregate(Aggregate::COUNT, $column);
+        return (integer) $this->query->aggregate($this->filter, $agg);
     }
 
     /**
@@ -177,7 +178,7 @@ class QuerySet
      */
     public function exists()
     {
-        return $this->query->count($this->filter) > 0;
+        return $this->count() > 0;
     }
 
     /**
