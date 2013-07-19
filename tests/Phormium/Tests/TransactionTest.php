@@ -32,7 +32,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
         DB::commit();
 
-        self::assertEquals(54321, Person::get($id)->income);
+        $this->assertEquals(54321, Person::get($id)->income);
     }
 
     public function testManualBeginRollback()
@@ -52,7 +52,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
         DB::rollback();
 
-        self::assertEquals(12345, Person::get($id)->income);
+        $this->assertEquals(12345, Person::get($id)->income);
     }
 
     public function testCallbackTransactionCommit()
@@ -70,7 +70,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
             $p->save();
         });
 
-        self::assertEquals(54321, Person::get($id)->income);
+        $this->assertEquals(54321, Person::get($id)->income);
     }
 
     public function testCallbackTransactionRollback()
@@ -98,7 +98,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         }
 
         // Check changes have been rolled back
-        self::assertEquals(12345, Person::get($id)->income);
+        $this->assertEquals(12345, Person::get($id)->income);
     }
 
     /**
@@ -127,6 +127,6 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
         DB::disconnectAll();
 
-        self::assertEquals(12345, Person::get($id)->income);
+        $this->assertEquals(12345, Person::get($id)->income);
     }
 }

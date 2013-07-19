@@ -27,12 +27,12 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         $qs1 = Person::objects();
         $qs2 = $qs1->all();
 
-        self::assertEquals($qs1, $qs2);
-        self::assertNotSame($qs1, $qs2);
-        self::assertNull($qs1->getFilter());
-        self::assertNull($qs2->getFilter());
-        self::assertEmpty($qs1->getOrder());
-        self::assertEmpty($qs2->getOrder());
+        $this->assertEquals($qs1, $qs2);
+        $this->assertNotSame($qs1, $qs2);
+        $this->assertNull($qs1->getFilter());
+        $this->assertNull($qs2->getFilter());
+        $this->assertEmpty($qs1->getOrder());
+        $this->assertEmpty($qs2->getOrder());
     }
 
     public function testFilterQS()
@@ -41,18 +41,18 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         $qs1 = Person::objects();
         $qs2 = $qs1->filter('name', '=', 'x');
 
-        self::assertNotEquals($qs1, $qs2);
-        self::assertNotSame($qs1, $qs2);
+        $this->assertNotEquals($qs1, $qs2);
+        $this->assertNotSame($qs1, $qs2);
 
-        self::assertInstanceOf("\\Phormium\\CompositeFilter", $qs2->getFilter());
-        self::assertCount(1, $qs2->getFilter()->getFilters());
+        $this->assertInstanceOf("\\Phormium\\CompositeFilter", $qs2->getFilter());
+        $this->assertCount(1, $qs2->getFilter()->getFilters());
 
-        self::assertEmpty($qs1->getOrder());
-        self::assertEmpty($qs2->getOrder());
+        $this->assertEmpty($qs1->getOrder());
+        $this->assertEmpty($qs2->getOrder());
 
         $expected = Filter::_and($f);
         $actual = $qs2->getFilter();
-        self::assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     /**
@@ -78,22 +78,22 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         $qs1 = Person::objects();
         $qs2 = $qs1->orderBy('name', 'desc');
 
-        self::assertNotEquals($qs1, $qs2);
-        self::assertNotSame($qs1, $qs2);
+        $this->assertNotEquals($qs1, $qs2);
+        $this->assertNotSame($qs1, $qs2);
 
-        self::assertNull($qs1->getFilter());
-        self::assertNull($qs2->getFilter());
+        $this->assertNull($qs1->getFilter());
+        $this->assertNull($qs2->getFilter());
 
-        self::assertEmpty($qs1->getOrder());
+        $this->assertEmpty($qs1->getOrder());
 
         $expected = array('name desc');
         $actual = $qs2->getOrder();
-        self::assertSame($expected, $actual);
+        $this->assertSame($expected, $actual);
 
         $qs3 = $qs2->orderBy('id');
         $expected = array('name desc', 'id asc');
         $actual = $qs3->getOrder();
-        self::assertSame($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     /**
@@ -136,15 +136,15 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
 
         $qs = Person::objects()->filter('name', 'like', "{$uniq}%");
 
-        self::assertFalse($qs->exists());
-        self::assertSame(0, $qs->count());
+        $this->assertFalse($qs->exists());
+        $this->assertSame(0, $qs->count());
 
         Person::fromArray($p1)->save();
         Person::fromArray($p2)->save();
         Person::fromArray($p3)->save();
 
-        self::assertTrue($qs->exists());
-        self::assertSame(3, $qs->count());
+        $this->assertTrue($qs->exists());
+        $this->assertSame(3, $qs->count());
 
         // Give everybody a raise!
         $count = $qs->update(
@@ -153,24 +153,24 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        self::assertSame(3, $count);
+        $this->assertSame(3, $count);
 
         $persons = $qs->fetch();
         foreach ($persons as $person) {
-            self::assertEquals(5000, $person->income);
+            $this->assertEquals(5000, $person->income);
         }
 
         // Delete
         $count = $qs->delete();
-        self::assertSame(3, $count);
+        $this->assertSame(3, $count);
 
         // Check deleted
-        self::assertFalse($qs->exists());
-        self::assertSame(0, $qs->count());
+        $this->assertFalse($qs->exists());
+        $this->assertSame(0, $qs->count());
 
         // Repeated delete should yield 0 count
         $count = $qs->delete();
-        self::assertSame(0, $count);
+        $this->assertSame(0, $count);
     }
 
     public function testLimitedFetch()
@@ -194,17 +194,17 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
             ->filter('name', 'like', "{$uniq}%")
             ->orderBy('name');
 
-        self::assertEquals(array_slice($persons, 0, 2), $qs->limit(2)->fetch());
-        self::assertEquals(array_slice($persons, 0, 2), $qs->limit(2, 0)->fetch());
-        self::assertEquals(array_slice($persons, 1, 2), $qs->limit(2, 1)->fetch());
-        self::assertEquals(array_slice($persons, 2, 2), $qs->limit(2, 2)->fetch());
-        self::assertEquals(array_slice($persons, 3, 2), $qs->limit(2, 3)->fetch());
-        self::assertEquals(array_slice($persons, 0, 1), $qs->limit(1)->fetch());
-        self::assertEquals(array_slice($persons, 0, 1), $qs->limit(1, 0)->fetch());
-        self::assertEquals(array_slice($persons, 1, 1), $qs->limit(1, 1)->fetch());
-        self::assertEquals(array_slice($persons, 2, 1), $qs->limit(1, 2)->fetch());
-        self::assertEquals(array_slice($persons, 3, 1), $qs->limit(1, 3)->fetch());
-        self::assertEquals(array_slice($persons, 4, 1), $qs->limit(1, 4)->fetch());
+        $this->assertEquals(array_slice($persons, 0, 2), $qs->limit(2)->fetch());
+        $this->assertEquals(array_slice($persons, 0, 2), $qs->limit(2, 0)->fetch());
+        $this->assertEquals(array_slice($persons, 1, 2), $qs->limit(2, 1)->fetch());
+        $this->assertEquals(array_slice($persons, 2, 2), $qs->limit(2, 2)->fetch());
+        $this->assertEquals(array_slice($persons, 3, 2), $qs->limit(2, 3)->fetch());
+        $this->assertEquals(array_slice($persons, 0, 1), $qs->limit(1)->fetch());
+        $this->assertEquals(array_slice($persons, 0, 1), $qs->limit(1, 0)->fetch());
+        $this->assertEquals(array_slice($persons, 1, 1), $qs->limit(1, 1)->fetch());
+        $this->assertEquals(array_slice($persons, 2, 1), $qs->limit(1, 2)->fetch());
+        $this->assertEquals(array_slice($persons, 3, 1), $qs->limit(1, 3)->fetch());
+        $this->assertEquals(array_slice($persons, 4, 1), $qs->limit(1, 4)->fetch());
     }
 
     /**

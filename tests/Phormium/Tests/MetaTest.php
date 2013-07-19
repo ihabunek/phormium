@@ -31,7 +31,7 @@ class MetaTest extends \PHPUnit_Framework_TestCase
         $expected->nonPK = array('name', 'email', 'birthday', 'created', 'income');
 
         $actual = Person::getMeta();
-        self::assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     public function testTradeMeta()
@@ -45,7 +45,7 @@ class MetaTest extends \PHPUnit_Framework_TestCase
         $expected->nonPK = array('datetime', 'price', 'quantity');
 
         $actual = Trade::getMeta();
-        self::assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     public function testPkLessMeta()
@@ -59,7 +59,7 @@ class MetaTest extends \PHPUnit_Framework_TestCase
         $expected->nonPK = array('foo', 'bar', 'baz');
 
         $actual = PkLess::getMeta();
-        self::assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     /**
@@ -121,6 +121,6 @@ class MetaTest extends \PHPUnit_Framework_TestCase
         $meta1 = Person::getMeta();
         $meta2 = Person::objects()->getMeta();
 
-        self::assertSame($meta1, $meta2);
+        $this->assertSame($meta1, $meta2);
     }
 }

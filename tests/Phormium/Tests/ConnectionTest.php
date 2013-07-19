@@ -29,7 +29,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $p->name = 'Test Person Execution';
         $p->email = 'test.person.exec@example.com';
         $p->save();
-        self::assertNotNull($p->id);
+        $this->assertNotNull($p->id);
 
         $updateId = $p->id;
 
@@ -38,7 +38,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         /** @var Person $person */
         $person = Person::get($updateId);
 
-        self::assertEquals(100, $person->income);
+        $this->assertEquals(100, $person->income);
     }
 
     public function testQuery()
@@ -48,7 +48,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
         $result = $connection->query("SELECT count(*) as ct FROM person");
         $result = current($result);
-        self::assertEquals(4, $result['ct']);
+        $this->assertEquals(4, $result['ct']);
     }
 
     public function testPreparedQuery()
@@ -61,13 +61,13 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $p->name = 'Test Person Execution';
         $p->email = 'test.person.exec@example.com';
         $p->save();
-        self::assertNotNull($p->id);
+        $this->assertNotNull($p->id);
 
         $arguments = array("Test Person Execution");
 
         $result = $connection->preparedQuery("SELECT * FROM person WHERE name like ?", $arguments);
         $result = current($result);
-        self::assertEquals("test.person.exec@example.com", $result['email']);
+        $this->assertEquals("test.person.exec@example.com", $result['email']);
     }
 
     /**
@@ -80,24 +80,24 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $p->name = 'Test Person';
         $p->email = 'test.person@example.com';
         $p->save();
-        self::assertNotNull($p->id);
+        $this->assertNotNull($p->id);
 
         $p = new Person();
         $p->name = 'Test Person 2';
         $p->email = 'test.person2@example.com';
         $p->save();
-        self::assertNotNull($p->id);
+        $this->assertNotNull($p->id);
 
         $p = new Person();
         $p->name = 'Test Person 3';
         $p->email = 'test.person3@example.com';
         $p->save();
-        self::assertNotNull($p->id);
+        $this->assertNotNull($p->id);
 
         $p = new Person();
         $p->name = 'Test Person 4';
         $p->email = 'test.person4@example.com';
         $p->save();
-        self::assertNotNull($p->id);
+        $this->assertNotNull($p->id);
     }
 }
