@@ -6,6 +6,9 @@ use Phormium\Config;
 
 use \Phormium\DB;
 
+/**
+ * @group config
+ */
 class DBTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()

@@ -8,7 +8,7 @@ use \Phormium\Log;
 use \Phormium\NullLogger;
 
 /**
- * @group logging
+ * @group logger
  */
 class LoggerTest extends \PHPUnit_Framework_TestCase
 {

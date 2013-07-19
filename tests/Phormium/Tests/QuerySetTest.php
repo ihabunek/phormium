@@ -12,6 +12,9 @@ use \Phormium\QuerySet;
 
 use \Phormium\Tests\Models\Person;
 
+/**
+ * @group queryset
+ */
 class QuerySetTest extends \PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()
@@ -111,70 +114,6 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         Person::objects()->orderBy('xxx', 'asc')->fetch();
     }
 
-    public function testAggregates()
-    {
-        // Create some sample data
-        $uniq = uniqid('agg');
-
-        $p1 = array(
-            'name' => "{$uniq}_1",
-            'birthday' => '2000-01-01',
-            'income' => 10000
-        );
-
-        $p2 = array(
-            'name' => "{$uniq}_2",
-            'birthday' => '2001-01-01',
-            'income' => 20000
-        );
-
-        $p3 = array(
-            'name' => "{$uniq}_3",
-            'birthday' => '2002-01-01',
-            'income' => 30000
-        );
-
-        self::assertFalse(Person::objects()->filter('birthday', '=', '2000-01-01')->exists());
-
-        Person::fromArray($p1)->save();
-        Person::fromArray($p2)->save();
-        Person::fromArray($p3)->save();
-
-        self::assertTrue(Person::objects()->filter('birthday', '=', '2000-01-01')->exists());
-
-        // Query set filtering the above created records
-        $qs = Person::objects()->filter('name', 'like', "$uniq%");
-
-        $count = $qs->count();
-        self::assertSame(3, $count);
-
-        self::assertSame('2000-01-01', $qs->min('birthday'));
-        self::assertSame('2002-01-01', $qs->max('birthday'));
-
-        self::assertEquals(10000, $qs->min('income'));
-        self::assertEquals(20000, $qs->avg('income'));
-        self::assertEquals(60000, $qs->sum('income'));
-        self::assertEquals(30000, $qs->max('income'));
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Invalid aggregate type [xxx].
-     */
-    public function testAggregatesInvalidType()
-    {
-        $agg = new Aggregate('xxx', 'yyy');
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Error forming aggregate query. Column [xxx] does not exist in table [person].
-     */
-    public function testAggregatesInvalidColumn()
-    {
-        Person::objects()->avg('xxx');
-    }
-
     public function testBatch()
     {
         // Create some sample data
@@ -234,15 +173,6 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         self::assertSame(0, $count);
     }
 
-    public function testGetMeta()
-    {
-        // Just to improve code coverage
-        $meta1 = Person::getMeta();
-        $meta2 = Person::objects()->getMeta();
-
-        self::assertSame($meta1, $meta2);
-    }
-
     public function testLimitedFetch()
     {
         // Create some sample data
@@ -286,7 +216,7 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         Person::objects()->limit(1.1);
     }
 
-/**
+    /**
      * @expectedException \Exception
      * @expectedExceptionMessage Limit must be an integer or null.
      */

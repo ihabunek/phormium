@@ -5,6 +5,9 @@ namespace Phormium\Tests;
 use \Phormium\Tests\Models\Person;
 use \Phormium\DB;
 
+/**
+ * @group printer
+ */
 class PrinterTest extends \PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()

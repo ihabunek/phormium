@@ -5,6 +5,9 @@ namespace Phormium\Tests;
 use \Phormium\DB;
 use \Phormium\Tests\Models\Person;
 
+/**
+ * @group transaction
+ */
 class TransactionTest extends \PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()

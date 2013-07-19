@@ -10,6 +10,9 @@ use \Phormium\Tests\Models\Person;
 use \Phormium\Tests\Models\Trade;
 use \Phormium\Tests\Models\PkLess;
 
+/**
+ * @group connection
+ */
 class ConnectionTest extends \PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()

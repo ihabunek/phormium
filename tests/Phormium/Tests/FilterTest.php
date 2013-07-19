@@ -10,6 +10,9 @@ use \Phormium\Filter;
 use \Phormium\CompositeFilter;
 use \Phormium\Parser;
 
+/**
+ * @group filter
+ */
 class FilterTest extends \PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()
