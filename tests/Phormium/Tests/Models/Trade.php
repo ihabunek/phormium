@@ -16,7 +16,6 @@ class Trade extends \Phormium\Model
 
     public $tradedate;
     public $tradeno;
-    public $datetime;
     public $price;
     public $quantity;
 }

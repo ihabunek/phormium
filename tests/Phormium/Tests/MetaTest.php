@@ -40,9 +40,9 @@ class MetaTest extends \PHPUnit_Framework_TestCase
         $expected->table = 'trade';
         $expected->class = 'Phormium\\Tests\\Models\\Trade';
         $expected->database = 'testdb';
-        $expected->columns = array('tradedate', 'tradeno', 'datetime', 'price', 'quantity');
+        $expected->columns = array('tradedate', 'tradeno', 'price', 'quantity');
         $expected->pk = array('tradedate', 'tradeno');
-        $expected->nonPK = array('datetime', 'price', 'quantity');
+        $expected->nonPK = array('price', 'quantity');
 
         $actual = Trade::getMeta();
         $this->assertEquals($expected, $actual);

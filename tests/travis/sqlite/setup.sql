@@ -12,7 +12,6 @@ DROP TABLE IF EXISTS trade;
 CREATE TABLE trade(
     tradedate DATE NOT NULL,
     tradeno INTEGER NOT NULL,
-    datetime DATETIME,
     price DECIMAL(10,2),
     quantity INTEGER,
     PRIMARY KEY(tradedate, tradeno)
