@@ -43,6 +43,7 @@ class Connection
             $stmt->setFetchMode(PDO::FETCH_CLASS, $class);
         }
 
+        $this->logExecute($arguments);
         $stmt->execute($arguments);
 
         return $this->fetchAll($stmt, $fetchStyle);
@@ -81,6 +82,7 @@ class Connection
      */
     public function execute($query)
     {
+        Log::debug("Executing query: $query");
         return $this->pdo->exec($query);
     }
 
@@ -100,6 +102,7 @@ class Connection
         Log::debug("Preparing query: $query");
         $stmt = $this->pdo->prepare($query);
 
+        $this->logExecute($arguments);
         $stmt->execute($arguments);
         return $stmt->rowCount();
     }
