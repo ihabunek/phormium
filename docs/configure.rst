@@ -9,25 +9,25 @@ connect and other options.
 
     {
         "databases": {
-            "db1": {
+            "mydb1": {
                 "dsn": "mysql:host=localhost;dbname=db1",
                 "username": "myuser",
                 "password": "mypass"
             },
-            "db2": {
+            "mydb2": {
                 "dsn": "sqlite:/path/to/db2.sqlite"
             }
         },
-        logging: true
+        "logging": true
     }
 
 The configuration comprises of the following options:
 
 `databases` (object)
     One or more databases to which you wish to connect. Indexed by a database
-    name (here db1 and db2) which will be used later in the model to determine
-    in which database the table is located. Each database should contain the
-    DSN (see PDO_ for details). Username and password are optional.
+    name (here `mydb1` and `mydb2`) which will be used later in the model to
+    determine in which database the table is located. Each database should
+    contain the DSN (see PDO_ for details). Username and password are optional.
 
 `logging` (boolean)
     If set to `true`, Phormium will write out SQL queries which it prepares and
