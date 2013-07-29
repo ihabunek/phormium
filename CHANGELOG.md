@@ -3,6 +3,7 @@ Phormium Changelog
 
 0.5 / TBA
 ---------
+* Added `Model->dump()`
 
 0.4 / 2013-07-17
 ----------------

@@ -318,4 +318,34 @@ abstract class Model
     {
         return (array) $this;
     }
+
+    /**
+     * Prints the model and it's data in a human readable format.
+     */
+    public function dump()
+    {
+        $meta = self::getMeta();
+        $name = get_class($this) . " ($meta->database.$meta->table)";
+
+        echo "$name\n";
+        echo str_repeat("=", strlen($name)) . "\n";
+
+        foreach($meta->columns as $column) {
+            $value = $this->$column;
+            if ($value === null) {
+                $value = 'NULL';
+            } elseif (is_string($value)) {
+                $value = '"' . $value . '"';
+            } else {
+                $value = (string) $value;
+            }
+
+            if (in_array($column, $meta->pk)) {
+                $value .= ' (PK)';
+            }
+
+            echo "$column: $value\n";
+        }
+        echo "\n";
+    }
 }
