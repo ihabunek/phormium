@@ -43,7 +43,7 @@ it's features:
 // Create a new person record
 $person = new Person();
 $person->name = "Frank Zappa";
-$person->birthday = "1940-12-20";
+$person->birthday = "1940-12-21";
 $person->save();
 
 // Get record by primary key
