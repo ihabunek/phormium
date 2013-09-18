@@ -608,7 +608,7 @@ The arguments can either be unnamed:
     $query = "SELET * FROM x JOIN y ON x.pk = y.fk WHERE col1 > ? AND col2 < ?";
     $arguments = array(10, 20);
     $conn = DB::getConnection('myconn');
-    $data = $conn->preparedQuery($query);
+    $data = $conn->preparedQuery($query, $arguments);
 
 Or they can be named:
 
@@ -620,7 +620,7 @@ Or they can be named:
         "val2" => 20
     );
     $conn = DB::getConnection('myconn');
-    $data = $conn->preparedQuery($query);
+    $data = $conn->preparedQuery($query, $arguments);
 
 Direct PDO access
 ~~~~~~~~~~~~~~~~~
