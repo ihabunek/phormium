@@ -36,8 +36,18 @@ class Connection
      */
     public function preparedQuery($query, $arguments = array(), $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
+        $statsEnabled = Config::statsEnabled();
+
+        if ($statsEnabled) {
+            $time1 = microtime(true);
+        }
+
         Log::debug("Preparing query: $query");
         $stmt = $this->pdo->prepare($query);
+
+        if ($statsEnabled) {
+            $time2 = microtime(true);
+        }
 
         if ($fetchStyle === PDO::FETCH_CLASS && isset($class)) {
             $stmt->setFetchMode(PDO::FETCH_CLASS, $class);
@@ -46,7 +56,27 @@ class Connection
         $this->logExecute($arguments);
         $stmt->execute($arguments);
 
-        return $this->fetchAll($stmt, $fetchStyle);
+        if ($statsEnabled) {
+            $time3 = microtime(true);
+        }
+
+        $data = $this->fetchAll($stmt, $fetchStyle);
+
+        if ($statsEnabled) {
+            $time4 = microtime(true);
+
+            Stats::add(array(
+                'query' => $query,
+                'arguments' => $arguments,
+                'prepare' => $time2 - $time1,
+                'execute' => $time3 - $time2,
+                'fetch' => $time4 - $time3,
+                'total' => $time4 - $time1,
+                'numrows' => count($data),
+            ));
+        }
+
+        return $data;
     }
 
     /**
@@ -62,14 +92,40 @@ class Connection
      */
     public function query($query, $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
+        $statsEnabled = Config::statsEnabled();
+
+        if ($statsEnabled) {
+            $time1 = microtime(true);
+        }
+
         Log::debug("Executing query: $query");
         $stmt = $this->pdo->query($query);
+
+        if ($statsEnabled) {
+            $time2 = microtime(true);
+        }
 
         if ($fetchStyle === PDO::FETCH_CLASS && isset($class)) {
             $stmt->setFetchMode(PDO::FETCH_CLASS, $class);
         }
 
-        return $this->fetchAll($stmt, $fetchStyle);
+        $data = $this->fetchAll($stmt, $fetchStyle);
+
+        if ($statsEnabled) {
+            $time3 = microtime(true);
+
+            Stats::add(array(
+                'query' => $query,
+                'arguments' => null,
+                'prepare' => null,
+                'execute' => $time2 - $time1,
+                'fetch' => $time3 - $time2,
+                'total' => $time3 - $time1,
+                'numrows' => count($data),
+            ));
+        }
+
+        return $data;
     }
 
     /**
@@ -82,8 +138,30 @@ class Connection
      */
     public function execute($query)
     {
+        $statsEnabled = Config::statsEnabled();
+
+        if ($statsEnabled) {
+            $time1 = microtime(true);
+        }
+
         Log::debug("Executing query: $query");
-        return $this->pdo->exec($query);
+        $numRows = $this->pdo->exec($query);
+
+        if ($statsEnabled) {
+            $time2 = microtime(true);
+
+            Stats::add(array(
+                'query' => $query,
+                'arguments' => null,
+                'prepare' => null,
+                'execute' => $time2 - $time1,
+                'fetch' => $time3 - $time2,
+                'total' => $time3 - $time1,
+                'numrows' => $numRows,
+            ));
+        }
+
+        return $numRows;
     }
 
     /**
@@ -99,12 +177,38 @@ class Connection
      */
     public function preparedExecute($query, $arguments = array())
     {
+        $statsEnabled = Config::statsEnabled();
+
+        if ($statsEnabled) {
+            $time1 = microtime(true);
+        }
+
         Log::debug("Preparing query: $query");
         $stmt = $this->pdo->prepare($query);
 
+        if ($statsEnabled) {
+            $time2 = microtime(true);
+        }
+
         $this->logExecute($arguments);
         $stmt->execute($arguments);
-        return $stmt->rowCount();
+        $numRows = $stmt->rowCount();
+
+        if ($statsEnabled) {
+            $time3 = microtime(true);
+
+            Stats::add(array(
+                'query' => $query,
+                'arguments' => $arguments,
+                'prepare' => $time2 - $time1,
+                'execute' => $time3 - $time2,
+                'fetch' => null,
+                'total' => $time3 - $time1,
+                'numrows' => $numRows,
+            ));
+        }
+
+        return $numRows;
     }
 
     /**
@@ -161,7 +265,7 @@ class Connection
     /** Logs the execute arguments if logging is enabled. */
     public function logExecute($args)
     {
-        if (Config::isLoggingEnabled()) {
+        if (Config::loggingEnabled()) {
             foreach ($args as &$arg) {
                 if ($arg === null) {
                     $arg = "NULL";
