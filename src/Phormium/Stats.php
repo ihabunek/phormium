@@ -37,6 +37,12 @@ class Stats
         self::$stats = array();
     }
 
+    /** Dumps statistics to stdout as a table. */
+    public static function dump()
+    {
+        Printer::dump(self::$stats);
+    }
+
     /** Sets max number of stats records to keep. */
     public static function setLimit($limit)
     {
