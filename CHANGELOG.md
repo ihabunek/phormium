@@ -4,6 +4,8 @@ Phormium Changelog
 0.5 / TBA
 ---------
 * Added `Model->dump()`
+* Added `Filter::col()`
+* Added gathering of query stats
 
 0.4 / 2013-07-17
 ----------------
