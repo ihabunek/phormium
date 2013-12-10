@@ -18,7 +18,12 @@ connect and other options.
                 "dsn": "sqlite:/path/to/db2.sqlite"
             }
         },
-        "logging": true
+        "logging": true,
+        "stats": {
+                "enabled": true,
+                "limit": 100
+            }
+        }
     }
 
 The configuration comprises of the following options:
@@ -30,11 +35,24 @@ The configuration comprises of the following options:
     contain the DSN (see PDO_ for details). Username and password are optional.
 
 `logging` (boolean)
-    If set to `true`, Phormium will write out SQL queries which it prepares and
-    executes. This requires
-    `Apache log4php <http://logging.apache.org/log4php/>`_. Defaults to false.
+    Enables logging. Optional, default is `false`.
+
+    If enabled, Phormium will write out SQL queries which it prepares and
+    executes. This requires `Apache log4php
+    <http://logging.apache.org/log4php/>`_.
 
 .. _PDO: http://www.php.net/manual/en/pdo.construct.php
+
+`stats` (object)
+    Phormium can be configured to collect query statistics, this will time each
+    prepare, execute and fetch operations for each query. They can be later
+    accessed using `Phormium\Stats::get()`.
+
+`stats.enabled` (boolean)
+    If set to true, Phormium will gather statistics (default is `false`).
+
+`stats.limit` (integer)
+    Maximum count of queries stats to keep (default is 100).
 
 To configure Phormium, pass the path to the configuration file to the configure
 method.
