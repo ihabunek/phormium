@@ -92,40 +92,22 @@ For example:
         ->filter('birthday', '<' '2000-01-01')
         ->fetch();
 
-This will result in the following query:
+This kind of filter is called a **column filter** since it acts on a single
+column of the SQL statement, and it will result in the following query:
 
 .. code-block:: sql
 
     SELECT ... FROM person WHERE birthday < ?;
 
-Since Phormium uses
-`prepared statements <http://php.net/manual/en/pdo.prepared-statements.php>`_,
-the values for each filter are given as `?` and are passed in separately when
-executing the query. This prevents any possibility of SQL injection.
+.. note::
 
-Filters can be chained; chanining multiple filters will AND them
+    Since Phormium uses `prepared statements`_, the values for each filter are
+    given as `?` and are passed in separately when executing the query. This
+    prevents any possibility of SQL injection.
 
-.. code-block:: php
+.. _prepared statements: http://php.net/manual/en/pdo.prepared-statements.php
 
-    Person::objects()
-        ->filter('birthday', '<', '2000-01-01')
-        ->filter('income', '>', 10000)
-        ->fetch();
-
-This will create:
-
-.. code-block:: sql
-
-    SELECT ... FROM person WHERE birthday < ? AND income > 10000;
-
-QuerySets are lazy - no queries will be executed on the database until one of
-the `fetch methods <#fetching-data>`_ are called.
-
-Each time a filter is added to a `QuerySet`, a new instance is created which is
-not bound to the previous instance. Each additional filtering creates a distinct
-`QuerySet` object which can be stored and reused.
-
-Available filters:
+Available column filters:
 
 .. code-block:: php
 
@@ -145,32 +127,108 @@ Available filters:
         ->filter($column, 'IS NULL')
         ->filter($column, 'NOT NULL')
 
+You can also create a column filter using the `Filter::col()` factory method and
+add pass the resulting ColumnFilter object to `QuerySet::filter()` as a single
+argument.
+
+.. code-block:: php
+
+    use Phormium\Filter;
+
+    $filter = Filter::col('birthday', '<' '2000-01-01');
+
+    Person::objects()
+        ->filter($filter)
+        ->fetch();
+
+Filters can be chained; chanining multiple filters will AND them
+
+.. code-block:: php
+
+    Person::objects()
+        ->filter('birthday', '<', '2000-01-01')
+        ->filter('income', '>', 10000)
+        ->fetch();
+
+This will create:
+
+.. code-block:: sql
+
+    SELECT ... FROM person WHERE birthday < ? AND income > ?;
+
 Composite filters
 ~~~~~~~~~~~~~~~~~
 
 In order to create complex where clauses, Phormium provides composite filters.
-Composite filters are collections of Column filters joined by either AND or OR
-operator.
+A *composite filter* is a collection of *column filters* joined by either
+**AND** or **OR** operator.
 
 To make creating complex filters easier, two factory methods exist:
 `Filter::_and()` and `Filter::_or()`. These are prefixed by `_` because `and`
 and `or` are PHP keywords and cannot be used as method names.
 
+For example to find people younger than 10 and older than 20:
+
+.. code-block:: php
+
+    use Phormium\Filter;
+
+    $filter = Filter::_or(
+        Filter::col('age', '<', 10),
+        Filter::col('age', '>', 20),
+    );
+
+    Person::objects()
+        ->filter($filter)
+        ->fetch();
+
+This will create:
+
+.. code-block:: sql
+
+    SELECT ... FROM person WHERE age < ? OR age > ?;
+
+To make composite filters less verbose, you can use the shorthand way and
+pass arrays to `Filter::_or()` and `Filter::_and()`.
+
+.. code-block:: php
+
+    use Phormium\Filter;
+
+    $filter = Filter::_or(
+        array('age', '<', 10),
+        array('age', '>', 20),
+    );
+
+Additionally, you can use a class alias for `Phormium\\Filter` to further
+shorten the syntax.
+
+.. code-block:: php
+
+    use Phormium\Filter as f;
+
+    $filter = f::_or(
+        f::col('age', '<', 10),
+        f::col('age', '>', 20),
+    );
+
 Composite filters can be chained and combined. For example:
 
 .. code-block:: php
 
+    use Phormium\Filter as f;
+
     Person::objects()->filter(
-        Filter::_or(
-            Filter::_and(
-                array('id', '>=', 10),
-                array('id', '<=', 20)
+        f::_or(
+            f::_and(
+                f::col('id', '>=', 10),
+                f::col('id', '<=', 20)
             ),
-            Filter::_and(
-                array('id', '>=', 50),
-                array('id', '<=', 60)
+            f::_and(
+                f::col('id', '>=', 50),
+                f::col('id', '<=', 60)
             ),
-            array('id', '>=', 100),
+            f::col('id', '>=', 100),
         )
     )->fetch();
 
@@ -187,6 +245,32 @@ This will translate to:
         (id >= ? AND id <= ?) OR
         id >= ?
     ));
+
+Lazy execution
+--------------
+
+QuerySets are lazy - no queries will be executed on the database until one of
+the `fetch methods <#fetching-data>`_ are called.
+
+QuerySets are immutable. Filtering and ordering of querysets produces a new
+instance, instead of changing the existing one.
+
+Therefore watch out not to do this by accident:
+
+.. code-block:: php
+
+    $qs = Person::objects();
+    $qs->filter('id', '>', 10); // QUERYSET NOT CHANGED
+    $qs->fetch();
+
+Instead do this:
+
+.. code-block:: php
+
+    $qs = Person::objects();
+    $qs = $qs->filter('id', '>', 10); // Better
+    $qs->fetch();
+
 
 
 Ordering data
@@ -634,7 +718,7 @@ The arguments can either be unnamed:
     $query = "SELET * FROM x JOIN y ON x.pk = y.fk WHERE col1 > ? AND col2 < ?";
     $arguments = array(10, 20);
     $conn = DB::getConnection('myconn');
-    $data = $conn->preparedQuery($query);
+    $data = $conn->preparedQuery($query, $arguments);
 
 Or they can be named:
 
@@ -646,7 +730,7 @@ Or they can be named:
         "val2" => 20
     );
     $conn = DB::getConnection('myconn');
-    $data = $conn->preparedQuery($query);
+    $data = $conn->preparedQuery($query, $arguments);
 
 Direct PDO access
 ~~~~~~~~~~~~~~~~~

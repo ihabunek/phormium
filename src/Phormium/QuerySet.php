@@ -49,21 +49,20 @@ class QuerySet
      * Returns a new query set with the given filter AND-ed to the existing
      * ones.
      *
-     * Accepts either:
+     * @param mixed Accepts either:
      *   - an instance of the Filter class
-     *   - an array with two values [$column, $operation] for filters which
-     *     don't require an value
-     *   - an array with three values [$column, $operation, $value]
+     *   - an array with two values or three values [$column, $operation,
+     *     $value] will be converted to a ColumnFilter object.
      *
      * @return QuerySet
      */
     public function filter()
     {
-        $args = func_get_args();
-        $count = func_num_args();
+        $argv = func_get_args();
+        $argc = func_num_args();
 
-        if ($count == 1) {
-            $arg = $args[0];
+        if ($argc == 1) {
+            $arg = $argv[0];
 
             if ($arg instanceof Filter) {
                 $filter = $arg;
@@ -73,7 +72,7 @@ class QuerySet
                 throw new \Exception("Invalid arguments given.");
             }
         } else {
-            $filter = ColumnFilter::fromArray($args);
+            $filter = ColumnFilter::fromArray($argv);
         }
 
         $qs = clone $this;
@@ -120,14 +119,18 @@ class QuerySet
     // ******************************************
 
     /**
-     * Performs a SELECT COUNT(*) and returns the number of records matching
+     * Performs a SELECT COUNT() and returns the number of records matching
      * the current filter.
+     *
+     * @param string $column If given, will query COUNT($column), if not will
+     *      query COUNT(*).
      *
      * @return integer
      */
-    public function count()
+    public function count($column = null)
     {
-        return $this->query->count($this->filter);
+        $agg = new Aggregate(Aggregate::COUNT, $column);
+        return (integer) $this->query->aggregate($this->filter, $agg);
     }
 
     /**
@@ -178,7 +181,7 @@ class QuerySet
      */
     public function exists()
     {
-        return $this->query->count($this->filter) > 0;
+        return $this->count() > 0;
     }
 
     /**

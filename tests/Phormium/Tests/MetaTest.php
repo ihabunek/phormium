@@ -4,12 +4,22 @@ namespace Phormium\Tests;
 
 use \Phormium\DB;
 use \Phormium\Meta;
+use \Phormium\Parser;
 use \Phormium\Tests\Models\Person;
 use \Phormium\Tests\Models\Trade;
 use \Phormium\Tests\Models\PkLess;
 
+/**
+ * @group meta
+ */
 class MetaTest extends \PHPUnit_Framework_TestCase
 {
+    private $testMeta = array(
+        'table' => 'person',
+        'database' => 'testdb',
+        'pk' => 'id'
+    );
+
     public function testPersonMeta()
     {
         $expected = new Meta();
@@ -21,7 +31,7 @@ class MetaTest extends \PHPUnit_Framework_TestCase
         $expected->nonPK = array('name', 'email', 'birthday', 'created', 'income');
 
         $actual = Person::getMeta();
-        self::assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     public function testTradeMeta()
@@ -30,12 +40,12 @@ class MetaTest extends \PHPUnit_Framework_TestCase
         $expected->table = 'trade';
         $expected->class = 'Phormium\\Tests\\Models\\Trade';
         $expected->database = 'testdb';
-        $expected->columns = array('tradedate', 'tradeno', 'datetime', 'price', 'quantity');
+        $expected->columns = array('tradedate', 'tradeno', 'price', 'quantity');
         $expected->pk = array('tradedate', 'tradeno');
-        $expected->nonPK = array('datetime', 'price', 'quantity');
+        $expected->nonPK = array('price', 'quantity');
 
         $actual = Trade::getMeta();
-        self::assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     public function testPkLessMeta()
@@ -49,6 +59,68 @@ class MetaTest extends \PHPUnit_Framework_TestCase
         $expected->nonPK = array('foo', 'bar', 'baz');
 
         $actual = PkLess::getMeta();
-        self::assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Not an array.
+     */
+    public function testParserInvalidMeta()
+    {
+        Parser::getMeta('xxx', 'xxx');
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Missing 'database'
+     */
+    public function testParserNoDatabase()
+    {
+        $meta = $this->testMeta;
+        unset($meta['database']);
+        Parser::getMeta('xxx', $meta);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Missing 'table'
+     */
+    public function testParserNoTable()
+    {
+        $meta = $this->testMeta;
+        unset($meta['table']);
+        Parser::getMeta('xxx', $meta);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Invalid \Phormium\Tests\Models\Person::$_meta['pk']. Not a string or array.
+     */
+    public function testParserInvalidPK()
+    {
+        $meta = $this->testMeta;
+        $meta['pk'] = 1;
+        Parser::getMeta('\Phormium\Tests\Models\Person', $meta);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Given primary key column [xxx] does not exist.
+     */
+    public function testParserNonexistantPK()
+    {
+        $meta = $this->testMeta;
+        $meta['pk'] = 'xxx';
+        Parser::getMeta('\Phormium\Tests\Models\Person', $meta);
+    }
+
+    public function testGetMeta()
+    {
+        // Just to improve code coverage
+        $meta1 = Person::getMeta();
+        $meta2 = Person::objects()->getMeta();
+
+        $this->assertSame($meta1, $meta2);
     }
 }

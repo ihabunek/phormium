@@ -3,7 +3,11 @@
 namespace Phormium\Tests;
 
 use \Phormium\Tests\Models\Person;
+use \Phormium\DB;
 
+/**
+ * @group printer
+ */
 class PrinterTest extends \PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()
@@ -11,7 +15,7 @@ class PrinterTest extends \PHPUnit_Framework_TestCase
         DB::configure(PHORMIUM_CONFIG_FILE);
     }
 
-    public function testDumpReturn()
+    public function testDumpQSReturn()
     {
         $name = "Freddy Mercury";
 
@@ -28,11 +32,31 @@ class PrinterTest extends \PHPUnit_Framework_TestCase
         $actual = Person::objects()->filter("name", "=", $name)->dump(true);
         $lines = explode(PHP_EOL, $actual);
 
-        self::assertRegExp("/^\\s*id\\s+name\\s+email\\s+birthday\\s+created\\s+income\\s*$/", $lines[0]);
-        self::assertRegExp("/^=+$/", $lines[1]);
-        self::assertRegExp("/^\\s*$id1\\s+Freddy Mercury\\s+100(.00)?\\s*$/", $lines[2]);
-        self::assertRegExp("/^\\s*$id2\\s+Freddy Mercury\\s+200(.00)?\\s*$/", $lines[3]);
-        self::assertRegExp("/^\\s*$id3\\s+Freddy Mercury\\s+300(.00)?\\s*$/", $lines[4]);
+        $this->assertRegExp("/^\\s*id\\s+name\\s+email\\s+birthday\\s+created\\s+income\\s*$/", $lines[0]);
+        $this->assertRegExp("/^=+$/", $lines[1]);
+        $this->assertRegExp("/^\\s*$id1\\s+Freddy Mercury\\s+100(.00)?\\s*$/", $lines[2]);
+        $this->assertRegExp("/^\\s*$id2\\s+Freddy Mercury\\s+200(.00)?\\s*$/", $lines[3]);
+        $this->assertRegExp("/^\\s*$id3\\s+Freddy Mercury\\s+300(.00)?\\s*$/", $lines[4]);
+    }
+
+    public function testDumpArrayReturn()
+    {
+        $name = "Freddy Mercury";
+
+        $data = array(
+            array("id" => 1, "name" => $name, "email" => "freddy@queen.org", "income" => 100),
+            array("id" => 2, "name" => $name, "email" => "freddy@queen.org", "income" => 200),
+            array("id" => 3, "name" => $name, "email" => "freddy@queen.org", "income" => 300),
+        );
+
+        $actual = \Phormium\Printer::dump($data, true);
+        $lines = explode(PHP_EOL, $actual);
+
+        $this->assertRegExp("/^\\s*id\\s+name\\s+email\\s+income\\s*$/", $lines[0]);
+        $this->assertRegExp("/^=+$/", $lines[1]);
+        $this->assertRegExp("/^\\s*1\\s+Freddy Mercury\\s+freddy@queen.org\\s+100(.00)?\\s*$/", $lines[2]);
+        $this->assertRegExp("/^\\s*2\\s+Freddy Mercury\\s+freddy@queen.org\\s+200(.00)?\\s*$/", $lines[3]);
+        $this->assertRegExp("/^\\s*3\\s+Freddy Mercury\\s+freddy@queen.org\\s+300(.00)?\\s*$/", $lines[4]);
     }
 
     public function testDumpEcho()
@@ -55,10 +79,10 @@ class PrinterTest extends \PHPUnit_Framework_TestCase
 
         $lines = explode(PHP_EOL, $actual);
 
-        self::assertRegExp("/^\\s*id\\s+name\\s+email\\s+birthday\\s+created\\s+income\\s*$/", $lines[0]);
-        self::assertRegExp("/^=+$/", $lines[1]);
-        self::assertRegExp("/^\\s*$id1\\s+Rob Halford\\s+100(.00)?\\s*$/", $lines[2]);
-        self::assertRegExp("/^\\s*$id2\\s+Rob Halford\\s+200(.00)?\\s*$/", $lines[3]);
-        self::assertRegExp("/^\\s*$id3\\s+Rob Halford\\s+300(.00)?\\s*$/", $lines[4]);
+        $this->assertRegExp("/^\\s*id\\s+name\\s+email\\s+birthday\\s+created\\s+income\\s*$/", $lines[0]);
+        $this->assertRegExp("/^=+$/", $lines[1]);
+        $this->assertRegExp("/^\\s*$id1\\s+Rob Halford\\s+100(.00)?\\s*$/", $lines[2]);
+        $this->assertRegExp("/^\\s*$id2\\s+Rob Halford\\s+200(.00)?\\s*$/", $lines[3]);
+        $this->assertRegExp("/^\\s*$id3\\s+Rob Halford\\s+300(.00)?\\s*$/", $lines[4]);
     }
 }

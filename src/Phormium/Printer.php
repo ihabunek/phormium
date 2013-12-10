@@ -14,18 +14,47 @@ class Printer
     const COLUMN_MAX_LENGTH = 50;
 
     /**
-     * Takes a QuerySet, fetches the data which matches the QuerySet and
-     * prints it to the console in a human readable way.
+     * Takes a either a QuerySet or an array of table data, fetches the data
+     * which matches the QuerySet and prints it to the console in a human
+     * readable way.
      *
-     * If using non-ascii characters, make sure to set mb_internal_encoding
-     * to the appropreiate value, e.g.:
-     * <pre>mb_internal_encoding('UTF-8');</pre>
+     * If using non-ascii characters, make sure to set mb_internal_encoding to
+     * the appropreiate value, e.g.: <pre>mb_internal_encoding('UTF-8');</pre>
      *
      * @param array $array Input array.
      * @param array $return If set to true, the dump will be returned as string
-     *         instead of printing it.
+     * instead of printing it.
      */
-    public static function dump(QuerySet $querySet, $return = false)
+    public static function dump($input, $return = false)
+    {
+        if ($input instanceof QuerySet) {
+            return self::dumpQS($input, $return);
+        } elseif (is_array($input)) {
+            return self::dumpArray($input, $return);
+        }
+
+        throw new \Exception("Invalid input for dump(): not array or QuerySet.");
+    }
+
+    /** Dump implementation for arrays. */
+    private static function dumpArray(array $array, $return = false)
+    {
+        if (empty($array)) {
+            throw new \Exception("Invalid input for dump(): empty array.");
+        }
+
+        $firstRow = $array[0];
+        if (!is_array($firstRow)) {
+            throw new \Exception("Invalid input for dump(): first element not an array.");
+        }
+
+        $columns = array_keys($firstRow);
+
+        return self::dumpData($array, $columns, $return);
+    }
+
+    /** Dump implementation for QuerySets. */
+    private static function dumpQS(QuerySet $querySet, $return = false)
     {
         $data = $querySet->fetch();
 
@@ -36,6 +65,11 @@ class Printer
         $meta = $querySet->getMeta();
         $columns = $meta->columns;
 
+        return self::dumpData($data, $columns, $return);
+    }
+
+    private static function dumpData($data, $columns, $return = false)
+    {
         // Record column names lengths
         $lengths = array();
         foreach ($columns as $name) {
@@ -43,20 +77,26 @@ class Printer
         }
 
         // Process data for display and record data lengths
-        foreach ($data as $model) {
+        foreach ($data as &$item) {
 
-            if (!($model instanceof Model)) {
-                throw new \Exception("Invalid input for dump().");
+            if ($item instanceof Model) {
+                $item = $item->toArray();
             }
 
-            foreach ($model as $key => $value) {
-                $model->$key = self::prepareValue($value);
+            if (!is_array($item)) {
+                throw new \Exception("Invalid input for dump(): element not an array or Model.");
+            }
 
-                if (mb_strlen($value) > $lengths[$key]) {
-                    $lengths[$key] = mb_strlen($value);
+            foreach ($columns as $column) {
+                $value = self::prepareValue($item[$column]);
+                $item[$column] = $value;
+
+                if (mb_strlen($value) > $lengths[$column]) {
+                    $lengths[$column] = mb_strlen($value);
                 }
             }
         }
+        unset($item);
 
         // Determine total row length
         $totalLength = 0;

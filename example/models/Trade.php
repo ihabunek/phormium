@@ -1,7 +1,5 @@
 <?php
 
-namespace Phormium\Tests\Models;
-
 /**
  * A stock exchange trade.
  * Demonstrates usage of composite primary key.
@@ -9,7 +7,7 @@ namespace Phormium\Tests\Models;
 class Trade extends \Phormium\Model
 {
     protected static $_meta = array(
-        'database' => 'testdb',
+        'database' => 'exampledb',
         'table' => 'trade',
         'pk' => array('tradedate', 'tradeno')
     );

@@ -9,53 +9,14 @@ use \Phormium\Tests\Models\Person;
 use \Phormium\Tests\Models\Trade;
 use \Phormium\Tests\Models\PkLess;
 
+/**
+ * @group model
+ */
 class ModelTest extends \PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()
     {
         DB::configure(PHORMIUM_CONFIG_FILE);
-    }
-
-    public function testPersonMeta()
-    {
-        $expected = new Meta();
-        $expected->table = 'person';
-        $expected->class = 'Phormium\\Tests\\Models\\Person';
-        $expected->database = 'testdb';
-        $expected->columns = array('id', 'name', 'email', 'birthday', 'created', 'income');
-        $expected->pk = array('id');
-        $expected->nonPK = array('name', 'email', 'birthday', 'created', 'income');
-
-        $actual = Person::getMeta();
-        self::assertEquals($expected, $actual);
-    }
-
-    public function testTradeMeta()
-    {
-        $expected = new Meta();
-        $expected->table = 'trade';
-        $expected->class = 'Phormium\\Tests\\Models\\Trade';
-        $expected->database = 'testdb';
-        $expected->columns = array('tradedate', 'tradeno', 'datetime', 'price', 'quantity');
-        $expected->pk = array('tradedate', 'tradeno');
-        $expected->nonPK = array('datetime', 'price', 'quantity');
-
-        $actual = Trade::getMeta();
-        self::assertEquals($expected, $actual);
-    }
-
-    public function testPkLessMeta()
-    {
-        $expected = new Meta();
-        $expected->table = 'pkless';
-        $expected->class = 'Phormium\\Tests\\Models\\PkLess';
-        $expected->database = 'testdb';
-        $expected->columns = array('foo', 'bar', 'baz');
-        $expected->pk = null;
-        $expected->nonPK = array('foo', 'bar', 'baz');
-
-        $actual = PkLess::getMeta();
-        self::assertEquals($expected, $actual);
     }
 
     public function testNewPerson()
@@ -64,19 +25,19 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $p->name = 'Test Person';
         $p->email = 'test.person@example.com';
 
-        self::assertNull($p->id);
+        $this->assertNull($p->id);
         $p->save();
-        self::assertNotNull($p->id);
+        $this->assertNotNull($p->id);
 
         $id = $p->id;
 
         // Load it from the database
         $p2 = Person::get($id);
-        self::assertEquals($p, $p2);
+        $this->assertEquals($p, $p2);
 
         // Alternative get
         $p3 = Person::get(array($id));
-        self::assertEquals($p, $p3);
+        $this->assertEquals($p, $p3);
     }
 
     public function testNewTrade()
@@ -105,11 +66,11 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
         // Load it from the database
         $t2 = Trade::get($date, $no);
-        self::assertEquals($t, $t2);
+        $this->assertEquals($t, $t2);
 
         // Alternative get
         $t3 = Trade::get(array($date, $no));
-        self::assertEquals($t, $t3);
+        $this->assertEquals($t, $t3);
     }
 
     public function testNewPersonAssignedPK()
@@ -125,11 +86,11 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $p->email = 'test.person@example.com';
         $p->save();
 
-        self::assertEquals($id, $p->id);
+        $this->assertEquals($id, $p->id);
 
         // Load it from the database
         $p2 = Person::get($id);
-        self::assertEquals($p, $p2);
+        $this->assertEquals($p, $p2);
     }
 
     public function testNewPersonFromArray()
@@ -143,13 +104,13 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
         // Perform INSERT
         $p->save();
-        self::assertNotNull($p->id);
+        $this->assertNotNull($p->id);
 
         $id = $p->id;
 
         // Load it from the database
         $p2 = Person::get($id);
-        self::assertEquals($p, $p2);
+        $this->assertEquals($p, $p2);
 
         // Perform UPDATE
         $p2->email = 'peter2@peterson.com';
@@ -157,8 +118,8 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
         // Load from DB
         $p3 = Person::get($id);
-        self::assertEquals($p2, $p3);
-        self::assertEquals($id, $p3->id);
+        $this->assertEquals($p2, $p3);
+        $this->assertEquals($id, $p3->id);
     }
 
     public function testFromJSON()
@@ -176,7 +137,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $expected->created = '2000-03-07 10:45:13';
         $expected->income = 12345.67;
 
-        self::assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     /**
@@ -221,16 +182,16 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $qs = Person::objects()->filter('id', '=', $person1->id);
         $person2 = $qs->single();
 
-        self::assertEquals($person1, $person2);
-        self::assertTrue($qs->exists());
+        $this->assertEquals($person1, $person2);
+        $this->assertTrue($qs->exists());
 
         $count = $person1->delete();
-        self::assertFalse($qs->exists());
-        self::assertSame(1, $count);
+        $this->assertFalse($qs->exists());
+        $this->assertSame(1, $count);
 
         // On repeated delete, 0 count should be returned
         $count = $person1->delete();
-        self::assertSame(0, $count);
+        $this->assertSame(0, $count);
     }
 
     /**
@@ -271,7 +232,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             ->limit($limit, $offset)
             ->fetch();
 
-        self::assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     /**
@@ -284,22 +245,22 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $qs = Person::objects()->filter('name', '=', 'Hrvoje');
         $qs->delete();
 
-        self::assertSame(0, $qs->count());
-        self::assertFalse($qs->exists());
+        $this->assertSame(0, $qs->count());
+        $this->assertFalse($qs->exists());
 
         Person::objects()->filter('name', '=', 'Hrvoje')->single();
     }
 
     public function testSingleZeroAllowed()
     {
-        $qs = Person::objects()->filter('name', '=', 'Hrvoje');
+        $qs = Person::objects()->filter('name', '=', 'The Invisible Man');
         $qs->delete();
 
-        self::assertSame(0, $qs->count());
-        self::assertFalse($qs->exists());
+        $this->assertSame(0, $qs->count());
+        $this->assertFalse($qs->exists());
 
-        $actual = Person::objects()->filter('name', '=', 'Hrvoje')->single(true);
-        self::assertNull($actual);
+        $actual = $qs->single(true);
+        $this->assertNull($actual);
     }
 
     /**
@@ -312,15 +273,16 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $qs = Person::objects()->filter('name', '=', 'Hrvoje');
         $qs->delete();
 
-        self::assertSame(0, $qs->count());
-        self::assertFalse($qs->exists());
+        $this->assertSame(0, $qs->count());
+        $this->assertFalse($qs->exists());
 
-        Person::fromArray(array('name' => 'Hrvoje'))->save();
-        Person::fromArray(array('name' => 'Hrvoje'))->save();
-        Person::fromArray(array('name' => 'Hrvoje'))->save();
+        $data = array('name' => 'Hrvoje');
+        Person::fromArray($data)->save();
+        Person::fromArray($data)->save();
+        Person::fromArray($data)->save();
 
-        self::assertSame(3, $qs->count());
-        self::assertTrue($qs->exists());
+        $this->assertSame(3, $qs->count());
+        $this->assertTrue($qs->exists());
 
         $qs->single();
     }
@@ -336,7 +298,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $p1 = Person::fromArray($array);
         $p2 = Person::fromArray($object);
 
-        self::assertEquals($p1, $p2);
+        $this->assertEquals($p1, $p2);
     }
 
     /**
@@ -370,39 +332,39 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testFind()
     {
-        self::assertNull(Person::find(12345678));
+        $this->assertNull(Person::find(12345678));
 
         $p = new Person();
         $p->name = "Jimmy Hendrix";
         $p->insert();
 
         $p2 = Person::find($p->id);
-        self::assertNotNull($p2);
-        self::assertEquals($p, $p2);
+        $this->assertNotNull($p2);
+        $this->assertEquals($p, $p2);
     }
 
     public function testExists()
     {
-        self::assertFalse(Person::exists(12345678));
+        $this->assertFalse(Person::exists(12345678));
 
         $p = new Person();
         $p->name = "Jimmy Page";
         $p->insert();
 
         $actual = Person::exists($p->id);
-        self::assertTrue($actual);
+        $this->assertTrue($actual);
     }
 
     public function testGetPK()
     {
         $foo = new Person();
-        self::assertCount(1, $foo->getPK());
+        $this->assertCount(1, $foo->getPK());
 
         $foo = new PkLess();
-        self::assertCount(0, $foo->getPK());
+        $this->assertCount(0, $foo->getPK());
 
         $foo = new Trade();
-        self::assertCount(2, $foo->getPK());
+        $this->assertCount(2, $foo->getPK());
     }
 
     public function testFetchDistinct()
@@ -431,7 +393,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
                 'income' => 200,
             ),
         );
-        self::assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual);
 
         $actual = Person::objects()
             ->filter('name', '=', $name)
@@ -439,7 +401,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             ->distinct('income');
 
         $expected = array(100, 200);
-        self::assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     public function testFetchValues()
@@ -461,7 +423,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             array('name' => "$name-3", 'income' => 300),
         );
 
-        self::assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual);
 
         $actual = Person::objects()
             ->filter('name', 'LIKE', "$name%")
@@ -474,7 +436,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             array("$name-3", 300),
         );
 
-        self::assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual);
 
         $actual = Person::objects()
             ->filter('name', 'LIKE', "$name%")
@@ -487,7 +449,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             "$name-3",
         );
 
-        self::assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     public function testModelToJsonToArray()
@@ -508,8 +470,8 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             'income' => 100000
         );
 
-        self::assertSame($json, $person->toJSON());
-        self::assertSame($array, $person->toArray());
+        $this->assertSame($json, $person->toJSON());
+        $this->assertSame($array, $person->toArray());
     }
 
     /**

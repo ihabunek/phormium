@@ -3,7 +3,7 @@
 namespace Phormium;
 
 /**
- * A common interface for filters.
+ * Base class for filters.
  */
 abstract class Filter
 {
@@ -42,5 +42,19 @@ abstract class Filter
             CompositeFilter::OP_OR,
             func_get_args()
         );
+    }
+
+    /**
+     * Creates a new column filter.
+     *
+     * @param string $column Column to filter by.
+     * @param string $operation Filter opration, see {@link ColumnFilter}
+     * @param string $value Optional filter value.
+     *
+     * @return ColumnFilter
+     */
+    public static function col($column, $operation, $value = null)
+    {
+        return new ColumnFilter($column, $operation, $value);
     }
 }

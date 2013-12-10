@@ -8,7 +8,7 @@ use \Phormium\Log;
 use \Phormium\NullLogger;
 
 /**
- * @group logging
+ * @group logger
  */
 class LoggerTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,7 +27,7 @@ class LoggerTest extends \PHPUnit_Framework_TestCase
         $actual = ob_get_clean();
         $expected = "";
 
-        self::assertSame($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public function testLoggingWithoutLog4php()
@@ -44,7 +44,7 @@ class LoggerTest extends \PHPUnit_Framework_TestCase
         $actual = ob_get_clean();
         $expected = "";
 
-        self::assertSame($expected, $actual);
+        $this->assertSame($expected, $actual);
      }
 }
 

@@ -1,9 +1,9 @@
 {
-	"databases": {
-		"exampledb": {
-			"dsn": "sqlite:example.sq3",
-			"username": "",
-			"password": ""
-		}
-	}
+    "databases": {
+        "exampledb": {
+            "dsn": "sqlite:example.sq3",
+            "username": "",
+            "password": ""
+        }
+    }
 }
