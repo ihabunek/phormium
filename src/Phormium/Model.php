@@ -66,6 +66,15 @@ abstract class Model
         return $instance;
     }
 
+    /**
+     * Fetches all records from the table.
+     *
+     * @return array An array of models.
+     */
+    public static function all()
+    {
+        return self::objects()->fetch();
+    }
 
     /**
      * Fetches a single record by primary key, throws an exception if the model

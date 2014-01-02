@@ -483,4 +483,21 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $pkl = new PkLess();
         $pkl->save();
     }
+
+    public function testAll()
+    {
+        Person::objects()->delete();
+
+        $actual = Person::all();
+        $this->assertInternalType('array', $actual);
+        $this->assertEmpty($actual);
+
+        Person::fromArray(array('name' => "Freddy Mercury"))->insert();
+        Person::fromArray(array('name' => "Brian May"))->insert();
+        Person::fromArray(array('name' => "Roger Taylor"))->insert();
+
+        $actual = Person::all();
+        $this->assertInternalType('array', $actual);
+        $this->assertCount(3, $actual);
+    }
 }

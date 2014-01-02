@@ -72,6 +72,12 @@ To fetch all data from a table, run:
 
 .. code-block:: php
 
+    Person::all();
+
+This is shorthand for calling:
+
+.. code-block:: php
+
     Person::objects()->fetch();
 
 The `objects()` method will return a `QuerySet` object which is used for
