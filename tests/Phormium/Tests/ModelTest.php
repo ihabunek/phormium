@@ -323,6 +323,15 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Exception
+     * @expectedExceptionMessage Nonscalar value given for primary key value.
+     */
+    public function testGetErrorPKNotScalar()
+    {
+        Person::get(array(array()));
+    }
+
+    /**
+     * @expectedException \Exception
      * @expectedExceptionMessage [Phormium\Tests\Models\Person] record with primary key [12345678] does not exist.
      */
     public function testGetErrorModelDoesNotExist()
