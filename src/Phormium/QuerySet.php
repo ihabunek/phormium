@@ -190,7 +190,14 @@ class QuerySet
      */
     public function fetch()
     {
-        return $this->query->select($this->filter, $this->order, null, $this->limit, $this->offset);
+        return $this->query->select(
+            $this->filter,
+            $this->order,
+            null,
+            $this->limit,
+            $this->offset,
+            PDO::FETCH_CLASS
+        );
     }
 
     /**
