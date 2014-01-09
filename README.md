@@ -9,7 +9,7 @@ with a PDO driver or may require some work.
 Warning: This is a work in progress. Test before using! Report any bugs
 [here](https://github.com/ihabunek/phormium/issues).
 
-[![Build Status](https://travis-ci.org/ihabunek/phormium.png)](https://travis-ci.org/ihabunek/phormium)
+[![Latest Stable Version](https://poser.pugx.org/phormium/phormium/v/stable.png)](https://packagist.org/packages/phormium/phormium) [![Total Downloads](https://poser.pugx.org/phormium/phormium/downloads.png)](https://packagist.org/packages/phormium/phormium) [![Build Status](https://travis-ci.org/ihabunek/phormium.png)](https://travis-ci.org/ihabunek/phormium)
 
 Features
 --------
