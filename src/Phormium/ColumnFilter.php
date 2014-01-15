@@ -48,8 +48,20 @@ class ColumnFilter extends Filter
         switch($this->operation)
         {
             case self::OP_EQUALS:
+                if (is_null($this->value)) {
+                    return $this->renderIsNull($this->column);
+                } else {
+                    return $this->renderSimple($this->column, $this->operation, $this->value);
+                }
+
             case self::OP_NOT_EQUALS:
             case self::OP_NOT_EQUALS_ALT:
+                if (is_null($this->value)) {
+                    return $this->renderNotNull($this->column);
+                } else {
+                    return $this->renderSimple($this->column, $this->operation, $this->value);
+                }
+
             case self::OP_LIKE:
             case self::OP_NOT_LIKE:
             case self::OP_GREATER:
@@ -57,16 +69,22 @@ class ColumnFilter extends Filter
             case self::OP_LESSER:
             case self::OP_LESSER_OR_EQUAL:
                 return $this->renderSimple($this->column, $this->operation, $this->value);
+
             case self::OP_LIKE_CASE_INSENSITIVE:
                 return $this->renderLikeCaseInsensitive($this->column, $this->value);
+
             case self::OP_IN:
                 return $this->renderIn($this->column, $this->value);
+
             case self::OP_NOT_IN:
                 return $this->renderNotIn($this->column, $this->value);
+
             case self::OP_IS_NULL:
                 return $this->renderIsNull($this->column);
+
             case self::OP_NOT_NULL:
                 return $this->renderNotNull($this->column);
+
             case self::OP_BETWEEN:
                 return $this->renderBetween($this->column, $this->value);
             default:

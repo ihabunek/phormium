@@ -28,6 +28,14 @@ class FilterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $actual);
     }
 
+    public function testEqNull()
+    {
+        $filter = new ColumnFilter('test', '=', null);
+        $actual = $filter->render();
+        $expected = array("test IS NULL", array());
+        $this->assertSame($expected, $actual);
+    }
+
     public function testNeq1()
     {
         $filter = new ColumnFilter('test', '!=', 1);
@@ -41,6 +49,22 @@ class FilterTest extends \PHPUnit_Framework_TestCase
         $filter = new ColumnFilter('test', '<>', 1);
         $actual = $filter->render();
         $expected = array("test <> ?", array(1));
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testNeqNull1()
+    {
+        $filter = new ColumnFilter('test', '<>', null);
+        $actual = $filter->render();
+        $expected = array("test IS NOT NULL", array());
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testNeqNull2()
+    {
+        $filter = new ColumnFilter('test', '!=', null);
+        $actual = $filter->render();
+        $expected = array("test IS NOT NULL", array());
         $this->assertSame($expected, $actual);
     }
 
