@@ -1,6 +1,6 @@
 <?php
 
-namespace Phormium;
+namespace Phormium\Filter;
 
 /**
  * Base class for filters.

@@ -2,7 +2,9 @@
 
 namespace Phormium;
 
-use \PDO;
+use Phormium\Filter\Filter;
+
+use PDO;
 
 /**
  * Generates and executes SQL queries.

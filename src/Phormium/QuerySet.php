@@ -4,6 +4,10 @@ namespace Phormium;
 
 use PDO;
 
+use Phormium\Filter\ColumnFilter;
+use Phormium\Filter\CompositeFilter;
+use Phormium\Filter\Filter;
+
 /**
  * Performs lazy database lookup for sets of objects.
  */

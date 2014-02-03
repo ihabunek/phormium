@@ -1,6 +1,6 @@
 <?php
 
-namespace Phormium;
+namespace Phormium\Filter;
 
 /**
  * A filter for SQL queries which converts to a single WHERE condition.

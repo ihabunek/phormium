@@ -5,9 +5,9 @@ namespace Phormium\Tests;
 use \Phormium\Tests\Models\Person;
 
 use \Phormium\DB;
-use \Phormium\ColumnFilter;
-use \Phormium\Filter;
-use \Phormium\CompositeFilter;
+use \Phormium\Filter\ColumnFilter;
+use \Phormium\Filter\CompositeFilter;
+use \Phormium\Filter\Filter;
 use \Phormium\Parser;
 
 /**
@@ -226,14 +226,14 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     {
         $actual = ColumnFilter::fromArray(array('id', '=', 123));
 
-        $this->assertInstanceOf('\\Phormium\\ColumnFilter', $actual);
+        $this->assertInstanceOf('\\Phormium\\Filter\\ColumnFilter', $actual);
         $this->assertSame('id', $actual->column);
         $this->assertSame('=', $actual->operation);
         $this->assertSame(123, $actual->value);
 
         $actual = ColumnFilter::fromArray(array('email', 'null'));
 
-        $this->assertInstanceOf('\\Phormium\\ColumnFilter', $actual);
+        $this->assertInstanceOf('\\Phormium\\Filter\\ColumnFilter', $actual);
         $this->assertSame('email', $actual->column);
         $this->assertSame('NULL', $actual->operation);
         $this->assertNull($actual->value);
@@ -319,7 +319,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Argument 1 passed to Phormium\CompositeFilter::add() must be an instance of Phormium\Filter, integer given
+     * @expectedExceptionMessage Argument 1 passed to Phormium\Filter\CompositeFilter::add() must be an instance of Phormium\Filter\Filter, integer given
      */
     public function testCompositeFilterAddInvalid()
     {

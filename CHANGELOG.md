@@ -3,6 +3,9 @@ Phormium Changelog
 
 0.6 / TBA
 ---------
+* BC BREAK: Moved filter classes to `Phormium\Filter` namespace
+  You will need to update your code!
+
 * Added `Model::all()`
 
 0.5 / 2013-12-10
