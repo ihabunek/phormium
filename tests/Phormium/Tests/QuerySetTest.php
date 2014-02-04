@@ -2,15 +2,15 @@
 
 namespace Phormium\Tests;
 
-use \Phormium\Aggregate;
-use \Phormium\DB;
-use \Phormium\Filter\ColumnFilter;
-use \Phormium\Filter\CompositeFilter;
-use \Phormium\Filter\Filter;
-use \Phormium\Meta;
-use \Phormium\QuerySet;
+use Phormium\Aggregate;
+use Phormium\DB;
+use Phormium\Filter\ColumnFilter;
+use Phormium\Filter\CompositeFilter;
+use Phormium\Filter\Filter;
+use Phormium\Meta;
+use Phormium\QuerySet;
 
-use \Phormium\Tests\Models\Person;
+use Phormium\Tests\Models\Person;
 
 /**
  * @group queryset

@@ -2,10 +2,10 @@
 
 namespace Phormium\Tests;
 
-use \Phormium\Tests\Models\Person;
+use Phormium\Tests\Models\Person;
 
-use \Phormium\Log;
-use \Phormium\NullLogger;
+use Phormium\Log;
+use Phormium\NullLogger;
 
 /**
  * @group logger

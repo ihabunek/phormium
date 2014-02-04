@@ -2,12 +2,12 @@
 
 namespace Phormium\Tests;
 
-use \Phormium\DB;
-use \Phormium\Meta;
-use \Phormium\QuerySet;
-use \Phormium\Tests\Models\Person;
-use \Phormium\Tests\Models\Trade;
-use \Phormium\Tests\Models\PkLess;
+use Phormium\DB;
+use Phormium\Meta;
+use Phormium\QuerySet;
+use Phormium\Tests\Models\Person;
+use Phormium\Tests\Models\Trade;
+use Phormium\Tests\Models\PkLess;
 
 /**
  * @group model

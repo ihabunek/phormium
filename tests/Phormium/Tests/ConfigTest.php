@@ -4,7 +4,7 @@ namespace Phormium\Tests;
 
 use Phormium\Config;
 
-use \Phormium\DB;
+use Phormium\DB;
 
 /**
  * @group config

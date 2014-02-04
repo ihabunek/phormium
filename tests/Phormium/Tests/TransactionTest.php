@@ -2,8 +2,8 @@
 
 namespace Phormium\Tests;
 
-use \Phormium\DB;
-use \Phormium\Tests\Models\Person;
+use Phormium\DB;
+use Phormium\Tests\Models\Person;
 
 /**
  * @group transaction
