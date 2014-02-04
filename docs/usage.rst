@@ -166,6 +166,8 @@ This will create:
 Raw filters
 ~~~~~~~~~~~
 
+.. versionadded:: 0.6
+
 Sometimes column filters can be limiting, since they only allow operations
 on a single column. **Raw filters** allow usage of custom SQL code in your WHERE
 clause. They will pass any given SQL condition into the WHERE clause.
@@ -197,6 +199,18 @@ Which produces:
 .. code-block:: sql
 
     SELECT ... FROM price_list WHERE unit_price * quantity < ?;
+
+.. warning::
+
+    Any string passed in as a raw filter is inserted into the resulting SQL
+    query without any validation. This makes it easy to:
+
+    - break a query by passing in invalid SQL
+    - create queries which are platform dependent (e.g. by using
+      database-specific functions)
+    - pass in unvalidated values (use arguments instead)
+
+    Be careful.
 
 Alternative methods of creating raw filters:
 
