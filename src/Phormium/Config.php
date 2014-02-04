@@ -42,27 +42,6 @@ class Config
         self::$config['databases'][$name] = compact('dsn', 'username', 'password');
     }
 
-    public static function isLoggingEnabled()
-    {
-        return isset(self::$config['logging']) && self::$config['logging'];
-    }
-
-    public static function enableLogging()
-    {
-        self::$config['logging'] = true;
-    }
-
-    public static function disableLogging()
-    {
-        self::$config['logging'] = false;
-    }
-
-    public static function loggingEnabled()
-    {
-        return isset(self::$config['logging']) &&
-            self::$config['logging'];
-    }
-
     public static function statsEnabled()
     {
         return isset(self::$config['stats']['enabled']) &&
@@ -122,8 +101,6 @@ class Config
             self::checkString($config, array("databases", $name, "username"));
             self::checkString($config, array("databases", $name, "password"));
         }
-
-        self::checkBoolean($config, "logging");
 
         self::checkArray($config, "stats");
         self::checkBoolean($config, array("stats", "enabled"));

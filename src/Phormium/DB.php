@@ -82,8 +82,6 @@ class DB
      */
     public static function begin()
     {
-        Log::debug("BEGIN global transaction.");
-
         if (self::$beginTriggered) {
             throw new \Exception("Already in transaction.");
         }
@@ -96,8 +94,6 @@ class DB
      */
     public static function commit()
     {
-        Log::debug("COMMIT global transaction.");
-
         if (!self::$beginTriggered) {
             throw new \Exception("Cannot commit. Not in transaction.");
         }
@@ -118,8 +114,6 @@ class DB
      */
     public static function rollback()
     {
-        Log::debug("ROLLBACK global transaction.");
-
         if (!self::$beginTriggered) {
             throw new \Exception("Cannot roll back. Not in transaction.");
         }

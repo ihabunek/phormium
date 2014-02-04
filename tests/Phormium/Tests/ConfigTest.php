@@ -29,7 +29,6 @@ class DBTest extends \PHPUnit_Framework_TestCase
             )
         );
         $this->assertEquals($expected, Config::getDatabases());
-        $this->assertFalse(Config::isLoggingEnabled());
     }
 
     /**

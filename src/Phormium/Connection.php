@@ -42,7 +42,6 @@ class Connection
             $time1 = microtime(true);
         }
 
-        Log::debug("Preparing query: $query");
         $stmt = $this->pdo->prepare($query);
 
         if ($statsEnabled) {
@@ -53,7 +52,6 @@ class Connection
             $stmt->setFetchMode(PDO::FETCH_CLASS, $class);
         }
 
-        $this->logExecute($arguments);
         $stmt->execute($arguments);
 
         if ($statsEnabled) {
@@ -98,7 +96,6 @@ class Connection
             $time1 = microtime(true);
         }
 
-        Log::debug("Executing query: $query");
         $stmt = $this->pdo->query($query);
 
         if ($statsEnabled) {
@@ -144,7 +141,6 @@ class Connection
             $time1 = microtime(true);
         }
 
-        Log::debug("Executing query: $query");
         $numRows = $this->pdo->exec($query);
 
         if ($statsEnabled) {
@@ -183,14 +179,12 @@ class Connection
             $time1 = microtime(true);
         }
 
-        Log::debug("Preparing query: $query");
         $stmt = $this->pdo->prepare($query);
 
         if ($statsEnabled) {
             $time2 = microtime(true);
         }
 
-        $this->logExecute($arguments);
         $stmt->execute($arguments);
         $numRows = $stmt->rowCount();
 
@@ -260,25 +254,5 @@ class Connection
             $data[] = $row;
         }
         return $data;
-    }
-
-    /** Logs the execute arguments if logging is enabled. */
-    public function logExecute($args)
-    {
-        if (Config::loggingEnabled()) {
-            foreach ($args as &$arg) {
-                if ($arg === null) {
-                    $arg = "NULL";
-                } elseif (is_string($arg)) {
-                    $arg = '"' . $arg . '"';
-                }
-            }
-
-            if (empty($args)) {
-                Log::debug("Executing query with no args.");
-            } else {
-                Log::debug("Executing query with args: " . implode(', ', $args));
-            }
-        }
     }
 }

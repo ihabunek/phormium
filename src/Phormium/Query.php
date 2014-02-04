@@ -351,10 +351,7 @@ class Query
         $conn = DB::getConnection($this->meta->database);
         $pdo = $conn->getPDO();
 
-        Log::debug("Preparing query: $query");
         $stmt = $pdo->prepare($query);
-
-        $conn->logExecute($args);
         $stmt->execute($args);
 
         $data = array();
