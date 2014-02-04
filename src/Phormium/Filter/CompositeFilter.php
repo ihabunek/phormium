@@ -69,4 +69,9 @@ class CompositeFilter extends Filter
     {
         return $this->filters;
     }
+
+    public function getOperation()
+    {
+        return $this->operation;
+    }
 }

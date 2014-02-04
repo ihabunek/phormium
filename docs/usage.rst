@@ -90,7 +90,8 @@ Filtering data
 In order to retrieve only selected rows, `QuerySets` can be filtered. Filters
 are used to consturct a WHERE clause in the resulting SQL query.
 
-For example:
+Column filters
+~~~~~~~~~~~~~~
 
 .. code-block:: php
 
@@ -134,12 +135,12 @@ Available column filters:
         ->filter($column, 'NOT NULL')
 
 You can also create a column filter using the `Filter::col()` factory method and
-add pass the resulting ColumnFilter object to `QuerySet::filter()` as a single
+pass the resulting ColumnFilter object to `QuerySet::filter()` as a single
 argument.
 
 .. code-block:: php
 
-    use Phormium\Filter;
+    use Phormium\Filter\Filter;
 
     $filter = Filter::col('birthday', '<' '2000-01-01');
 
@@ -162,6 +163,73 @@ This will create:
 
     SELECT ... FROM person WHERE birthday < ? AND income > ?;
 
+Raw filters
+~~~~~~~~~~~
+
+Sometimes column filters can be limiting, since they only allow operations
+on a single column. **Raw filters** allow usage of custom SQL code in your WHERE
+clause. They will pass any given SQL condition into the WHERE clause.
+
+Raw filters can be created by passing a single string into `QuerySet::filter()`.
+
+.. code-block:: php
+
+    Table::objects()
+        ->filter("col1 > col2")
+        ->fetch();
+
+This will produce:
+
+.. code-block:: sql
+
+    SELECT ... FROM table WHERE col1 > col2;
+
+Raw filters also work with arguments, for prepared queries:
+
+.. code-block:: php
+
+    PriceList::objects()
+        ->filter('unit_price * quantity < ?', [100])
+        ->fetch();
+
+Which produces:
+
+.. code-block:: sql
+
+    SELECT ... FROM price_list WHERE unit_price * quantity < ?;
+
+Alternative methods of creating raw filters:
+
+.. code-block:: php
+
+    use Phormium\Filter\RawFilter;
+
+    // Either by instantiating the RawFilter class directly
+    $filter = new RawFilter("col1 > col2");
+    $filter = new RawFilter("col1 > ?", [100]);
+
+    // Or using the raw() factory method
+    $filter = Filter::raw("col1 > col2");
+    $filter = Filter::raw("col1 > ?", [100]);
+
+    // And passing it into filter()
+    Table::objects()
+        ->filter($filter)
+        ->fetch();
+
+Some use cases for raw filters:
+
+.. code-block:: php
+
+    // Conditions which don't involve any columns
+    Filter::raw("current_time < ?", ['16:00:00']);
+
+    // Mathematical expressions
+    Filter::raw("col1 * col2 / col3 < col4");
+
+    // Using SQL functions
+    Filter::raw("round(col1) < 0");
+
 Composite filters
 ~~~~~~~~~~~~~~~~~
 
@@ -177,7 +245,7 @@ For example to find people younger than 10 and older than 20:
 
 .. code-block:: php
 
-    use Phormium\Filter;
+    use Phormium\Filter\Filter;
 
     $filter = Filter::_or(
         Filter::col('age', '<', 10),
@@ -199,19 +267,19 @@ pass arrays to `Filter::_or()` and `Filter::_and()`.
 
 .. code-block:: php
 
-    use Phormium\Filter;
+    use Phormium\Filter\Filter;
 
     $filter = Filter::_or(
         array('age', '<', 10),
         array('age', '>', 20),
     );
 
-Additionally, you can use a class alias for `Phormium\\Filter` to further
-shorten the syntax.
+Additionally, you can use a class alias for `Phormium\\Filter\\Filter` to
+further shorten the syntax.
 
 .. code-block:: php
 
-    use Phormium\Filter as f;
+    use Phormium\Filter\Filter as f;
 
     $filter = f::_or(
         f::col('age', '<', 10),
@@ -222,7 +290,7 @@ Composite filters can be chained and combined. For example:
 
 .. code-block:: php
 
-    use Phormium\Filter as f;
+    use Phormium\Filter\Filter as f;
 
     Person::objects()->filter(
         f::_or(

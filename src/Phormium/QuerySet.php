@@ -7,6 +7,7 @@ use PDO;
 use Phormium\Filter\ColumnFilter;
 use Phormium\Filter\CompositeFilter;
 use Phormium\Filter\Filter;
+use Phormium\Filter\RawFilter;
 
 /**
  * Performs lazy database lookup for sets of objects.
@@ -62,26 +63,41 @@ class QuerySet
      */
     public function filter()
     {
-        $argv = func_get_args();
-        $argc = func_num_args();
-
-        if ($argc == 1) {
-            $arg = $argv[0];
-
-            if ($arg instanceof Filter) {
-                $filter = $arg;
-            } elseif (is_array($arg)) {
-                $filter = ColumnFilter::fromArray($arg);
-            } else {
-                throw new \Exception("Invalid arguments given.");
-            }
-        } else {
-            $filter = ColumnFilter::fromArray($argv);
-        }
+        $filter = $this->parseFilterArgs(
+            func_get_args(),
+            func_num_args()
+        );
 
         $qs = clone $this;
         $qs->addFilter($filter);
         return $qs;
+    }
+
+    private function parseFilterArgs($argv, $argc)
+    {
+        if ($argc === 1) {
+            $arg = $argv[0];
+
+            if ($arg instanceof Filter) {
+                return $arg;
+            } elseif (is_array($arg)) {
+                return ColumnFilter::fromArray($arg);
+            } elseif (is_string($arg)) {
+                return new RawFilter($arg);
+            }
+        } elseif ($argc === 2) {
+            if (is_string($argv[0])) {
+                if (is_string($argv[1])) {
+                    return ColumnFilter::fromArray($args);
+                } elseif (is_array($argv[1])) {
+                    return new RawFilter($argv[0], $argv[1]);
+                }
+            }
+        } elseif ($argc === 3) {
+            return ColumnFilter::fromArray($argv);
+        }
+
+        throw new \InvalidArgumentException("Invalid filter arguments.");
     }
 
     /**

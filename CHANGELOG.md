@@ -7,6 +7,7 @@ Phormium Changelog
   You will need to update your code!
 
 * Added `Model::all()`
+* Added raw filters
 
 0.5 / 2013-12-10
 ----------------

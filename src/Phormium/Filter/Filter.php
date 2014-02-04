@@ -57,4 +57,17 @@ abstract class Filter
     {
         return new ColumnFilter($column, $operation, $value);
     }
+
+    /**
+     * Creates a new raw filter.
+     *
+     * @param string $condition The SQL condition.
+     * @param array $arguments Array of named arguments (optional).
+     *
+     * @return RawFilter
+     */
+    public static function raw($condition, $arguments = array())
+    {
+        return new RawFilter($condition, $arguments);
+    }
 }
