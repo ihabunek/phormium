@@ -8,6 +8,7 @@
 
 require "../../vendor/autoload.php";
 require "model.php";
+require "functions.php";
 
 Phormium\DB::configure([
     'databases' => [
