@@ -21,8 +21,8 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     private $connection;
     private $driver;
 
-    private $triggeredEvents = array();
-    private $triggeredArguments = array();
+    public $triggeredEvents = array();
+    public $triggeredArguments = array();
 
     private $queryEvents = array(
         'query.started',
