@@ -38,7 +38,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     public function testManualBeginRollback()
     {
         $person = new Person();
-        $person->name = 'Bruce Dickinson';
+        $person->name = 'Steve Harris';
         $person->income = 12345;
         $person->save();
 
@@ -58,7 +58,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     public function testCallbackTransactionCommit()
     {
         $person = new Person();
-        $person->name = 'Bruce Dickinson';
+        $person->name = 'Dave Murray';
         $person->income = 12345;
         $person->save();
 
@@ -76,7 +76,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     public function testCallbackTransactionRollback()
     {
         $person = new Person();
-        $person->name = 'Bruce Dickinson';
+        $person->name = 'Adrian Smith';
         $person->income = 12345;
         $person->save();
 
@@ -113,7 +113,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     public function testDisconnectRollsBackTransaction()
     {
         $person = new Person();
-        $person->name = 'Bruce Dickinson';
+        $person->name = 'Nicko McBrain';
         $person->income = 12345;
         $person->save();
 
