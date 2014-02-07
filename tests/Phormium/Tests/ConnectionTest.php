@@ -210,8 +210,8 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         }
         $this->assertTrue($errored);
 
-        // sqlite fails on prepare, others on execute
-        if ($this->driver === 'sqlite') {
+        // sqlite and informix fail on prepare, others on execute
+        if (in_array($this->driver, array('sqlite', 'informix'))) {
             $expected = array(
                 'query.started',
                 'query.preparing',
@@ -304,8 +304,8 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         }
         $this->assertTrue($errored);
 
-        // sqlite fails on prepare, others on execute
-        if ($this->driver === 'sqlite') {
+        // sqlite and informix fail on prepare, others on execute
+        if (in_array($this->driver, array('sqlite', 'informix'))) {
             $expected = array(
                 'query.started',
                 'query.preparing',
