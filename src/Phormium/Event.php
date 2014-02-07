@@ -4,6 +4,9 @@ namespace Phormium;
 
 /**
  * Simple event emitter/listener implementation.
+ *
+ * Code heavily based on Evenement by Igor Wiedler.
+ * https://github.com/igorw/evenement
  */
 class Event
 {
@@ -16,18 +19,17 @@ class Event
         self::$listeners[$event][] = $listener;
     }
 
-    public function once($event, $listener)
+    public static function once($event, $listener)
     {
         $onceListener = function () use (&$onceListener, $event, $listener) {
-            $this->removeListener($event, $onceListener);
-
+            self::removeListener($event, $onceListener);
             call_user_func_array($listener, func_get_args());
         };
 
-        $this->on($event, $onceListener);
+        self::on($event, $onceListener);
     }
 
-    public static function emit($event, array $arguments)
+    public static function emit($event, array $arguments = array())
     {
         if (isset(self::$listeners[$event])) {
             foreach(self::$listeners[$event] as $listener) {
@@ -36,16 +38,9 @@ class Event
         }
     }
 
-    public static function listeners($event = null)
+    public static function listeners($event)
     {
-        if (isset($event)) {
-            if (!isset(self::$listneers[$event])) {
-                self::$listneers[$event] = array();
-            }
-            return self::$listeners[$event];
-        } else {
-            return self::$listeners;
-        }
+        return isset(self::$listeners[$event]) ? self::$listeners[$event] : array();
     }
 
     public static function removeListeners($event = null)
@@ -57,7 +52,7 @@ class Event
         }
     }
 
-    public function removeListener($event, $listener)
+    public static function removeListener($event, $listener)
     {
         if (isset(self::$listeners[$event])) {
             $index = array_search($listener, self::$listeners[$event], true);
