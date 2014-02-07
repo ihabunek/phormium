@@ -14,6 +14,9 @@ class Connection
     /** The wrapped PDO connection */
     private $pdo;
 
+    /** The driver name extracted from the PDO connection. */
+    private $driver;
+
     /**
      * Constructs a new wrapper with the given PDO connection
      *
@@ -22,6 +25,7 @@ class Connection
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
+        $this->driver = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
     }
 
     /**
@@ -130,7 +134,7 @@ class Connection
     /** Returns the name of the driver for the underlying PDO connection. */
     public function getDriver()
     {
-        return $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+        return $this->driver;
     }
 
     /** Calls BEGIN on the underlying PDO connection */
