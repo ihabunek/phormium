@@ -22,7 +22,7 @@ class Event
     public static function once($event, $listener)
     {
         $onceListener = function () use (&$onceListener, $event, $listener) {
-            self::removeListener($event, $onceListener);
+            Event::removeListener($event, $onceListener);
             call_user_func_array($listener, func_get_args());
         };
 

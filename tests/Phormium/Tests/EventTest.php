@@ -113,7 +113,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $listeners1 = Event::listeners($id1);
         $listeners2 = Event::listeners($id2);
 
-        $this->assertSame($listeners1[0], $listeners2[0]);
+        $this->assertEquals($listeners1, $listeners2);
         $this->assertCount(1, $listeners1);
         $this->assertCount(1, $listeners2);
 
@@ -139,7 +139,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $listeners1 = Event::listeners($id1);
         $listeners2 = Event::listeners($id2);
 
-        $this->assertSame($listeners1[0], $listeners2[0]);
+        $this->assertEquals($listeners1, $listeners2);
         $this->assertCount(1, $listeners1);
         $this->assertCount(1, $listeners2);
 
