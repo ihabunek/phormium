@@ -3,11 +3,15 @@ Phormium Changelog
 
 0.6 / TBA
 ---------
-* **BC BREAK**: Moved filter classes to `Phormium\Filter` namespace. You will
-  need to update your code!
-* **BC BREAK**: Removed logging.
+* **BC BREAK**: Moved filter classes to `Phormium\Filter` namespace. Please update
+  your references. E.g. `use Phormium\ColumnFilter` to
+  `use Phormium\Filter\ColumnFilter`.
+* **BC BREAK**: Removed logging and stats classes. These will be reimplemented
+  using events and available as separate packages.
+
 * Added `Model::all()`
 * Added raw filters
+* Added events
 
 0.5 / 2013-12-10
 ----------------
