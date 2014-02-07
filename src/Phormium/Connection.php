@@ -11,6 +11,9 @@ use PDOStatement;
  */
 class Connection
 {
+    /** Name of the connection. */
+    private $name;
+
     /** The wrapped PDO connection */
     private $pdo;
 
@@ -22,8 +25,9 @@ class Connection
      *
      * @param PDO $pdo
      */
-    public function __construct(PDO $pdo)
+    public function __construct($name, PDO $pdo)
     {
+        $this->name = $name;
         $this->pdo = $pdo;
         $this->driver = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
     }
@@ -41,6 +45,8 @@ class Connection
      */
     public function preparedQuery($query, array $arguments = array(), $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
+        DB::getConnection($this->name); // Handles transactions
+
         Event::emit('query.started', array($query, $arguments, $this));
 
         $stmt = $this->pdoPrepare($query, $arguments);
@@ -65,6 +71,8 @@ class Connection
      */
     public function query($query, $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
+        DB::getConnection($this->name); // Handles transactions
+
         $arguments = array();
 
         Event::emit('query.started', array($query, $arguments, $this));
@@ -87,6 +95,8 @@ class Connection
      */
     public function execute($query)
     {
+        DB::getConnection($this->name); // Handles transactions
+
         $arguments = array();
 
         Event::emit('query.started', array($query, $arguments, $this));
@@ -111,6 +121,8 @@ class Connection
      */
     public function preparedExecute($query, $arguments = array())
     {
+        DB::getConnection($this->name); // Handles transactions
+
         Event::emit('query.started', array($query, $arguments, $this));
 
         $stmt = $this->pdoPrepare($query, $arguments);

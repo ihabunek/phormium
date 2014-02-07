@@ -66,7 +66,7 @@ class DB
         // Force an exception to be thrown on error
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        return new Connection($pdo);
+        return new Connection($name, $pdo);
     }
 
     /**

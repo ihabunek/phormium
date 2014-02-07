@@ -129,4 +129,50 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(12345, Person::get($id)->income);
     }
+
+    public function testExecuteTransaction()
+    {
+        $person = new Person();
+        $person->name = 'Janick Gers';
+        $person->income = 100;
+        $person->insert();
+
+        $id = $person->id;
+        $conn = DB::getConnection('testdb');
+
+        DB::begin();
+        $conn->execute("UPDATE person SET income = income + 1");
+        DB::rollback();
+
+        $this->assertEquals(100, Person::get($id)->income);
+
+        DB::begin();
+        $conn->execute("UPDATE person SET income = income + 1");
+        DB::commit();
+
+        $this->assertEquals(101, Person::get($id)->income);
+    }
+
+    public function testPreparedExecuteTransaction()
+    {
+        $person = new Person();
+        $person->name = 'Janick Gers';
+        $person->income = 100;
+        $person->insert();
+
+        $id = $person->id;
+        $conn = DB::getConnection('testdb');
+
+        DB::begin();
+        $conn->preparedExecute("UPDATE person SET income = ?", array(200));
+        DB::rollback();
+
+        $this->assertEquals(100, Person::get($id)->income);
+
+        DB::begin();
+        $conn->preparedExecute("UPDATE person SET income = ?", array(200));
+        DB::commit();
+
+        $this->assertEquals(200, Person::get($id)->income);
+    }
 }
