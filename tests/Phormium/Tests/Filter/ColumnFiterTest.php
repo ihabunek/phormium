@@ -36,6 +36,16 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $actual);
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter = requires a scalar value, array given.
+     */
+    public function testEqWrongParam()
+    {
+        $filter = new ColumnFilter('test', '=', array());
+        $filter->render();
+    }
+
     public function testNeq1()
     {
         $filter = new ColumnFilter('test', '!=', 1);
@@ -66,6 +76,16 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
         $actual = $filter->render();
         $expected = array("test IS NOT NULL", array());
         $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter != requires a scalar value, array given.
+     */
+    public function testNeqWrongParam()
+    {
+        $filter = new ColumnFilter('test', '!=', array());
+        $filter->render();
     }
 
     public function testGt()
@@ -109,12 +129,41 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage IN filter requires an array with one or more values
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter IN requires an array, integer given.
      */
-    public function testInWrongParam()
+    public function testInWrongParam1()
     {
         $filter = new ColumnFilter('test', 'in', 1);
+        $filter->render();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter IN requires an array, string given.
+     */
+    public function testInWrongParam2()
+    {
+        $filter = new ColumnFilter('test', 'in', "1");
+        $filter->render();
+    }
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter IN requires an array, NULL given.
+     */
+    public function testInWrongParam3()
+    {
+        $filter = new ColumnFilter('test', 'in', null);
+        $filter->render();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter IN requires a non-empty array, empty array given.
+     */
+    public function testInWrongParam4()
+    {
+        $filter = new ColumnFilter('test', 'in', array());
         $filter->render();
     }
 
@@ -127,12 +176,41 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage NOT IN filter requires an array with one or more values
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter NOT IN requires an array, integer given.
      */
-    public function testNotInWrongParam()
+    public function testNotInWrongParam1()
     {
         $filter = new ColumnFilter('test', 'not in', 1);
+        $filter->render();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter NOT IN requires an array, string given.
+     */
+    public function testNotInWrongParam2()
+    {
+        $filter = new ColumnFilter('test', 'not in', "1");
+        $filter->render();
+    }
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter NOT IN requires an array, NULL given.
+     */
+    public function testNotInWrongParam3()
+    {
+        $filter = new ColumnFilter('test', 'not in', null);
+        $filter->render();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter NOT IN requires a non-empty array, empty array given.
+     */
+    public function testNotInWrongParam4()
+    {
+        $filter = new ColumnFilter('test', 'not in', array());
         $filter->render();
     }
 
@@ -193,8 +271,8 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage BETWEEN filter requires an array of two values.
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter BETWEEN requires an array, string given.
      */
     public function testBetweenWrongParam1()
     {
@@ -203,10 +281,20 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage BETWEEN filter requires an array of two values.
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter BETWEEN requires an array, NULL given.
      */
     public function testBetweenWrongParam2()
+    {
+        $filter = new ColumnFilter('test', 'between', null);
+        $filter->render();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter BETWEEN requires an array with 2 values, given array has 1 values.
+     */
+    public function testBetweenWrongParam3()
     {
         $filter = new ColumnFilter('test', 'between', array(1));
         $filter->render();
@@ -259,6 +347,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Exception
+     * @expectedExceptionMessage Argument 1 passed to Phormium\Filter\ColumnFilter::fromArray() must be of the type array, integer given,
      */
     public function testFilterFromArrayExceptionWrongType()
     {
