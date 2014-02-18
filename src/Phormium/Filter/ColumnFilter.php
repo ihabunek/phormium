@@ -23,6 +23,7 @@ class ColumnFilter extends Filter
     const OP_NOT_EQUALS_ALT = '!=';
     const OP_NOT_IN = 'NOT IN';
     const OP_NOT_NULL = 'NOT NULL';
+    const OP_NOT_NULL_ALT = 'IS NOT NULL';
 
     /** The filter operation, one of OP_* constants. */
     public $operation;
@@ -83,6 +84,7 @@ class ColumnFilter extends Filter
                 return $this->renderIsNull($this->column);
 
             case self::OP_NOT_NULL:
+            case self::OP_NOT_NULL_ALT:
                 return $this->renderNotNull($this->column);
 
             case self::OP_BETWEEN:

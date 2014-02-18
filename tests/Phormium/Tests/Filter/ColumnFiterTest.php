@@ -152,6 +152,14 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $actual);
     }
 
+    public function testNotNull2()
+    {
+        $filter = new ColumnFilter('test', 'is not null');
+        $actual = $filter->render();
+        $expected = array("test IS NOT NULL", array());
+        $this->assertSame($expected, $actual);
+    }
+
     public function testLike()
     {
         $filter = new ColumnFilter('test', 'like', '%foo%');
