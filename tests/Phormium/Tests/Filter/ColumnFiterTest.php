@@ -347,7 +347,6 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Argument 1 passed to Phormium\Filter\ColumnFilter::fromArray() must be of the type array, integer given,
      */
     public function testFilterFromArrayExceptionWrongType()
     {
