@@ -9,8 +9,15 @@ use Phormium\DB;
 /**
  * @group config
  */
-class DBTest extends \PHPUnit_Framework_TestCase
+class ConfigTest extends \PHPUnit_Framework_TestCase
 {
+    private $configDir;
+
+    public function __construct()
+    {
+        $this->configDir = realpath(__DIR__ . '/../../config');
+    }
+
     public function setUp()
     {
         Config::reset();
@@ -18,7 +25,7 @@ class DBTest extends \PHPUnit_Framework_TestCase
 
     public function testConfigure()
     {
-        $config = realpath(__DIR__ . '/../../config/config.json');
+        $config = $this->configDir . '/config.json';
         DB::configure($config);
 
         $expected = array(
@@ -33,22 +40,75 @@ class DBTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Failed parsing json config file
+     * @expectedExceptionMessage Failed parsing JSON configuration
      */
-    public function testConfigureFail()
+    public function testFailInvalidSyntax()
     {
-        $config = realpath(__DIR__ . '/../../config/invalid.json');
+        $config = $this->configDir . '/invalid.json';
         DB::configure($config);
-        $this->assertTrue(false);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Config file not found at "/should/not/exist.json"
+     */
+    public function testFailFileDoesNotExist()
+    {
+        $config = '/should/not/exist.json';
+        DB::configure($config);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Unknown config file extension "xxx"
+     */
+    public function testFailUnknownExtension()
+    {
+        $config = $this->configDir . '/config.xxx';
+        DB::configure($config);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Error loading config path from
+     */
+    public function testFileExistsButIsADirectory()
+    {
+        $config = __DIR__;
+        @DB::configure($config);
     }
 
     public function testReset()
     {
-        $config = realpath(__DIR__ . '/../../config/config.json');
+        $config = $this->configDir . '/config.json';
         $this->assertEmpty(Config::getDatabases());
         Config::load($config);
         $this->assertNotEmpty(Config::getDatabases());
         Config::reset();
         $this->assertEmpty(Config::getDatabases());
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Database "xxx" not defined
+     */
+    public function testDatabaseDoesNotExist()
+    {
+        Config::getDatabase('xxx');
+    }
+
+    public function testAddDatabase()
+    {
+        $dsn = 'dsn goes here';
+        Config::addDatabase('xxx', $dsn);
+        $actual = Config::getDatabase('xxx');
+
+        $expected = array(
+            'dsn' => $dsn,
+            'username' => null,
+            'password' => null,
+        );
+
+        $this->assertSame($expected, $actual);
     }
 }
