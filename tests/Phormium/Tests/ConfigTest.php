@@ -70,7 +70,6 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Error loading config path from
      */
     public function testFileExistsButIsADirectory()
     {

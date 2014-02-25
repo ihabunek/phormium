@@ -95,7 +95,7 @@ class Config
 
         $data = file_get_contents($path);
         if ($data === false) {
-            throw new \Exception("Error loading config path from \"$path\".");
+            throw new \Exception("Error loading config file from \"$path\".");
         }
 
         $ext = pathinfo($path, PATHINFO_EXTENSION);
