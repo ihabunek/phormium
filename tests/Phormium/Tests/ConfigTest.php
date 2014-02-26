@@ -23,7 +23,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         Config::reset();
     }
 
-    public function testConfigure()
+    public function testConfigureJson()
     {
         $config = $this->configDir . '/config.json';
         DB::configure($config);
@@ -35,6 +35,44 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 'password' => '',
             )
         );
+
+        $this->assertEquals($expected, Config::getDatabases());
+    }
+
+    public function testConfigureYaml()
+    {
+        $config = $this->configDir . '/config.yaml';
+        DB::configure($config);
+
+        $expected = array(
+            'mydb' => array(
+                'dsn' => 'sqlite:target/temp/test.db',
+                'username' => '',
+                'password' => '',
+            )
+        );
+
+        $this->assertEquals($expected, Config::getDatabases());
+    }
+
+    public function testConfigureArray()
+    {
+        DB::configure(array(
+            'databases' => array(
+                'mydb' => array(
+                    'dsn' => 'sqlite:target/temp/test.db'
+                )
+            )
+        ));
+
+        $expected = array(
+            'mydb' => array(
+                'dsn' => 'sqlite:target/temp/test.db',
+                'username' => '',
+                'password' => '',
+            )
+        );
+
         $this->assertEquals($expected, Config::getDatabases());
     }
 

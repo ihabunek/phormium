@@ -39,9 +39,7 @@ class JsonConfigLoader extends FileLoader
 
     public function supports($resource, $type = null)
     {
-        if (is_string($resource)) {
-            $ext = pathinfo($resource, PATHINFO_EXTENSION);
-            return $ext === 'json';
-        }
+        return is_string($resource) &&
+            pathinfo($resource, PATHINFO_EXTENSION) === 'json';
     }
 }
