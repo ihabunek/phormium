@@ -2,6 +2,8 @@
 
 namespace Phormium;
 
+use Symfony\Component\Yaml\Yaml;
+
 /**
  * Parent class for database-mapped classes.
  */
@@ -47,23 +49,6 @@ abstract class Model
         $meta = self::getMeta();
         $query = self::getQuery();
         return new QuerySet($query, $meta);
-    }
-
-    /**
-     * Creates a Model instance from data in the given array or object.
-     * @param array|stdClass $array The input array or stdClass object.
-     * @param boolean $strict If set to TRUE, will throw an exception if the
-     *      array contains a property which does not exist in the Model. Default
-     *      value is FALSE.
-     * @return Model
-     */
-    public static function fromArray($array, $strict = false)
-    {
-        $class = get_called_class();
-
-        $instance = new $class();
-        $instance->merge($array, $strict);
-        return $instance;
     }
 
     /**
@@ -136,10 +121,34 @@ abstract class Model
     }
 
     /**
-     * Creates a Model instance from data in the given array.
+     * Creates a Model instance from data in the given array or object.
+     *
+     * @param array|stdClass $array The input array or stdClass object.
+     * @param boolean $strict If set to TRUE, will throw an exception if the
+     *      array contains a property which does not exist in the Model. Default
+     *      value is FALSE which means these will be ignored.
      * @return Model
      */
-    public static function fromJSON($json)
+    public static function fromArray($array, $strict = false)
+    {
+        $class = get_called_class();
+
+        $instance = new $class();
+        $instance->merge($array, $strict);
+        return $instance;
+    }
+
+    /**
+     * Creates a Model instance from data in JSON.
+     *
+     * @param string $json The input data in JSON.
+     * @param boolean $strict If set to TRUE, will throw an exception if the
+     *      json contains a property which does not exist in the Model. Default
+     *      value is FALSE which means these will be ignored.
+     *
+     * @return Model
+     */
+    public static function fromJSON($json, $strict = false)
     {
         $array = json_decode($json);
 
@@ -152,8 +161,25 @@ abstract class Model
             $array = (array) $array;
         }
 
-        return self::fromArray($array);
+        return self::fromArray($array, $strict);
     }
+
+    /**
+     * Creates a Model instance from data in YAML.
+     *
+     * @param string $yaml The input data in YAML.
+     * @param boolean $strict If set to TRUE, will throw an exception if the
+     *      json contains a property which does not exist in the Model. Default
+     *      value is FALSE which means these will be ignored.
+     *
+     * @return Model
+     */
+    public static function fromYAML($yaml, $strict = false)
+    {
+        $array = Yaml::parse($yaml);
+        return self::fromArray($array, $strict);
+    }
+
 
     /** Inner method used by get(), search() and exists(). */
     private static function getQuerySetForPK($argv, $argc)
@@ -314,6 +340,16 @@ abstract class Model
     }
 
     /**
+     * Returns the model's Array representation.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return (array) $this;
+    }
+
+    /**
      * Returns the model's JSON representation.
      *
      * @return string
@@ -324,13 +360,13 @@ abstract class Model
     }
 
     /**
-     * Returns the model's Array representation.
+     * Returns the model's YAML representation.
      *
-     * @return array
+     * @return string
      */
-    public function toArray()
+    public function toYAML()
     {
-        return (array) $this;
+        return Yaml::dump(self::toArray($this));
     }
 
     /**

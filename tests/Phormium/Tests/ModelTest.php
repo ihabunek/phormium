@@ -144,6 +144,30 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function testFromYAML()
+    {
+        $yaml = implode("\n", array(
+            'id: 101',
+            'name: "Jack Jackson"',
+            'email: "jack@jackson.org"',
+            'birthday: "1980-03-14"',
+            'created: "2000-03-07 10:45:13"',
+            'income: 12345.67',
+        ));
+
+        $actual = Person::fromYAML($yaml);
+
+        $expected = new Person();
+        $expected->id = 101;
+        $expected->name = 'Jack Jackson';
+        $expected->email = 'jack@jackson.org';
+        $expected->birthday = '1980-03-14';
+        $expected->created = '2000-03-07 10:45:13';
+        $expected->income = 12345.67;
+
+        $this->assertEquals($expected, $actual);
+    }
+
     /**
      * @expectedException \Exception
      * @expectedExceptionMessage Invalid JSON string
@@ -465,7 +489,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testModelToJsonToArray()
+    public function testToArray()
     {
         $person = Person::fromArray(array(
             'name' => "Michael Kiske",
@@ -473,8 +497,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             'income' => 100000,
         ));
 
-        $json = '{"id":null,"name":"Michael Kiske","email":"miki@example.com","birthday":null,"created":null,"income":100000}';
-        $array = array(
+        $expected = array(
             'id' => null,
             'name' => 'Michael Kiske',
             'email' => 'miki@example.com',
@@ -483,8 +506,40 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             'income' => 100000
         );
 
-        $this->assertSame($json, $person->toJSON());
-        $this->assertSame($array, $person->toArray());
+        $this->assertSame($expected, $person->toArray());
+    }
+
+    public function testToJson()
+    {
+        $person = Person::fromArray(array(
+            'name' => "Michael Kiske",
+            'email' => "miki@example.com",
+            'income' => 100000,
+        ));
+
+        $expected = '{"id":null,"name":"Michael Kiske","email":"miki@example.com","birthday":null,"created":null,"income":100000}';
+
+        $this->assertSame($expected, $person->toJSON());
+    }
+
+    public function testToYaml()
+    {
+        $person = Person::fromArray(array(
+            'name' => "Michael Kiske",
+            'email' => "miki@example.com",
+            'income' => 100000,
+        ));
+
+        $expected = implode("\n", array(
+            'id: null',
+            "name: 'Michael Kiske'",
+            'email: miki@example.com',
+            'birthday: null',
+            'created: null',
+            'income: 100000',
+        )) . "\n";
+
+        $this->assertSame($expected, $person->toYAML());
     }
 
     /**
