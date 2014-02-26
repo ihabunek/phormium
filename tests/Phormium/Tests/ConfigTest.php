@@ -78,7 +78,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Failed parsing JSON configuration
+     * @expectedExceptionMessage Failed parsing JSON
      */
     public function testFailInvalidSyntax()
     {

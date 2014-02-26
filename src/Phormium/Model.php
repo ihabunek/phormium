@@ -2,6 +2,8 @@
 
 namespace Phormium;
 
+use Phormium\Helpers\Json;
+
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -150,12 +152,7 @@ abstract class Model
      */
     public static function fromJSON($json, $strict = false)
     {
-        $array = json_decode($json);
-
-        $error = json_last_error();
-        if ($error !== JSON_ERROR_NONE) {
-            throw new \Exception("Invalid JSON string. Error code [$error].");
-        }
+        $array = Json::parse($json);
 
         if (is_object($array)) {
             $array = (array) $array;
@@ -356,7 +353,7 @@ abstract class Model
      */
     public function toJSON()
     {
-        return json_encode($this);
+        return Json::dump($this);
     }
 
     /**

@@ -170,7 +170,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Invalid JSON string
+     * @expectedExceptionMessage Failed parsing JSON
      */
     public function testFromJSONError()
     {
