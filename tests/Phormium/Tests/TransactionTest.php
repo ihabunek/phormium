@@ -175,4 +175,32 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(200, Person::get($id)->income);
     }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Cannot roll back. Not in transaction.
+     */
+    public function testRollbackBeforeBegin()
+    {
+        DB::rollback();
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Cannot commit. Not in transaction.
+     */
+    public function testCommitBeforeBegin()
+    {
+        DB::commit();
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Already in transaction.
+     */
+    public function testDoubleBegin()
+    {
+        DB::begin();
+        DB::begin();
+    }
 }

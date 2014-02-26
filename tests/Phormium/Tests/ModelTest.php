@@ -441,6 +441,15 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage No columns given
+     */
+    public function testFetchDistinctFailureNoColumns()
+    {
+        Person::objects()->distinct();
+    }
+
     public function testFetchValues()
     {
         $name = uniqid();
