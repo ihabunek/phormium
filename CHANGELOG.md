@@ -10,8 +10,12 @@ Phormium Changelog
   using events and available as separate packages.
 
 * Added `Model::all()`
+* Added `Model->toYAML()`
+* Added `Model::fromYAML()`
 * Added raw filters
 * Added events
+
+* `Model::fromJSON()` now takes an optional `$strict` parameter
 
 0.5 / 2013-12-10
 ----------------
