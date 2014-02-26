@@ -60,7 +60,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Unknown config file extension "xxx"
+     * @expectedExceptionMessage Unsupported configuration format
      */
     public function testFailUnknownExtension()
     {
