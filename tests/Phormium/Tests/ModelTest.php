@@ -513,4 +513,33 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType('array', $actual);
         $this->assertCount(3, $actual);
     }
+
+    public function testDump()
+    {
+        $p = Person::fromArray(array(
+            'id' => 10,
+            'name' => "Tom Lehrer",
+            'email' => "tom@lehrer.net",
+            'birthday' => "1928-04-09",
+            'income' => 1000
+        ));
+
+        ob_start();
+        $p->dump();
+        $actual = ob_get_clean();
+
+        $expected = implode("\n", array(
+            'Phormium\Tests\Models\Person (testdb.person)',
+            '============================================',
+            'id: 10 (PK)',
+            'name: "Tom Lehrer"',
+            'email: "tom@lehrer.net"',
+            'birthday: "1928-04-09"',
+            'created: NULL',
+            'income: 1000',
+        ));
+        $expected .= "\n\n";
+
+        $this->assertSame($expected, $actual);
+    }
 }
