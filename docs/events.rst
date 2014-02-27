@@ -22,23 +22,23 @@ The following events are emitted when running a database query.
 +-------------------+---------------------------------------------+---------------------------------+
 | Event             | Callback arguments                          | Description                     |
 +===================+=============================================+=================================+
-| `query.started`   | $query, $arguments, $connection             | Before contacting the database. |
+| query.started     | $query, $arguments, $connection             | Before contacting the database. |
 +-------------------+---------------------------------------------+---------------------------------+
-| `query.preparing` | $query, $arguments, $connection             | Before preparing the query.     |
+| query.preparing   | $query, $arguments, $connection             | Before preparing the query.     |
 +-------------------+---------------------------------------------+---------------------------------+
-| `query.prepared`  | $query, $arguments, $connection             | After preparing the query.      |
+| query.prepared    | $query, $arguments, $connection             | After preparing the query.      |
 +-------------------+---------------------------------------------+---------------------------------+
-| `query.executing` | $query, $arguments, $connection             | Before executing the query.     |
+| query.executing   | $query, $arguments, $connection             | Before executing the query.     |
 +-------------------+---------------------------------------------+---------------------------------+
-| `query.executed`  | $query, $arguments, $connection             | After executing the query.      |
+| query.executed    | $query, $arguments, $connection             | After executing the query.      |
 +-------------------+---------------------------------------------+---------------------------------+
-| `query.fetching`  | $query, $arguments, $connection             | Before fetching resulting data. |
+| query.fetching    | $query, $arguments, $connection             | Before fetching resulting data. |
 +-------------------+---------------------------------------------+---------------------------------+
-| `query.fetched`   | $query, $arguments, $connection, $data      | After fetching resulting data.  |
+| query.fetched     | $query, $arguments, $connection, $data      | After fetching resulting data.  |
 +-------------------+---------------------------------------------+---------------------------------+
-| `query.completed` | $query, $arguments, $connection, $data      | On successful completion.       |
+| query.completed   | $query, $arguments, $connection, $data      | On successful completion.       |
 +-------------------+---------------------------------------------+---------------------------------+
-| `query.error`     | $query, $arguments, $connection, $exception | On error.                       |
+| query.error       | $query, $arguments, $connection, $exception | On error.                       |
 +-------------------+---------------------------------------------+---------------------------------+
 
 Note that not all events are triggered for each query. Only prepared queries
@@ -50,15 +50,15 @@ Event callback functions use the following arguments:
 +---------------+----------------------+--------------------------------------+
 | Name          | Type                 | Description                          |
 +===============+======================+======================================+
-| `$query`      | string               | Query SQL code                       |
+| $query        | string               | Query SQL code                       |
 +---------------+----------------------+--------------------------------------+
-| `$arguments`  | array                | Query arguments                      |
+| $arguments    | array                | Query arguments                      |
 +---------------+----------------------+--------------------------------------+
-| `$connection` | Phormium\\Connection | Connection on which the query is run |
+| $connection   | Phormium\\Connection | Connection on which the query is run |
 +---------------+----------------------+--------------------------------------+
-| `$data`       | array                | The data fetched from the database.  |
+| $data         | array                | The data fetched from the database.  |
 +---------------+----------------------+--------------------------------------+
-| `$exception`  | Exception            | Exception thrown on query failure    |
+| $exception    | Exception            | Exception thrown on query failure    |
 +---------------+----------------------+--------------------------------------+
 
 Transaction events
@@ -86,7 +86,8 @@ Examples
 Logging
 ~~~~~~~
 
-A simple logging example using Apache log4php.
+A simple logging example using
+`Apache log4php <https://logging.apache.org/log4php/>`_.
 
 .. code-block:: php
 
@@ -117,7 +118,7 @@ Timing query execution for locating slow queries.
     {
         private $active;
 
-        private $stats;
+        private $stats = array();
 
         /** Hooks onto relevant events. */
         public function register()
