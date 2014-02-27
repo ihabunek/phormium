@@ -142,9 +142,11 @@ There are two reasons:
 * I work a lot on Informix on my day job and no other ORM I found supports it.
 * Writing an ORM is a great experience. You should try it.
 
-Phormium is greatly inspired by other ORMs, in particular
-[Django ORM](https://docs.djangoproject.com/en/dev/topics/db/) and
-Laravel's [Eloquent ORM](http://laravel.com/docs/database/eloquent).
+Phormium is greatly inspired by other ORMs, in particular:
+
+* [Django ORM](https://docs.djangoproject.com/en/dev/topics/db/)
+* Laravel's [Eloquent ORM](http://laravel.com/docs/database/eloquent)
+* [Paris](http://j4mie.github.io/idiormandparis/)
 
 Let me know what you think!
 
