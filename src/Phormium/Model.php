@@ -2,7 +2,7 @@
 
 namespace Phormium;
 
-use Phormium\Helpers\Json;
+use Phormium\Helper\Json;
 
 use Symfony\Component\Yaml\Yaml;
 

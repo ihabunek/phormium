@@ -1,6 +1,6 @@
 <?php
 
-namespace Phormium\Helpers;
+namespace Phormium\Helper;
 
 /**
  * Encodes and decodes JSON.

@@ -2,7 +2,7 @@
 
 namespace Phormium\Config;
 
-use Phormium\Helpers\Json;
+use Phormium\Helper\Json;
 
 /**
  * Loads and decodes JSON configuration files.
