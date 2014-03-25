@@ -51,19 +51,21 @@ class ColumnFilter extends Filter
         switch($this->operation)
         {
             case self::OP_EQUALS:
+                // Replace "= null" with "IS NULL"
                 if (is_null($this->value)) {
                     return $this->renderIsNull($this->column);
-                } else {
-                    return $this->renderSimple($this->column, $this->operation, $this->value);
                 }
+
+                return $this->renderSimple($this->column, $this->operation, $this->value);
 
             case self::OP_NOT_EQUALS:
             case self::OP_NOT_EQUALS_ALT:
+                // Replace "<> null" with "IS NOT NULL"
                 if (is_null($this->value)) {
                     return $this->renderNotNull($this->column);
-                } else {
-                    return $this->renderSimple($this->column, $this->operation, $this->value);
                 }
+
+                return $this->renderSimple($this->column, $this->operation, $this->value);
 
             case self::OP_LIKE:
             case self::OP_NOT_LIKE:

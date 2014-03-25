@@ -28,7 +28,8 @@ class Event
 
     private static $listeners = array();
 
-    public static function on($event, $listener) {
+    public static function on($event, $listener)
+    {
         if (!isset(self::$listeners[$event])) {
             self::$listeners[$event] = array();
         }
@@ -48,7 +49,7 @@ class Event
     public static function emit($event, array $arguments = array())
     {
         if (isset(self::$listeners[$event])) {
-            foreach(self::$listeners[$event] as $listener) {
+            foreach (self::$listeners[$event] as $listener) {
                 call_user_func_array($listener, $arguments);
             }
         }

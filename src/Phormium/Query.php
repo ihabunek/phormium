@@ -125,7 +125,10 @@ class Query
 
         if (!in_array($column, $this->meta->columns)) {
             if (!($aggregate->type === Aggregate::COUNT && $column === '*')) {
-                throw new \Exception("Error forming aggregate query. Column [$column] does not exist in table [$table].");
+                throw new \Exception(
+                    "Error forming aggregate query. " .
+                    "Column [$column] does not exist in table [$table]."
+                );
             }
         }
 

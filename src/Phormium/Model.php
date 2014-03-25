@@ -377,7 +377,7 @@ abstract class Model
         echo "$name\n";
         echo str_repeat("=", strlen($name)) . "\n";
 
-        foreach($meta->columns as $column) {
+        foreach ($meta->columns as $column) {
             $value = $this->$column;
             if ($value === null) {
                 $value = 'NULL';
