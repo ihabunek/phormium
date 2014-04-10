@@ -2,15 +2,15 @@
 
 namespace Phormium\Tests;
 
-use \Phormium\Filter;
-use \Phormium\DB;
-use \Phormium\ColumnFilter;
-use \Phormium\CompositeFilter;
-use \Phormium\Meta;
-use \Phormium\Aggregate;
-use \Phormium\QuerySet;
+use Phormium\Aggregate;
+use Phormium\DB;
+use Phormium\Filter\ColumnFilter;
+use Phormium\Filter\CompositeFilter;
+use Phormium\Filter\Filter;
+use Phormium\Meta;
+use Phormium\QuerySet;
 
-use \Phormium\Tests\Models\Person;
+use Phormium\Tests\Models\Person;
 
 /**
  * @group queryset
@@ -44,7 +44,7 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEquals($qs1, $qs2);
         $this->assertNotSame($qs1, $qs2);
 
-        $this->assertInstanceOf("\\Phormium\\CompositeFilter", $qs2->getFilter());
+        $this->assertInstanceOf("\\Phormium\\Filter\\CompositeFilter", $qs2->getFilter());
         $this->assertCount(1, $qs2->getFilter()->getFilters());
 
         $this->assertEmpty($qs1->getOrder());

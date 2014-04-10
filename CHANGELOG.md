@@ -1,6 +1,22 @@
 Phormium Changelog
 ==================
 
+0.6 / 2014-04-10
+----------------
+
+* **BC BREAK**: Moved filter classes to `Phormium\Filter` namespace<br />
+  Please update your references (e.g. `use Phormium\ColumnFilter` to
+  `use Phormium\Filter\ColumnFilter`).
+* **BC BREAK**: Removed logging and stats classes<br />
+  These will be reimplemented using events and available as separate packages.
+* Added `Model::all()`
+* Added `Model->toYAML()`
+* Added `Model::fromYAML()`
+* Added raw filters
+* Added events
+
+* Modified `Model::fromJSON()` to take an optional `$strict` parameter
+
 0.5 / 2013-12-10
 ----------------
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Phormium;
+namespace Phormium\Filter;
 
 /**
  * A filter which consists of several Filter objects which are joined by an
@@ -68,5 +68,10 @@ class CompositeFilter extends Filter
     public function getFilters()
     {
         return $this->filters;
+    }
+
+    public function getOperation()
+    {
+        return $this->operation;
     }
 }

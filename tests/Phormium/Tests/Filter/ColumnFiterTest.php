@@ -2,22 +2,22 @@
 
 namespace Phormium\Tests;
 
-use \Phormium\Tests\Models\Person;
+use Phormium\Tests\Models\Person;
 
-use \Phormium\DB;
-use \Phormium\ColumnFilter;
-use \Phormium\Filter;
-use \Phormium\CompositeFilter;
-use \Phormium\Parser;
+use Phormium\Filter\ColumnFilter;
+use Phormium\Filter\Filter;
 
 /**
  * @group filter
  */
-class FilterTest extends \PHPUnit_Framework_TestCase
+class ColumnFilterTest extends \PHPUnit_Framework_TestCase
 {
-    public static function setUpBeforeClass()
+    function testFactory()
     {
-        DB::configure(PHORMIUM_CONFIG_FILE);
+        $filter = Filter::col('test', '=', 1);
+        $actual = $filter->render();
+        $expected = array("test = ?", array(1));
+        $this->assertSame($expected, $actual);
     }
 
     public function testEq()
@@ -26,6 +26,24 @@ class FilterTest extends \PHPUnit_Framework_TestCase
         $actual = $filter->render();
         $expected = array("test = ?", array(1));
         $this->assertSame($expected, $actual);
+    }
+
+    public function testEqNull()
+    {
+        $filter = new ColumnFilter('test', '=', null);
+        $actual = $filter->render();
+        $expected = array("test IS NULL", array());
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter = requires a scalar value, array given.
+     */
+    public function testEqWrongParam()
+    {
+        $filter = new ColumnFilter('test', '=', array());
+        $filter->render();
     }
 
     public function testNeq1()
@@ -42,6 +60,32 @@ class FilterTest extends \PHPUnit_Framework_TestCase
         $actual = $filter->render();
         $expected = array("test <> ?", array(1));
         $this->assertSame($expected, $actual);
+    }
+
+    public function testNeqNull1()
+    {
+        $filter = new ColumnFilter('test', '<>', null);
+        $actual = $filter->render();
+        $expected = array("test IS NOT NULL", array());
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testNeqNull2()
+    {
+        $filter = new ColumnFilter('test', '!=', null);
+        $actual = $filter->render();
+        $expected = array("test IS NOT NULL", array());
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter != requires a scalar value, array given.
+     */
+    public function testNeqWrongParam()
+    {
+        $filter = new ColumnFilter('test', '!=', array());
+        $filter->render();
     }
 
     public function testGt()
@@ -85,12 +129,41 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage IN filter requires an array with one or more values
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter IN requires an array, integer given.
      */
-    public function testInWrongParam()
+    public function testInWrongParam1()
     {
         $filter = new ColumnFilter('test', 'in', 1);
+        $filter->render();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter IN requires an array, string given.
+     */
+    public function testInWrongParam2()
+    {
+        $filter = new ColumnFilter('test', 'in', "1");
+        $filter->render();
+    }
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter IN requires an array, NULL given.
+     */
+    public function testInWrongParam3()
+    {
+        $filter = new ColumnFilter('test', 'in', null);
+        $filter->render();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter IN requires a non-empty array, empty array given.
+     */
+    public function testInWrongParam4()
+    {
+        $filter = new ColumnFilter('test', 'in', array());
         $filter->render();
     }
 
@@ -103,12 +176,41 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage NOT IN filter requires an array with one or more values
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter NOT IN requires an array, integer given.
      */
-    public function testNotInWrongParam()
+    public function testNotInWrongParam1()
     {
         $filter = new ColumnFilter('test', 'not in', 1);
+        $filter->render();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter NOT IN requires an array, string given.
+     */
+    public function testNotInWrongParam2()
+    {
+        $filter = new ColumnFilter('test', 'not in', "1");
+        $filter->render();
+    }
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter NOT IN requires an array, NULL given.
+     */
+    public function testNotInWrongParam3()
+    {
+        $filter = new ColumnFilter('test', 'not in', null);
+        $filter->render();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter NOT IN requires a non-empty array, empty array given.
+     */
+    public function testNotInWrongParam4()
+    {
+        $filter = new ColumnFilter('test', 'not in', array());
         $filter->render();
     }
 
@@ -128,11 +230,27 @@ class FilterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $actual);
     }
 
+    public function testNotNull2()
+    {
+        $filter = new ColumnFilter('test', 'is not null');
+        $actual = $filter->render();
+        $expected = array("test IS NOT NULL", array());
+        $this->assertSame($expected, $actual);
+    }
+
     public function testLike()
     {
         $filter = new ColumnFilter('test', 'like', '%foo%');
         $actual = $filter->render();
         $expected = array("test LIKE ?", array('%foo%'));
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testILike()
+    {
+        $filter = new ColumnFilter('test', 'ilike', '%foo%');
+        $actual = $filter->render();
+        $expected = array("lower(test) LIKE lower(?)", array('%foo%'));
         $this->assertSame($expected, $actual);
     }
 
@@ -153,8 +271,8 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage BETWEEN filter requires an array of two values.
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter BETWEEN requires an array, string given.
      */
     public function testBetweenWrongParam1()
     {
@@ -163,10 +281,20 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage BETWEEN filter requires an array of two values.
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter BETWEEN requires an array, NULL given.
      */
     public function testBetweenWrongParam2()
+    {
+        $filter = new ColumnFilter('test', 'between', null);
+        $filter->render();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Filter BETWEEN requires an array with 2 values, given array has 1 values.
+     */
+    public function testBetweenWrongParam3()
     {
         $filter = new ColumnFilter('test', 'between', array(1));
         $filter->render();
@@ -182,34 +310,18 @@ class FilterTest extends \PHPUnit_Framework_TestCase
         $filter->render();
     }
 
-    public function testCaseInsensitiveLike()
-    {
-        $qs = Person::objects()->filter('name', 'ilike', 'pero');
-
-        $qs->delete();
-        $this->assertFalse($qs->exists());
-
-        Person::fromArray(array('name' => "PERO"))->insert();
-        Person::fromArray(array('name' => "pero"))->insert();
-        Person::fromArray(array('name' => "Pero"))->insert();
-        Person::fromArray(array('name' => "pERO"))->insert();
-
-        $this->assertSame(4, $qs->count());
-        $this->assertCount(4, $qs->fetch());
-    }
-
     public function testFilterFromArray()
     {
         $actual = ColumnFilter::fromArray(array('id', '=', 123));
 
-        $this->assertInstanceOf('\\Phormium\\ColumnFilter', $actual);
+        $this->assertInstanceOf('\\Phormium\\Filter\\ColumnFilter', $actual);
         $this->assertSame('id', $actual->column);
         $this->assertSame('=', $actual->operation);
         $this->assertSame(123, $actual->value);
 
         $actual = ColumnFilter::fromArray(array('email', 'null'));
 
-        $this->assertInstanceOf('\\Phormium\\ColumnFilter', $actual);
+        $this->assertInstanceOf('\\Phormium\\Filter\\ColumnFilter', $actual);
         $this->assertSame('email', $actual->column);
         $this->assertSame('NULL', $actual->operation);
         $this->assertNull($actual->value);
@@ -239,77 +351,5 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     public function testFilterFromArrayExceptionWrongType()
     {
         $actual = ColumnFilter::fromArray(1);
-    }
-
-    public function testFactoryAndOr()
-    {
-        $actual = Filter::_and();
-        $expected = new CompositeFilter(CompositeFilter::OP_AND);
-        $this->assertEquals($expected, $actual);
-
-        $actual = Filter::_or();
-        $expected = new CompositeFilter(CompositeFilter::OP_OR);
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testCompositeFilter1()
-    {
-        $filter = new CompositeFilter(
-            CompositeFilter::OP_OR,
-            array(
-                ColumnFilter::fromArray(array('id', '=', 1)),
-                ColumnFilter::fromArray(array('id', '=', 2)),
-                ColumnFilter::fromArray(array('id', '=', 3)),
-            )
-        );
-
-        $actual = $filter->render();
-        $expected = array("(id = ? OR id = ? OR id = ?)", array(1, 2, 3));
-        $this->assertSame($expected, $actual);
-    }
-
-    public function testCompositeFilter2()
-    {
-        $filter = new CompositeFilter(
-            CompositeFilter::OP_OR,
-            array(
-                array('id', '=', 1),
-                array('id', '=', 2),
-                array('id', '=', 3),
-            )
-        );
-
-        $actual = $filter->render();
-        $expected = array("(id = ? OR id = ? OR id = ?)", array(1, 2, 3));
-        $this->assertSame($expected, $actual);
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Invalid composite filter operation [foo]. Expected one of: AND, OR
-     */
-    public function testCompositeFilterInvalidOperation()
-    {
-        $filter = new CompositeFilter('foo');
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Argument 1 passed to Phormium\CompositeFilter::add() must be an instance of Phormium\Filter, integer given
-     */
-    public function testCompositeFilterAddInvalid()
-    {
-        $filter = new CompositeFilter("AND");
-        $filter->add(1);
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Canot render composite filter. No filters defined.
-     */
-    public function testCompositeFilterRenderEmpty()
-    {
-        $filter = new CompositeFilter("AND");
-        $filter->render();
     }
 }

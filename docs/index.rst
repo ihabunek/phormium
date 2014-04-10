@@ -22,6 +22,7 @@ Contents
    configure
    usage
    transactions
+   events
 
 License
 -------

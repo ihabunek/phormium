@@ -2,8 +2,8 @@
 
 namespace Phormium\Tests;
 
-use \Phormium\DB;
-use \Phormium\Tests\Models\Person;
+use Phormium\DB;
+use Phormium\Tests\Models\Person;
 
 /**
  * @group transaction
@@ -38,7 +38,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     public function testManualBeginRollback()
     {
         $person = new Person();
-        $person->name = 'Bruce Dickinson';
+        $person->name = 'Steve Harris';
         $person->income = 12345;
         $person->save();
 
@@ -58,7 +58,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     public function testCallbackTransactionCommit()
     {
         $person = new Person();
-        $person->name = 'Bruce Dickinson';
+        $person->name = 'Dave Murray';
         $person->income = 12345;
         $person->save();
 
@@ -76,7 +76,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     public function testCallbackTransactionRollback()
     {
         $person = new Person();
-        $person->name = 'Bruce Dickinson';
+        $person->name = 'Adrian Smith';
         $person->income = 12345;
         $person->save();
 
@@ -113,7 +113,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     public function testDisconnectRollsBackTransaction()
     {
         $person = new Person();
-        $person->name = 'Bruce Dickinson';
+        $person->name = 'Nicko McBrain';
         $person->income = 12345;
         $person->save();
 
@@ -128,5 +128,79 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         DB::disconnectAll();
 
         $this->assertEquals(12345, Person::get($id)->income);
+    }
+
+    public function testExecuteTransaction()
+    {
+        $person = new Person();
+        $person->name = 'Janick Gers';
+        $person->income = 100;
+        $person->insert();
+
+        $id = $person->id;
+        $conn = DB::getConnection('testdb');
+
+        DB::begin();
+        $conn->execute("UPDATE person SET income = income + 1");
+        DB::rollback();
+
+        $this->assertEquals(100, Person::get($id)->income);
+
+        DB::begin();
+        $conn->execute("UPDATE person SET income = income + 1");
+        DB::commit();
+
+        $this->assertEquals(101, Person::get($id)->income);
+    }
+
+    public function testPreparedExecuteTransaction()
+    {
+        $person = new Person();
+        $person->name = 'Janick Gers';
+        $person->income = 100;
+        $person->insert();
+
+        $id = $person->id;
+        $conn = DB::getConnection('testdb');
+
+        DB::begin();
+        $conn->preparedExecute("UPDATE person SET income = ?", array(200));
+        DB::rollback();
+
+        $this->assertEquals(100, Person::get($id)->income);
+
+        DB::begin();
+        $conn->preparedExecute("UPDATE person SET income = ?", array(200));
+        DB::commit();
+
+        $this->assertEquals(200, Person::get($id)->income);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Cannot roll back. Not in transaction.
+     */
+    public function testRollbackBeforeBegin()
+    {
+        DB::rollback();
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Cannot commit. Not in transaction.
+     */
+    public function testCommitBeforeBegin()
+    {
+        DB::commit();
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Already in transaction.
+     */
+    public function testDoubleBegin()
+    {
+        DB::begin();
+        DB::begin();
     }
 }

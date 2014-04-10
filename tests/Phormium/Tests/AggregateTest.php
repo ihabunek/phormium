@@ -2,11 +2,11 @@
 
 namespace Phormium\Tests;
 
-use \Phormium\DB;
-use \Phormium\Aggregate;
+use Phormium\DB;
+use Phormium\Aggregate;
 
-use \Phormium\Tests\Models\Person;
-use \Phormium\Tests\Models\Trade;
+use Phormium\Tests\Models\Person;
+use Phormium\Tests\Models\Trade;
 
 /**
  * @group aggregate

@@ -2,6 +2,10 @@
 
 namespace Phormium;
 
+use Phormium\Helper\Json;
+
+use Symfony\Component\Yaml\Yaml;
+
 /**
  * Parent class for database-mapped classes.
  */
@@ -50,22 +54,14 @@ abstract class Model
     }
 
     /**
-     * Creates a Model instance from data in the given array or object.
-     * @param array|stdClass $array The input array or stdClass object.
-     * @param boolean $strict If set to TRUE, will throw an exception if the
-     *      array contains a property which does not exist in the Model. Default
-     *      value is FALSE.
-     * @return Model
+     * Fetches all records from the table.
+     *
+     * @return array An array of models.
      */
-    public static function fromArray($array, $strict = false)
+    public static function all()
     {
-        $class = get_called_class();
-
-        $instance = new $class();
-        $instance->merge($array, $strict);
-        return $instance;
+        return self::objects()->fetch();
     }
-
 
     /**
      * Fetches a single record by primary key, throws an exception if the model
@@ -127,24 +123,60 @@ abstract class Model
     }
 
     /**
-     * Creates a Model instance from data in the given array.
+     * Creates a Model instance from data in the given array or object.
+     *
+     * @param array|stdClass $array The input array or stdClass object.
+     * @param boolean $strict If set to TRUE, will throw an exception if the
+     *      array contains a property which does not exist in the Model. Default
+     *      value is FALSE which means these will be ignored.
      * @return Model
      */
-    public static function fromJSON($json)
+    public static function fromArray($array, $strict = false)
     {
-        $array = json_decode($json);
+        $class = get_called_class();
 
-        $error = json_last_error();
-        if ($error !== JSON_ERROR_NONE) {
-            throw new \Exception("Invalid JSON string. Error code [$error].");
-        }
+        $instance = new $class();
+        $instance->merge($array, $strict);
+        return $instance;
+    }
+
+    /**
+     * Creates a Model instance from data in JSON.
+     *
+     * @param string $json The input data in JSON.
+     * @param boolean $strict If set to TRUE, will throw an exception if the
+     *      json contains a property which does not exist in the Model. Default
+     *      value is FALSE which means these will be ignored.
+     *
+     * @return Model
+     */
+    public static function fromJSON($json, $strict = false)
+    {
+        $array = Json::parse($json);
 
         if (is_object($array)) {
             $array = (array) $array;
         }
 
-        return self::fromArray($array);
+        return self::fromArray($array, $strict);
     }
+
+    /**
+     * Creates a Model instance from data in YAML.
+     *
+     * @param string $yaml The input data in YAML.
+     * @param boolean $strict If set to TRUE, will throw an exception if the
+     *      json contains a property which does not exist in the Model. Default
+     *      value is FALSE which means these will be ignored.
+     *
+     * @return Model
+     */
+    public static function fromYAML($yaml, $strict = false)
+    {
+        $array = Yaml::parse($yaml);
+        return self::fromArray($array, $strict);
+    }
+
 
     /** Inner method used by get(), search() and exists(). */
     private static function getQuerySetForPK($argv, $argc)
@@ -173,6 +205,11 @@ abstract class Model
         $qs = self::objects();
         foreach ($meta->pk as $name) {
             $value = array_shift($argv);
+
+            if (!is_scalar($value)) {
+                throw new \Exception("Nonscalar value given for primary key value.");
+            }
+
             $qs = $qs->filter($name, '=', $value);
         }
 
@@ -300,16 +337,6 @@ abstract class Model
     }
 
     /**
-     * Returns the model's JSON representation.
-     *
-     * @return string
-     */
-    public function toJSON()
-    {
-        return json_encode($this);
-    }
-
-    /**
      * Returns the model's Array representation.
      *
      * @return array
@@ -317,6 +344,26 @@ abstract class Model
     public function toArray()
     {
         return (array) $this;
+    }
+
+    /**
+     * Returns the model's JSON representation.
+     *
+     * @return string
+     */
+    public function toJSON()
+    {
+        return Json::dump($this);
+    }
+
+    /**
+     * Returns the model's YAML representation.
+     *
+     * @return string
+     */
+    public function toYAML()
+    {
+        return Yaml::dump(self::toArray($this));
     }
 
     /**
@@ -330,7 +377,7 @@ abstract class Model
         echo "$name\n";
         echo str_repeat("=", strlen($name)) . "\n";
 
-        foreach($meta->columns as $column) {
+        foreach ($meta->columns as $column) {
             $value = $this->$column;
             if ($value === null) {
                 $value = 'NULL';

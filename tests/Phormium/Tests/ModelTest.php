@@ -2,12 +2,12 @@
 
 namespace Phormium\Tests;
 
-use \Phormium\DB;
-use \Phormium\Meta;
-use \Phormium\QuerySet;
-use \Phormium\Tests\Models\Person;
-use \Phormium\Tests\Models\Trade;
-use \Phormium\Tests\Models\PkLess;
+use Phormium\DB;
+use Phormium\Meta;
+use Phormium\QuerySet;
+use Phormium\Tests\Models\Person;
+use Phormium\Tests\Models\Trade;
+use Phormium\Tests\Models\PkLess;
 
 /**
  * @group model
@@ -33,10 +33,12 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
         // Load it from the database
         $p2 = Person::get($id);
+        $this->assertInstanceOf("Phormium\\Tests\\Models\\Person", $p2);
         $this->assertEquals($p, $p2);
 
         // Alternative get
         $p3 = Person::get(array($id));
+        $this->assertInstanceOf("Phormium\\Tests\\Models\\Person", $p3);
         $this->assertEquals($p, $p3);
     }
 
@@ -66,10 +68,12 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
         // Load it from the database
         $t2 = Trade::get($date, $no);
+        $this->assertInstanceOf("Phormium\\Tests\\Models\\Trade", $t2);
         $this->assertEquals($t, $t2);
 
         // Alternative get
         $t3 = Trade::get(array($date, $no));
+        $this->assertInstanceOf("Phormium\\Tests\\Models\\Trade", $t3);
         $this->assertEquals($t, $t3);
     }
 
@@ -140,9 +144,33 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function testFromYAML()
+    {
+        $yaml = implode("\n", array(
+            'id: 101',
+            'name: "Jack Jackson"',
+            'email: "jack@jackson.org"',
+            'birthday: "1980-03-14"',
+            'created: "2000-03-07 10:45:13"',
+            'income: 12345.67',
+        ));
+
+        $actual = Person::fromYAML($yaml);
+
+        $expected = new Person();
+        $expected->id = 101;
+        $expected->name = 'Jack Jackson';
+        $expected->email = 'jack@jackson.org';
+        $expected->birthday = '1980-03-14';
+        $expected->created = '2000-03-07 10:45:13';
+        $expected->income = 12345.67;
+
+        $this->assertEquals($expected, $actual);
+    }
+
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Invalid JSON string
+     * @expectedExceptionMessage Failed parsing JSON
      */
     public function testFromJSONError()
     {
@@ -323,6 +351,15 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Exception
+     * @expectedExceptionMessage Nonscalar value given for primary key value.
+     */
+    public function testGetErrorPKNotScalar()
+    {
+        Person::get(array(array()));
+    }
+
+    /**
+     * @expectedException \Exception
      * @expectedExceptionMessage [Phormium\Tests\Models\Person] record with primary key [12345678] does not exist.
      */
     public function testGetErrorModelDoesNotExist()
@@ -404,6 +441,15 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage No columns given
+     */
+    public function testFetchDistinctFailureNoColumns()
+    {
+        Person::objects()->distinct();
+    }
+
     public function testFetchValues()
     {
         $name = uniqid();
@@ -452,7 +498,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testModelToJsonToArray()
+    public function testToArray()
     {
         $person = Person::fromArray(array(
             'name' => "Michael Kiske",
@@ -460,8 +506,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             'income' => 100000,
         ));
 
-        $json = '{"id":null,"name":"Michael Kiske","email":"miki@example.com","birthday":null,"created":null,"income":100000}';
-        $array = array(
+        $expected = array(
             'id' => null,
             'name' => 'Michael Kiske',
             'email' => 'miki@example.com',
@@ -470,8 +515,40 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             'income' => 100000
         );
 
-        $this->assertSame($json, $person->toJSON());
-        $this->assertSame($array, $person->toArray());
+        $this->assertSame($expected, $person->toArray());
+    }
+
+    public function testToJson()
+    {
+        $person = Person::fromArray(array(
+            'name' => "Michael Kiske",
+            'email' => "miki@example.com",
+            'income' => 100000,
+        ));
+
+        $expected = '{"id":null,"name":"Michael Kiske","email":"miki@example.com","birthday":null,"created":null,"income":100000}';
+
+        $this->assertSame($expected, $person->toJSON());
+    }
+
+    public function testToYaml()
+    {
+        $person = Person::fromArray(array(
+            'name' => "Michael Kiske",
+            'email' => "miki@example.com",
+            'income' => 100000,
+        ));
+
+        $expected = implode("\n", array(
+            'id: null',
+            "name: 'Michael Kiske'",
+            'email: miki@example.com',
+            'birthday: null',
+            'created: null',
+            'income: 100000',
+        )) . "\n";
+
+        $this->assertSame($expected, $person->toYAML());
     }
 
     /**
@@ -482,5 +559,51 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     {
         $pkl = new PkLess();
         $pkl->save();
+    }
+
+    public function testAll()
+    {
+        Person::objects()->delete();
+
+        $actual = Person::all();
+        $this->assertInternalType('array', $actual);
+        $this->assertEmpty($actual);
+
+        Person::fromArray(array('name' => "Freddy Mercury"))->insert();
+        Person::fromArray(array('name' => "Brian May"))->insert();
+        Person::fromArray(array('name' => "Roger Taylor"))->insert();
+
+        $actual = Person::all();
+        $this->assertInternalType('array', $actual);
+        $this->assertCount(3, $actual);
+    }
+
+    public function testDump()
+    {
+        $p = Person::fromArray(array(
+            'id' => 10,
+            'name' => "Tom Lehrer",
+            'email' => "tom@lehrer.net",
+            'birthday' => "1928-04-09",
+            'income' => 1000
+        ));
+
+        ob_start();
+        $p->dump();
+        $actual = ob_get_clean();
+
+        $expected = implode("\n", array(
+            'Phormium\Tests\Models\Person (testdb.person)',
+            '============================================',
+            'id: 10 (PK)',
+            'name: "Tom Lehrer"',
+            'email: "tom@lehrer.net"',
+            'birthday: "1928-04-09"',
+            'created: NULL',
+            'income: 1000',
+        ));
+        $expected .= "\n\n";
+
+        $this->assertSame($expected, $actual);
     }
 }

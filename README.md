@@ -9,7 +9,7 @@ with a PDO driver or may require some work.
 Warning: This is a work in progress. Test before using! Report any bugs
 [here](https://github.com/ihabunek/phormium/issues).
 
-[![Build Status](https://travis-ci.org/ihabunek/phormium.png)](https://travis-ci.org/ihabunek/phormium)
+[![Latest Stable Version](https://poser.pugx.org/phormium/phormium/v/stable.png)](https://packagist.org/packages/phormium/phormium) [![Total Downloads](https://poser.pugx.org/phormium/phormium/downloads.png)](https://packagist.org/packages/phormium/phormium) [![Build Status](https://travis-ci.org/ihabunek/phormium.png)](https://travis-ci.org/ihabunek/phormium)
 
 Features
 --------
@@ -20,12 +20,8 @@ Features
 * ordering
 * limiting
 * transactions
-* query logging (requires [Apache log4php](http://logging.apache.org/log4php/))
 * custom queries
-
-Not yet implemented:
-
-* relationships between models (joins)
+* events
 
 Documentation
 -------------
@@ -142,9 +138,11 @@ There are two reasons:
 * I work a lot on Informix on my day job and no other ORM I found supports it.
 * Writing an ORM is a great experience. You should try it.
 
-Phormium is greatly inspired by other ORMs, in particular
-[Django ORM](https://docs.djangoproject.com/en/dev/topics/db/) and
-Laravel's [Eloquent ORM](http://laravel.com/docs/database/eloquent).
+Phormium is greatly inspired by other ORMs, in particular:
+
+* [Django ORM](https://docs.djangoproject.com/en/dev/topics/db/)
+* Laravel's [Eloquent ORM](http://laravel.com/docs/database/eloquent)
+* [Paris](http://j4mie.github.io/idiormandparis/)
 
 Let me know what you think!
 

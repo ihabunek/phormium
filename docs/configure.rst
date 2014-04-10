@@ -2,8 +2,21 @@
 Configuration
 =============
 
-Phormium uses a JSON configuration file to configure databases to which to
-connect and other options.
+Phormium uses a configuration file to configure databases to which to connect.
+JSON and YAML notations are natively supported.
+
+The configuration comprises of the following options:
+
+`databases`
+    One or more databases to which you wish to connect. Indexed by a database
+    name (here `mydb1` and `mydb2`) which will be used later in the model to
+    determine in which database the table is located. Each database should
+    contain the DSN (see PDO_ for details). Username and password are optional.
+
+.. _PDO: http://www.php.net/manual/en/pdo.construct.php
+
+
+JSON example:
 
 .. code-block:: javascript
 
@@ -17,42 +30,20 @@ connect and other options.
             "mydb2": {
                 "dsn": "sqlite:/path/to/db2.sqlite"
             }
-        },
-        "logging": true,
-        "stats": {
-                "enabled": true,
-                "limit": 100
-            }
         }
     }
 
-The configuration comprises of the following options:
+YAML example:
 
-`databases` (object)
-    One or more databases to which you wish to connect. Indexed by a database
-    name (here `mydb1` and `mydb2`) which will be used later in the model to
-    determine in which database the table is located. Each database should
-    contain the DSN (see PDO_ for details). Username and password are optional.
+.. code-block:: yaml
 
-`logging` (boolean)
-    Enables logging. Optional, default is `false`.
-
-    If enabled, Phormium will write out SQL queries which it prepares and
-    executes. This requires `Apache log4php
-    <http://logging.apache.org/log4php/>`_.
-
-.. _PDO: http://www.php.net/manual/en/pdo.construct.php
-
-`stats` (object)
-    Phormium can be configured to collect query statistics, this will time each
-    prepare, execute and fetch operations for each query. They can be later
-    accessed using `Phormium\Stats::get()`.
-
-`stats.enabled` (boolean)
-    If set to true, Phormium will gather statistics (default is `false`).
-
-`stats.limit` (integer)
-    Maximum count of queries stats to keep (default is 100).
+    databases:
+        mydb1:
+            dsn: mysql:host=localhost;dbname=db1
+            username: myuser
+            password: mypass
+        mydb2:
+            dsn: sqlite:/path/to/db2.sqlite
 
 To configure Phormium, pass the path to the configuration file to the configure
 method.
@@ -60,6 +51,7 @@ method.
 .. code-block:: php
 
     Phormium\DB::configure('/path/to/config.json');
+    Phormium\DB::configure('/path/to/config.yaml');
 
 Alternatively, you can configure Phormium using an array instead of a
 configuration file:
@@ -76,8 +68,7 @@ configuration file:
             "db2" => [
                 "dsn" => "sqlite:/path/to/db2.sqlite"
             ]
-        ],
-        "logging" => true
+        ]
     ]);
 
 .. note:: Short array syntax `[ ... ]` requires PHP 5.4+.

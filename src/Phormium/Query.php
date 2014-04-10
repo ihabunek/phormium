@@ -2,7 +2,9 @@
 
 namespace Phormium;
 
-use \PDO;
+use Phormium\Filter\Filter;
+
+use PDO;
 
 /**
  * Generates and executes SQL queries.
@@ -123,7 +125,10 @@ class Query
 
         if (!in_array($column, $this->meta->columns)) {
             if (!($aggregate->type === Aggregate::COUNT && $column === '*')) {
-                throw new \Exception("Error forming aggregate query. Column [$column] does not exist in table [$table].");
+                throw new \Exception(
+                    "Error forming aggregate query. " .
+                    "Column [$column] does not exist in table [$table]."
+                );
             }
         }
 
@@ -349,10 +354,7 @@ class Query
         $conn = DB::getConnection($this->meta->database);
         $pdo = $conn->getPDO();
 
-        Log::debug("Preparing query: $query");
         $stmt = $pdo->prepare($query);
-
-        $conn->logExecute($args);
         $stmt->execute($args);
 
         $data = array();

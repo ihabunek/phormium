@@ -1,6 +1,8 @@
 <?php
 
-namespace Phormium;
+namespace Phormium\Filter;
+
+use InvalidArgumentException;
 
 /**
  * A filter for SQL queries which converts to a single WHERE condition.
@@ -23,6 +25,7 @@ class ColumnFilter extends Filter
     const OP_NOT_EQUALS_ALT = '!=';
     const OP_NOT_IN = 'NOT IN';
     const OP_NOT_NULL = 'NOT NULL';
+    const OP_NOT_NULL_ALT = 'IS NOT NULL';
 
     /** The filter operation, one of OP_* constants. */
     public $operation;
@@ -48,8 +51,22 @@ class ColumnFilter extends Filter
         switch($this->operation)
         {
             case self::OP_EQUALS:
+                // Replace "= null" with "IS NULL"
+                if (is_null($this->value)) {
+                    return $this->renderIsNull($this->column);
+                }
+
+                return $this->renderSimple($this->column, $this->operation, $this->value);
+
             case self::OP_NOT_EQUALS:
             case self::OP_NOT_EQUALS_ALT:
+                // Replace "<> null" with "IS NOT NULL"
+                if (is_null($this->value)) {
+                    return $this->renderNotNull($this->column);
+                }
+
+                return $this->renderSimple($this->column, $this->operation, $this->value);
+
             case self::OP_LIKE:
             case self::OP_NOT_LIKE:
             case self::OP_GREATER:
@@ -57,18 +74,26 @@ class ColumnFilter extends Filter
             case self::OP_LESSER:
             case self::OP_LESSER_OR_EQUAL:
                 return $this->renderSimple($this->column, $this->operation, $this->value);
+
             case self::OP_LIKE_CASE_INSENSITIVE:
-                return $this->renderLikeCaseInsensitive($this->column, $this->value);
+                return $this->renderLikeCaseInsensitive($this->column, $this->operation, $this->value);
+
             case self::OP_IN:
-                return $this->renderIn($this->column, $this->value);
+                return $this->renderIn($this->column, $this->operation, $this->value);
+
             case self::OP_NOT_IN:
-                return $this->renderNotIn($this->column, $this->value);
+                return $this->renderNotIn($this->column, $this->operation, $this->value);
+
             case self::OP_IS_NULL:
                 return $this->renderIsNull($this->column);
+
             case self::OP_NOT_NULL:
+            case self::OP_NOT_NULL_ALT:
                 return $this->renderNotNull($this->column);
+
             case self::OP_BETWEEN:
-                return $this->renderBetween($this->column, $this->value);
+                return $this->renderBetween($this->column, $this->operation, $this->value);
+
             default:
                 throw new \Exception("Unknown filter operation [{$this->operation}].");
         }
@@ -80,42 +105,43 @@ class ColumnFilter extends Filter
      */
     private function renderSimple($column, $operation, $value)
     {
+        $this->checkIsScalar($value, $operation);
+
         $where = "{$column} {$operation} ?";
         return array($where, array($value));
     }
 
-    private function renderBetween($column, $values)
+    private function renderBetween($column, $operation, $values)
     {
-        if (!is_array($values) || (count($values) != 2)) {
-            throw new \Exception("BETWEEN filter requires an array of two values.");
-        }
+        $this->checkIsArray($values, $operation);
+        $this->checkArrayCount($values, 2, $operation);
 
         $where = "{$column} BETWEEN ? AND ?";
         return array($where, $values);
     }
 
-    private function renderIn($column, $values)
+    private function renderIn($column, $operation, $values)
     {
-        if (!is_array($values) || empty($values)) {
-            throw new \Exception("IN filter requires an array with one or more values.");
-        }
+        $this->checkIsArray($values, $operation);
+        $this->checkArrayNotEmpty($values, $operation);
 
         $qs = array_fill(0, count($values), '?');
         $where = "$column IN (" . implode(', ', $qs) . ")";
         return array($where, $values);
     }
 
-    private function renderLikeCaseInsensitive($column, $value)
+    private function renderLikeCaseInsensitive($column, $operation, $value)
     {
+        $this->checkIsScalar($value, $operation);
+
         $where = "lower($column) LIKE lower(?)";
         return array($where, array($value));
     }
 
-    private function renderNotIn($column, $values)
+    private function renderNotIn($column, $operation, $values)
     {
-        if (!is_array($values) || empty($values)) {
-            throw new \Exception("NOT IN filter requires an array with one or more values.");
-        }
+        $this->checkIsArray($values, $operation);
+        $this->checkArrayNotEmpty($values, $operation);
 
         $qs = array_fill(0, count($values), '?');
         $where = "$column NOT IN (" . implode(', ', $qs) . ")";
@@ -132,6 +158,46 @@ class ColumnFilter extends Filter
     {
         $where = "$column IS NOT NULL";
         return array($where, array());
+    }
+
+    // ******************************************
+    // *** Validation functions               ***
+    // ******************************************
+
+    private function checkIsArray($value, $operation)
+    {
+        if (!is_array($value)) {
+            $type = gettype($value);
+            $msg = "Filter $operation requires an array, $type given.";
+            throw new InvalidArgumentException($msg);
+        }
+    }
+
+    private function checkIsScalar($value, $operation)
+    {
+        if (!is_scalar($value)) {
+            $type = gettype($value);
+            $msg = "Filter $operation requires a scalar value, $type given.";
+            throw new InvalidArgumentException($msg);
+        }
+    }
+
+    private function checkArrayCount(array $array, $expected, $operation)
+    {
+        $count = count($array);
+        if ($count !== $expected) {
+            $msg = "Filter $operation requires an array with $expected values, ";
+            $msg .= "given array has $count values.";
+            throw new InvalidArgumentException($msg);
+        }
+    }
+
+    private function checkArrayNotEmpty(array $array, $operation)
+    {
+        if (empty($array)) {
+            $msg = "Filter $operation requires a non-empty array, empty array given.";
+            throw new InvalidArgumentException($msg);
+        }
     }
 
     // ******************************************

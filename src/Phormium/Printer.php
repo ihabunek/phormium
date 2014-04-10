@@ -40,7 +40,7 @@ class Printer
     private static function dumpArray(array $array, $return = false)
     {
         if (empty($array)) {
-            throw new \Exception("Invalid input for dump(): empty array.");
+            return;
         }
 
         $firstRow = $array[0];
@@ -159,8 +159,11 @@ class Printer
      */
     private static function prepareValue($value)
     {
-        // Silence operator to prevent notices like Array to string conversion
-        $value = @trim(strval($value));
+        if (is_array($value)) {
+            $value = implode(', ', $value);
+        }
+
+        $value = trim(strval($value));
 
         // Trim to max allowed length
         if (mb_strlen($value) > self::COLUMN_MAX_LENGTH) {

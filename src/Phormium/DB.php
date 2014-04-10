@@ -40,19 +40,7 @@ class DB
     public static function getConnection($name)
     {
         if (!isset(self::$connections[$name])) {
-            // Fetch database configuration
-            $db = Config::getDatabase($name);
-
-            // Establish a connection
-            $pdo = new PDO($db['dsn'], $db['username'], $db['password']);
-
-            // Force lower case column names
-            $pdo->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
-
-            // Force an exception to be thrown on error
-            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            self::$connections[$name] = new Connection($pdo);
+            self::$connections[$name] = self::newConnection($name);
         }
 
         if (self::$beginTriggered && !in_array($name, self::$inTransaction)) {
@@ -61,6 +49,24 @@ class DB
         }
 
         return self::$connections[$name];
+    }
+
+    /** Connection factory */
+    private static function newConnection($name)
+    {
+        // Fetch database configuration
+        $db = Config::getDatabase($name);
+
+        // Establish a connection
+        $pdo = new PDO($db['dsn'], $db['username'], $db['password']);
+
+        // Force lower case column names
+        $pdo->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
+
+        // Force an exception to be thrown on error
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        return new Connection($name, $pdo);
     }
 
     /**
@@ -82,8 +88,6 @@ class DB
      */
     public static function begin()
     {
-        Log::debug("BEGIN global transaction.");
-
         if (self::$beginTriggered) {
             throw new \Exception("Already in transaction.");
         }
@@ -96,8 +100,6 @@ class DB
      */
     public static function commit()
     {
-        Log::debug("COMMIT global transaction.");
-
         if (!self::$beginTriggered) {
             throw new \Exception("Cannot commit. Not in transaction.");
         }
@@ -118,8 +120,6 @@ class DB
      */
     public static function rollback()
     {
-        Log::debug("ROLLBACK global transaction.");
-
         if (!self::$beginTriggered) {
             throw new \Exception("Cannot roll back. Not in transaction.");
         }

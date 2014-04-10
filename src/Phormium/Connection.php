@@ -3,6 +3,7 @@
 namespace Phormium;
 
 use PDO;
+use PDOStatement;
 
 /**
  * Wrapper for a PDO connection, which enables direct SQL executions and access
@@ -10,17 +11,25 @@ use PDO;
  */
 class Connection
 {
+    /** Name of the connection. */
+    private $name;
+
     /** The wrapped PDO connection */
     private $pdo;
+
+    /** The driver name extracted from the PDO connection. */
+    private $driver;
 
     /**
      * Constructs a new wrapper with the given PDO connection
      *
      * @param PDO $pdo
      */
-    public function __construct(PDO $pdo)
+    public function __construct($name, PDO $pdo)
     {
+        $this->name = $name;
         $this->pdo = $pdo;
+        $this->driver = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
     }
 
     /**
@@ -34,47 +43,17 @@ class Connection
      * @param string $class When using PDO::FETCH_CLASS, class to fetch into.
      * @return array The resulting data.
      */
-    public function preparedQuery($query, $arguments = array(), $fetchStyle = PDO::FETCH_ASSOC, $class = null)
+    public function preparedQuery($query, array $arguments = array(), $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
-        $statsEnabled = Config::statsEnabled();
+        DB::getConnection($this->name); // Handles transactions
 
-        if ($statsEnabled) {
-            $time1 = microtime(true);
-        }
+        Event::emit(Event::QUERY_STARTED, array($query, $arguments, $this));
 
-        Log::debug("Preparing query: $query");
-        $stmt = $this->pdo->prepare($query);
+        $stmt = $this->pdoPrepare($query, $arguments);
+        $this->pdoExecute($query, $arguments, $stmt);
+        $data = $this->pdoFetch($query, $arguments, $stmt, $fetchStyle, $class);
 
-        if ($statsEnabled) {
-            $time2 = microtime(true);
-        }
-
-        if ($fetchStyle === PDO::FETCH_CLASS && isset($class)) {
-            $stmt->setFetchMode(PDO::FETCH_CLASS, $class);
-        }
-
-        $this->logExecute($arguments);
-        $stmt->execute($arguments);
-
-        if ($statsEnabled) {
-            $time3 = microtime(true);
-        }
-
-        $data = $this->fetchAll($stmt, $fetchStyle);
-
-        if ($statsEnabled) {
-            $time4 = microtime(true);
-
-            Stats::add(array(
-                'query' => $query,
-                'arguments' => $arguments,
-                'prepare' => $time2 - $time1,
-                'execute' => $time3 - $time2,
-                'fetch' => $time4 - $time3,
-                'total' => $time4 - $time1,
-                'numrows' => count($data),
-            ));
-        }
+        Event::emit(Event::QUERY_COMPLETED, array($query, $arguments, $this, $data));
 
         return $data;
     }
@@ -92,38 +71,16 @@ class Connection
      */
     public function query($query, $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
-        $statsEnabled = Config::statsEnabled();
+        DB::getConnection($this->name); // Handles transactions
 
-        if ($statsEnabled) {
-            $time1 = microtime(true);
-        }
+        $arguments = array();
 
-        Log::debug("Executing query: $query");
-        $stmt = $this->pdo->query($query);
+        Event::emit(Event::QUERY_STARTED, array($query, $arguments, $this));
 
-        if ($statsEnabled) {
-            $time2 = microtime(true);
-        }
+        $stmt = $this->pdoQuery($query, $arguments);
+        $data = $this->pdoFetch($query, $arguments, $stmt, $fetchStyle, $class);
 
-        if ($fetchStyle === PDO::FETCH_CLASS && isset($class)) {
-            $stmt->setFetchMode(PDO::FETCH_CLASS, $class);
-        }
-
-        $data = $this->fetchAll($stmt, $fetchStyle);
-
-        if ($statsEnabled) {
-            $time3 = microtime(true);
-
-            Stats::add(array(
-                'query' => $query,
-                'arguments' => null,
-                'prepare' => null,
-                'execute' => $time2 - $time1,
-                'fetch' => $time3 - $time2,
-                'total' => $time3 - $time1,
-                'numrows' => count($data),
-            ));
-        }
+        Event::emit(Event::QUERY_COMPLETED, array($query, $arguments, $this, $data));
 
         return $data;
     }
@@ -138,28 +95,15 @@ class Connection
      */
     public function execute($query)
     {
-        $statsEnabled = Config::statsEnabled();
+        DB::getConnection($this->name); // Handles transactions
 
-        if ($statsEnabled) {
-            $time1 = microtime(true);
-        }
+        $arguments = array();
 
-        Log::debug("Executing query: $query");
-        $numRows = $this->pdo->exec($query);
+        Event::emit(Event::QUERY_STARTED, array($query, $arguments, $this));
 
-        if ($statsEnabled) {
-            $time2 = microtime(true);
+        $numRows = $this->pdoExec($query);
 
-            Stats::add(array(
-                'query' => $query,
-                'arguments' => null,
-                'prepare' => null,
-                'execute' => $time2 - $time1,
-                'fetch' => $time3 - $time2,
-                'total' => $time3 - $time1,
-                'numrows' => $numRows,
-            ));
-        }
+        Event::emit(Event::QUERY_COMPLETED, array($query, $arguments, $this, null));
 
         return $numRows;
     }
@@ -177,38 +121,16 @@ class Connection
      */
     public function preparedExecute($query, $arguments = array())
     {
-        $statsEnabled = Config::statsEnabled();
+        DB::getConnection($this->name); // Handles transactions
 
-        if ($statsEnabled) {
-            $time1 = microtime(true);
-        }
+        Event::emit(Event::QUERY_STARTED, array($query, $arguments, $this));
 
-        Log::debug("Preparing query: $query");
-        $stmt = $this->pdo->prepare($query);
+        $stmt = $this->pdoPrepare($query, $arguments);
+        $this->pdoExecute($query, $arguments, $stmt);
 
-        if ($statsEnabled) {
-            $time2 = microtime(true);
-        }
+        Event::emit(Event::QUERY_COMPLETED, array($query, $arguments, $this, null));
 
-        $this->logExecute($arguments);
-        $stmt->execute($arguments);
-        $numRows = $stmt->rowCount();
-
-        if ($statsEnabled) {
-            $time3 = microtime(true);
-
-            Stats::add(array(
-                'query' => $query,
-                'arguments' => $arguments,
-                'prepare' => $time2 - $time1,
-                'execute' => $time3 - $time2,
-                'fetch' => null,
-                'total' => $time3 - $time1,
-                'numrows' => $numRows,
-            ));
-        }
-
-        return $numRows;
+        return $stmt->rowCount();
     }
 
     /**
@@ -224,61 +146,127 @@ class Connection
     /** Returns the name of the driver for the underlying PDO connection. */
     public function getDriver()
     {
-        return $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+        return $this->driver;
     }
 
     /** Calls BEGIN on the underlying PDO connection */
     public function beginTransaction()
     {
+        Event::emit(Event::TRANSACTION_BEGIN, array($this));
         $this->pdo->beginTransaction();
     }
 
     /** Calls COMMIT on the underlying PDO connection */
     public function commit()
     {
+        Event::emit(Event::TRANSACTION_COMMIT, array($this));
         $this->pdo->commit();
     }
 
     /** Calls ROLLBACK on the underlying PDO connection */
     public function rollback()
     {
+        Event::emit(Event::TRANSACTION_ROLLBACK, array($this));
         $this->pdo->rollback();
     }
 
-    /**
-     * Fetches all resulting records from a PDO statement.
-     *
-     * This method uses fetch() in a loop instead of fetchAll(), because the
-     * latter method has problems on Informix: If a record is locked, fetchAll()
-     * will only return records upto the locked record, without raising an
-     * error. Fetch, on the other hand will produce an error.
-     */
-    private function fetchAll($stmt, $fetchStyle)
+    private function pdoPrepare($query, $arguments)
     {
-        $data = array();
-        while ($row = $stmt->fetch($fetchStyle)) {
-            $data[] = $row;
+        Event::emit(Event::QUERY_PREPARING, array($query, $arguments, $this));
+
+        try {
+            $stmt = $this->pdo->prepare($query);
+        } catch (\Exception $ex) {
+            Event::emit(Event::QUERY_ERROR, array($query, $arguments, $this, $ex));
+            throw $ex;
         }
-        return $data;
+
+        Event::emit(Event::QUERY_PREPARED, array($query, $arguments, $this));
+
+        return $stmt;
     }
 
-    /** Logs the execute arguments if logging is enabled. */
-    public function logExecute($args)
+    private function pdoExec($query)
     {
-        if (Config::loggingEnabled()) {
-            foreach ($args as &$arg) {
-                if ($arg === null) {
-                    $arg = "NULL";
-                } elseif (is_string($arg)) {
-                    $arg = '"' . $arg . '"';
+        $arguments = array();
+
+        Event::emit(Event::QUERY_EXECUTING, array($query, $arguments, $this));
+
+        try {
+            $this->pdo->exec($query);
+        } catch (\Exception $ex) {
+            Event::emit(Event::QUERY_ERROR, array($query, $arguments, $this, $ex));
+            throw $ex;
+        }
+
+        Event::emit(Event::QUERY_EXECUTED, array($query, $arguments, $this));
+    }
+
+    private function pdoExecute($query, $arguments, PDOStatement $stmt)
+    {
+        Event::emit(Event::QUERY_EXECUTING, array($query, $arguments, $this));
+
+        try {
+            $stmt->execute($arguments);
+        } catch (\Exception $ex) {
+            Event::emit(Event::QUERY_ERROR, array($query, $arguments, $this, $ex));
+            throw $ex;
+        }
+
+        Event::emit(Event::QUERY_EXECUTED, array($query, $arguments, $this));
+    }
+
+    private function pdoQuery($query, $arguments)
+    {
+        Event::emit(Event::QUERY_EXECUTING, array($query, $arguments, $this));
+
+        try {
+            $stmt = $this->pdo->query($query);
+        } catch (\Exception $ex) {
+            Event::emit(Event::QUERY_ERROR, array($query, $arguments, $this, $ex));
+            throw $ex;
+        }
+
+        Event::emit(Event::QUERY_EXECUTED, array($query, $arguments, $this));
+
+        return $stmt;
+    }
+
+    /** Fetches all resulting records from a PDO statement. */
+    private function pdoFetch($query, $arguments, PDOStatement $stmt, $fetchStyle, $class)
+    {
+        Event::emit(Event::QUERY_FETCHING, array($query, $arguments, $this));
+
+        $fetchIntoClass = $fetchStyle === PDO::FETCH_CLASS && isset($class);
+
+        try {
+            // For Informix use fetch() in a loop instead of fetchAll(), because
+            // the latter method has problems with pdo_informix. If a record is
+            // locked, fetchAll() will only return records upto the locked
+            // record, without raising an error. Fetch, on the other hand will
+            // produce an error.
+            if ($this->getDriver() == 'informix') {
+                $data = array();
+                if ($fetchIntoClass) {
+                    $stmt->setFetchMode(PDO::FETCH_CLASS, $class);
+                }
+                while ($row = $stmt->fetch($fetchStyle)) {
+                    $data[] = $row;
+                }
+            } else {
+                if ($fetchIntoClass) {
+                    $data = $stmt->fetchAll($fetchStyle, $class);
+                } else {
+                    $data = $stmt->fetchAll($fetchStyle);
                 }
             }
-
-            if (empty($args)) {
-                Log::debug("Executing query with no args.");
-            } else {
-                Log::debug("Executing query with args: " . implode(', ', $args));
-            }
+        } catch (\Exception $ex) {
+            Event::emit(Event::QUERY_ERROR, array($query, $arguments, $this, $ex));
+            throw $ex;
         }
+
+        Event::emit(Event::QUERY_FETCHED, array($query, $arguments, $this));
+
+        return $data;
     }
 }

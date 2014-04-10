@@ -2,8 +2,10 @@
 
 namespace Phormium\Tests;
 
-use \Phormium\Tests\Models\Person;
-use \Phormium\DB;
+use Phormium\DB;
+use Phormium\Printer;
+
+use Phormium\Tests\Models\Person;
 
 /**
  * @group printer
@@ -49,7 +51,7 @@ class PrinterTest extends \PHPUnit_Framework_TestCase
             array("id" => 3, "name" => $name, "email" => "freddy@queen.org", "income" => 300),
         );
 
-        $actual = \Phormium\Printer::dump($data, true);
+        $actual = Printer::dump($data, true);
         $lines = explode(PHP_EOL, $actual);
 
         $this->assertRegExp("/^\\s*id\\s+name\\s+email\\s+income\\s*$/", $lines[0]);
@@ -84,5 +86,27 @@ class PrinterTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp("/^\\s*$id1\\s+Rob Halford\\s+100(.00)?\\s*$/", $lines[2]);
         $this->assertRegExp("/^\\s*$id2\\s+Rob Halford\\s+200(.00)?\\s*$/", $lines[3]);
         $this->assertRegExp("/^\\s*$id3\\s+Rob Halford\\s+300(.00)?\\s*$/", $lines[4]);
+    }
+
+    public function testDumpEchoEmptyQS()
+    {
+        $name = "Rob Halford";
+
+        Person::objects()->filter("name", "=", $name)->delete();
+
+        ob_start();
+        Person::objects()->filter("name", "=", $name)->dump();
+        $actual = ob_get_clean();
+
+        $this->assertSame("", $actual);
+    }
+
+    public function testDumpEchoEmptyArray()
+    {
+        ob_start();
+        Printer::dump(array());
+        $actual = ob_get_clean();
+
+        $this->assertSame("", $actual);
     }
 }
