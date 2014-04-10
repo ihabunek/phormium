@@ -20,12 +20,8 @@ Features
 * ordering
 * limiting
 * transactions
-* query logging (requires [Apache log4php](http://logging.apache.org/log4php/))
 * custom queries
-
-Not yet implemented:
-
-* relationships between models (joins)
+* events
 
 Documentation
 -------------
