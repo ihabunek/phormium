@@ -17,6 +17,9 @@
         "symfony/yaml": "2.4.*",
         "ext-pdo": "*"
     },
+    "require-dev": {
+        "mockery/mockery": "@stable"
+    },
     "suggest": {
         "apache/log4php": "Required for query logging"
     },
