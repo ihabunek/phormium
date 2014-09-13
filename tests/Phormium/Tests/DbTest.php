@@ -4,7 +4,6 @@ namespace Phormium\Tests;
 
 use Mockery as m;
 
-use Phormium\Connection;
 use Phormium\DB;
 
 use Phormium\Tests\Models\Person;
@@ -16,7 +15,7 @@ class DbTest extends \PHPUnit_Framework_TestCase
 {
     public function testSetConnection()
     {
-        $mockConn = m::mock(Connection::class);
+        $mockConn = m::mock("Phormium\\Connection");
         $mockConn->shouldReceive('inTransaction')
             ->once()
             ->andReturn(false);
@@ -33,7 +32,7 @@ class DbTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetConnectionError()
     {
-        $mockConn = m::mock(Connection::class);
+        $mockConn = m::mock("Phormium\\Connection");
         $mockConn->shouldReceive('inTransaction')
             ->once()
             ->andReturn(false);
