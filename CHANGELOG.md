@@ -1,8 +1,8 @@
 Phormium Changelog
 ==================
 
-0.6.1 / TBA
------------
+0.6.1 / 2014-09-13
+------------------
 
 * Added `DB::disconnect()`, for disconnecting a single connection
 * Added `DB::isConnected()`, for checking if a connection is up
