@@ -20,6 +20,6 @@ matrix:
     - php: hhvm
       env: DB=postgres
 
-before_script: tests/travis/before.sh
+before_script: sh tests/travis/before.sh
 
 script: phpunit --configuration tests/travis/$DB/phpunit.xml
