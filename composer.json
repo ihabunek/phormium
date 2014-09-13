@@ -17,11 +17,17 @@
         "symfony/yaml": "2.4.*",
         "ext-pdo": "*"
     },
+    "require-dev": {
+        "mockery/mockery": "@stable"
+    },
     "suggest": {
         "apache/log4php": "Required for query logging"
     },
     "autoload": {
         "psr-0": {"Phormium": "src/"}
+    },
+    "autoload-dev": {
+        "psr-0": {"Phormium\\Tests": "tests/"}
     },
     "support": {
         "issues": "https://github.com/ihabunek/phormium/issues"

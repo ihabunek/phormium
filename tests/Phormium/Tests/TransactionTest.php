@@ -2,7 +2,11 @@
 
 namespace Phormium\Tests;
 
+use Mockery as m;
+
+use Phormium\Connection;
 use Phormium\DB;
+
 use Phormium\Tests\Models\Person;
 
 /**
@@ -125,6 +129,30 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $p->income = 54321;
         $p->save();
 
+        // This should roll back changes
+        DB::disconnect('testdb');
+
+        // So they won't be commited here
+        DB::commit();
+
+        $this->assertEquals(12345, Person::get($id)->income);
+    }
+
+    public function testDisconnectAllRollsBackTransaction()
+    {
+        $person = new Person();
+        $person->name = 'Nicko McBrain';
+        $person->income = 12345;
+        $person->save();
+
+        $id = $person->id;
+
+        DB::begin();
+
+        $p = Person::get($id);
+        $p->income = 54321;
+        $p->save();
+
         DB::disconnectAll();
 
         $this->assertEquals(12345, Person::get($id)->income);
@@ -194,13 +222,17 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         DB::commit();
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Already in transaction.
-     */
     public function testDoubleBegin()
     {
         DB::begin();
-        DB::begin();
+
+        try {
+            DB::begin();
+            $this->fail('Expected an exception here.');
+        } catch (\Exception $e) {
+            $this->assertContains("Already in transaction.", $e->getMessage());
+        }
+
+        DB::rollback();
     }
 }

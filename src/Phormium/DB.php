@@ -15,9 +15,6 @@ class DB
     /** Set to true when a global transaction has been triggered. */
     private static $beginTriggered = false;
 
-    /** Array of connection names for which BEGIN has been executed. */
-    private static $inTransaction = array();
-
     /**
      * Configures database definitions.
      *
@@ -43,12 +40,45 @@ class DB
             self::$connections[$name] = self::newConnection($name);
         }
 
-        if (self::$beginTriggered && !in_array($name, self::$inTransaction)) {
-            self::$connections[$name]->beginTransaction();
-            self::$inTransaction[] = $name;
+        $connection = self::$connections[$name];
+
+        if (self::$beginTriggered && !$connection->inTransaction()) {
+            $connection->beginTransaction();
         }
 
-        return self::$connections[$name];
+        return $connection;
+    }
+
+    /**
+     * Checks whether a connection is connnected (a PDO object exists).
+     *
+     * @param string $name Connection name.
+     *
+     * @return boolean
+     */
+    public static function isConnected($name)
+    {
+        return isset(self::$connections[$name]);
+    }
+
+    /**
+     * Manually set a connection. Useful for mocking.
+     *
+     * If you want to replace an existing connection call `disconnect()` before
+     * `setConnection()`.
+     *
+     * @param string     $name       Connection name
+     * @param Connection $connection The connection object
+     *
+     * @throws \Exception If the connection with the given name already exists.
+     */
+    public static function setConnection($name, Connection $connection)
+    {
+        if (isset(self::$connections[$name])) {
+            throw new \Exception("Connection \"$name\" is already connected. Please disconnect it before calling setConnection().");
+        }
+
+        self::$connections[$name] = $connection;
     }
 
     /** Connection factory */
@@ -67,6 +97,26 @@ class DB
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         return new Connection($name, $pdo);
+    }
+
+    /**
+     * Closes a connection if it's established.
+     *
+     * @param string $name Connection name
+     */
+    public static function disconnect($name)
+    {
+        if (!isset(self::$connections[$name])) {
+            return;
+        }
+
+        $connection = self::$connections[$name];
+
+        if ($connection->inTransaction()) {
+            $connection->rollback();
+        }
+
+        unset(self::$connections[$name]);
     }
 
     /**
@@ -96,7 +146,7 @@ class DB
     }
 
     /**
-     * Ends the global transaction by commiting all changes on all connections.
+     * Ends the global transaction by committing changes on all connections.
      */
     public static function commit()
     {
@@ -105,18 +155,18 @@ class DB
         }
 
         // Commit all started transactions
-        foreach (self::$inTransaction as $name) {
-            self::$connections[$name]->commit();
+        foreach(self::$connections as $name => $connection) {
+            if ($connection->inTransaction()) {
+                $connection->commit();
+            }
         }
 
         // End global transaction
         self::$beginTriggered = false;
-        self::$inTransaction = array();
     }
 
     /**
-     * Ends the global transaction by rolling back all changes on all
-     * connections.
+     * Ends the global transaction by rolling back changes on all connections.
      */
     public static function rollback()
     {
@@ -125,13 +175,14 @@ class DB
         }
 
         // Roll back all started transactions
-        foreach (self::$inTransaction as $name) {
-            self::$connections[$name]->rollBack();
+        foreach(self::$connections as $name => $connection) {
+            if ($connection->inTransaction()) {
+                $connection->rollBack();
+            }
         }
 
         // End global transaction
         self::$beginTriggered = false;
-        self::$inTransaction = array();
     }
 
     /**

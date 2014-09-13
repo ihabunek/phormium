@@ -1,7 +1,6 @@
 <?php
 
-$loader = require __DIR__ . '/../vendor/autoload.php';
-$loader->add('Phormium\\Tests', __DIR__);
+require __DIR__ . '/../vendor/autoload.php';
 
 // Setup the test database
 $tmpDir = __DIR__ . '/../tmp';

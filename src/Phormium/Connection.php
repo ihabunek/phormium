@@ -20,6 +20,9 @@ class Connection
     /** The driver name extracted from the PDO connection. */
     private $driver;
 
+    /** Flag to determine if the connection is currently in a transaction. */
+    private $inTransaction = false;
+
     /**
      * Constructs a new wrapper with the given PDO connection
      *
@@ -154,6 +157,8 @@ class Connection
     {
         Event::emit(Event::TRANSACTION_BEGIN, array($this));
         $this->pdo->beginTransaction();
+
+        $this->inTransaction = true;
     }
 
     /** Calls COMMIT on the underlying PDO connection */
@@ -161,6 +166,8 @@ class Connection
     {
         Event::emit(Event::TRANSACTION_COMMIT, array($this));
         $this->pdo->commit();
+
+        $this->inTransaction = false;
     }
 
     /** Calls ROLLBACK on the underlying PDO connection */
@@ -168,6 +175,14 @@ class Connection
     {
         Event::emit(Event::TRANSACTION_ROLLBACK, array($this));
         $this->pdo->rollback();
+
+        $this->inTransaction = false;
+    }
+
+    /** Returns true if the connection is in a transaction. */
+    public function inTransaction()
+    {
+        return $this->inTransaction;
     }
 
     private function pdoPrepare($query, $arguments)

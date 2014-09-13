@@ -1,6 +1,14 @@
 Phormium Changelog
 ==================
 
+0.6.1 / 2014-09-13
+------------------
+
+* Added `DB::disconnect()`, for disconnecting a single connection
+* Added `DB::isConnected()`, for checking if a connection is up
+* Added `DB::setConnection()`, useful for mocking
+* Added `Connection->inTransaction()`
+
 0.6 / 2014-04-10
 ----------------
 

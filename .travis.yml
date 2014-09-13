@@ -14,20 +14,12 @@ env:
 
 matrix:
   allow_failures:
-    - php: 5.6
     - php: hhvm
   # hhvm doesn't support postgres currently
   exclude:
     - php: hhvm
       env: DB=postgres
 
-before_script:
-  - composer install
-  - mkdir tmp
-  - sh -c "if [ '$DB' = 'mysql' ]; then mysql < tests/travis/mysql/setup.sql; fi"
-  - sh -c "if [ '$DB' = 'sqlite' ]; then sqlite3 tmp/test.db < tests/travis/sqlite/setup.sql; fi"
-  - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'drop database if exists phormium_tests;' -U postgres; fi"
-  - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'create database phormium_tests;' -U postgres; fi"
-  - sh -c "if [ '$DB' = 'postgres' ]; then psql -f tests/travis/postgres/setup.sql -d phormium_tests -U postgres; fi"
+before_script: sh tests/travis/before.sh
 
 script: phpunit --configuration tests/travis/$DB/phpunit.xml
