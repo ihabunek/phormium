@@ -1,6 +1,12 @@
 Phormium Changelog
 ==================
 
+0.6.2 / 2014-09-28
+------------------
+
+* Fixed an issue with shallow cloning which caused the same Filter instance to
+  be used in cloned QuerySets.
+
 0.6.1 / 2014-09-13
 ------------------
 
