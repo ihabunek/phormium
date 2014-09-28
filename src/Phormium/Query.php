@@ -222,13 +222,13 @@ class Query
         $meta = $this->meta;
 
         if (!isset($meta->pk)) {
-            throw new \Exception("Cannot update, model does not have a primary key defined in _meta.");
+            throw new \Exception("Cannot update. Model does not have a primary key defined in _meta.");
         }
 
         // All pk fields must be set to attempt an update
         foreach ($meta->pk as $column) {
             if (!isset($model->{$column})) {
-                throw new \Exception("Cannot update model because primary key column [$pk] is not set.");
+                throw new \Exception("Cannot update. Primary key column [$column] is not set.");
             }
         }
 
@@ -272,7 +272,7 @@ class Query
 
             // All PK fields must be set
             if (!isset($value)) {
-                throw new \Exception("Cannot delete. Primary key column [$key] is not set.");
+                throw new \Exception("Cannot delete. Primary key column [$column] is not set.");
             }
 
             $where[] = "{$column} = ?";

@@ -77,6 +77,17 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($t, $t3);
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Cannot insert. Primary key column(s) not set.
+     */
+    public function testNewTradeHalfPkSet()
+    {
+        $t = new Trade();
+        $t->tradedate = date('Y-m-d');
+        $t->insert();
+    }
+
     public function testNewPersonAssignedPK()
     {
         $id = 100;
@@ -201,6 +212,70 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testUpdate()
+    {
+        // Insert
+        $person1 = new Person();
+        $person1->name = 'foo';
+        $person1->save();
+
+        $id = $person1->id;
+
+        // Load
+        $person2 = Person::get($id);
+        $this->assertSame('foo', $person2->name);
+
+        // Modify + update
+        $person2->name = 'bar';
+        $person2->save();
+
+        // Load
+        $person3 = Person::get($id);
+        $this->assertSame('bar', $person3->name);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Cannot update. Primary key column [id] is not set.
+     */
+    public function testUpdateNoPK()
+    {
+        $person = new Person();
+        $person->update();
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Cannot update. Primary key column [tradeno] is not set.
+     */
+    public function testUpdateNoPKComposite1()
+    {
+        $trade = new Trade();
+        $trade->tradedate = date('Y-m-d');
+        $trade->update();
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Cannot update. Primary key column [tradedate] is not set.
+     */
+    public function testUpdateNoPKComposite2()
+    {
+        $trade = new Trade();
+        $trade->tradeno = 100;
+        $trade->update();
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Cannot update. Model does not have a primary key defined in _meta.
+     */
+    public function testUpdatePkless()
+    {
+        $pkless = new PkLess();
+        $pkless->update();
+    }
+
     public function testDelete()
     {
         $person1 = new Person();
@@ -220,6 +295,38 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         // On repeated delete, 0 count should be returned
         $count = $person1->delete();
         $this->assertSame(0, $count);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Cannot delete. Primary key column [id] is not set.
+     */
+    public function testDeleteWithoutPK()
+    {
+        $person = new Person();
+        $person->delete();
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Cannot delete. Primary key column [tradeno] is not set.
+     */
+    public function testDeleteWithoutPKComposite1()
+    {
+        $trade = new Trade();
+        $trade->tradedate = date('Y-m-d');
+        $trade->delete();
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Cannot delete. Primary key column [tradedate] is not set.
+     */
+    public function testDeleteWithoutPKComposite2()
+    {
+        $trade = new Trade();
+        $trade->tradeno = 100;
+        $trade->delete();
     }
 
     /**
