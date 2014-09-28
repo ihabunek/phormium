@@ -16,19 +16,40 @@ class QuerySet
 {
     /**
      * Meta data of the Model this QuerySet is handling.
-     * @var Meta
+     *
+     * @var Phormium\Meta
      */
     private $meta;
+
+    /**
+     * The Query object used for constructing queries.
+     *
+     * @var Phormium\Query
+     */
+    private $query;
 
     /** Order by clauses. */
     private $order = array();
 
+    /**
+     * The root filter.
+     *
+     * @var Phormium\Filter\Filter
+     */
     private $filter;
 
-    /** Maximum number of rows to fetch. */
+    /**
+     * Maximum number of rows to fetch.
+     *
+     * @var integer
+     */
     private $limit;
 
-    /** Offset of the first row to return. */
+    /**
+     * Offset of the first row to return.
+     *
+     * @var integer
+     */
     private $offset;
 
     public function __construct(Query $query, Meta $meta)
@@ -43,7 +64,8 @@ class QuerySet
 
     /**
      * Returns a new QuerySet that is a copy of the current one.
-     * @return QuerySet
+     *
+     * @return Phormium\QuerySet
      */
     public function all()
     {
@@ -59,7 +81,7 @@ class QuerySet
      *   - an array with two values or three values [$column, $operation,
      *     $value] will be converted to a ColumnFilter object.
      *
-     * @return QuerySet
+     * @return Phormium\QuerySet
      */
     public function filter()
     {
@@ -71,33 +93,6 @@ class QuerySet
         $qs = clone $this;
         $qs->addFilter($filter);
         return $qs;
-    }
-
-    private function parseFilterArgs($argv, $argc)
-    {
-        if ($argc === 1) {
-            $arg = $argv[0];
-
-            if ($arg instanceof Filter) {
-                return $arg;
-            } elseif (is_array($arg)) {
-                return ColumnFilter::fromArray($arg);
-            } elseif (is_string($arg)) {
-                return new RawFilter($arg);
-            }
-        } elseif ($argc === 2) {
-            if (is_string($argv[0])) {
-                if (is_string($argv[1])) {
-                    return ColumnFilter::fromArray($args);
-                } elseif (is_array($argv[1])) {
-                    return new RawFilter($argv[0], $argv[1]);
-                }
-            }
-        } elseif ($argc === 3) {
-            return ColumnFilter::fromArray($argv);
-        }
-
-        throw new \InvalidArgumentException("Invalid filter arguments.");
     }
 
     /**
@@ -368,6 +363,64 @@ class QuerySet
     // ******************************************
     // *** Private methods                    ***
     // ******************************************
+
+    /**
+     * Parses method arguments for `->filter()` and returns a corresponding
+     * Filter object. Here are the possibilities:
+     *
+     * 1. One argument is given
+     *
+     * a) If it's a Filter object, just return it as-is.
+     *    e.g. `->filter(new Filter(...))`
+     *
+     * b) If it's an array, use it to construct a ColumnFilter.
+     *    e.g. `->filter(['foo', 'isnull'])
+     *
+     * c) If it's a string, use it to construct a RawFilter.
+     *    e.g. `->filter('foo = lower(bar)')`
+     *
+     * 2. Two arguments given
+     *
+     * a) If both are strings, use them to construct a ColumnFilter.
+     *    e.g. `->filter('foo', 'isnull')
+     *
+     * b) If one is string and the other an array, use it to construct a
+     *    Raw filter (first is SQL filter, the second is arguments).
+     *    e.g. `->filter('foo = concat(?, ?)', ['bar', 'baz'])
+     *
+     * 3. Three arguments given
+     *
+     * a) Use them to construct a ColumnFilter.
+     *    e.g. `->filter('foo', '=', 'bar')
+     *
+     * @return Phormium\Filter\Filter.
+     */
+    private function parseFilterArgs($argv, $argc)
+    {
+        if ($argc === 1) {
+            $arg = $argv[0];
+
+            if ($arg instanceof Filter) {
+                return $arg;
+            } elseif (is_array($arg)) {
+                return ColumnFilter::fromArray($arg);
+            } elseif (is_string($arg)) {
+                return new RawFilter($arg);
+            }
+        } elseif ($argc === 2) {
+            if (is_string($argv[0])) {
+                if (is_string($argv[1])) {
+                    return ColumnFilter::fromArray($args);
+                } elseif (is_array($argv[1])) {
+                    return new RawFilter($argv[0], $argv[1]);
+                }
+            }
+        } elseif ($argc === 3) {
+            return ColumnFilter::fromArray($argv);
+        }
+
+        throw new \InvalidArgumentException("Invalid filter arguments.");
+    }
 
     /**
      * Adds a new filter to the queryset. If multiple filters are added, they
