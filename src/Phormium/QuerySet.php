@@ -495,4 +495,21 @@ class QuerySet
     {
         return $this->meta;
     }
+
+
+    // ******************************************
+    // *** Cloning                            ***
+    // ******************************************
+
+    /**
+     * When cloning a QuerySet, also clone the root Filter.
+     *
+     * The Query and Meta objects can stay the same, they do not change.
+     */
+    public function __clone()
+    {
+        if (isset($this->filter)) {
+            $this->filter = clone $this->filter;
+        }
+    }
 }

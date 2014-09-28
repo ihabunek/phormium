@@ -35,6 +35,20 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($qs2->getOrder());
     }
 
+    public function testDeepCloneQS()
+    {
+        $qs1 = Person::objects();
+        $qs2 = $qs1->filter("1=1");
+        $qs3 = $qs2->filter("1=2");
+
+        $this->assertNull($qs1->getFilter());
+        $this->assertNotNull($qs2->getFilter());
+        $this->assertNotNull($qs3->getFilter());
+
+        // Check that a deep clone has been made
+        $this->assertNotSame($qs2->getFilter(), $qs3->getFilter());
+    }
+
     public function testFilterQS()
     {
         $f = new ColumnFilter('name', '=', 'x');
