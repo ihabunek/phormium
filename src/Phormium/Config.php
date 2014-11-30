@@ -11,41 +11,15 @@ use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
 
-/**
- * Phormium configuration definition.
- *
- * @see http://symfony.com/doc/current/components/config/index.html
- */
-class Config implements ConfigurationInterface
+class Config
 {
-    public function getConfigTreeBuilder()
+    public static function load($config)
     {
-        $treeBuilder = new TreeBuilder();
+        throw new \Exception("Config::load() is deprecated, please use Phormium::configure().");
+    }
 
-        $rootNode = $treeBuilder->root('')
-            ->children()
-                ->arrayNode('databases')
-                    ->isRequired()
-                    ->requiresAtLeastOneElement()
-                    ->prototype('array')
-                        ->children()
-                            ->scalarNode('dsn')
-                                ->isRequired()
-                                ->cannotBeEmpty()
-                            ->end()
-                            ->scalarNode('username')
-                                ->cannotBeEmpty()
-                                ->defaultNull()
-                            ->end()
-                            ->scalarNode('password')
-                                ->defaultNull()
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
-            ->end()
-        ;
-
-        return $treeBuilder;
+    public static function reset()
+    {
+        throw new \Exception("Config::reset() is deprecated, please use Phormium::reset().");
     }
 }

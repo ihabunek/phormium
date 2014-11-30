@@ -38,15 +38,56 @@ class Database
 
         $connection = $this->connections[$name];
 
-        if ($this->beginTriggered && !$connection->inTransaction()) {
-            $connection->beginTransaction();
-        }
+        $this->handleTransaction($connection);
 
         return $connection;
     }
 
     /**
-     * Checks whether a connection is connnected (a PDO object exists).
+     * Starts a transaction on a connection if the global transaction is
+     * triggered, but the given connection is not in transaction.
+     */
+    public function handleTransaction(Connection $connection)
+    {
+        if ($this->beginTriggered && !$connection->inTransaction()) {
+            $connection->beginTransaction();
+        }
+    }
+
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
+     * Returns the configuration array for the given connection, or throws an
+     * exception if there is no such connection.
+     *
+     * @param  string $name Connection name.
+     *
+     * @return array An array with "dsn", "username" and "password", the latter
+     *               two are optional.
+     */
+    public function getConnectionConfig($name)
+    {
+        if (!isset($this->config[$name])) {
+            throw new \Exception("Database \"$name\" is not configured.");
+        }
+
+        return $this->config[$name];
+    }
+
+    public function setConnectionConfig($name, $dsn, $username = null, $password = null)
+    {
+        $this->config[$name] = array(
+            'dsn' => $dsn,
+            'username' => $username,
+            'password' => $password
+        );
+    }
+
+    /**
+     * Checks whether a connection is connected (a PDO object exists).
      *
      * @param string $name Connection name.
      *
@@ -81,11 +122,7 @@ class Database
     private function newConnection($name)
     {
         // Fetch database configuration
-        if (!isset($this->config[$name])) {
-            throw new \Exception("Database \"$name\" is not configured.");
-        }
-
-        $db = $this->config[$name];
+        $db = $this->getConnectionConfig($name);
 
         // Establish a connection
         $pdo = new PDO($db['dsn'], $db['username'], $db['password']);
@@ -96,7 +133,7 @@ class Database
         // Force an exception to be thrown on error
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        return new Connection($name, $pdo);
+        return new Connection($name, $pdo, $this);
     }
 
     /**

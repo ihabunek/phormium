@@ -39,7 +39,7 @@ abstract class Model
      */
     public static function getQuery()
     {
-        return new Query(self::getMeta());
+        return new Query(self::getMeta(), Phormium::db());
     }
 
     /**

@@ -1,9 +1,7 @@
 {
 	"databases": {
 	    "testdb": {
-	        "dsn": "sqlite:tmp/test.db",
-	        "username": "",
-	        "password": ""
+	        "dsn": "sqlite:tmp/test.db"
 	    }
 	}
 }

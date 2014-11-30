@@ -14,8 +14,19 @@ class Connection
     /** Name of the connection. */
     private $name;
 
-    /** The wrapped PDO connection */
+    /**
+     * The underlying database connection.
+     *
+     * @var PDO
+     */
     private $pdo;
+
+    /**
+     * The database connection handler.
+     *
+     * @var Phormium\Database
+     */
+    private $database;
 
     /** The driver name extracted from the PDO connection. */
     private $driver;
@@ -28,10 +39,13 @@ class Connection
      *
      * @param PDO $pdo
      */
-    public function __construct($name, PDO $pdo)
+    public function __construct($name, PDO $pdo, Database $database)
     {
         $this->name = $name;
         $this->pdo = $pdo;
+        $this->database = $database;
+
+        // Get the driver name from PDO
         $this->driver = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
     }
 
@@ -48,7 +62,7 @@ class Connection
      */
     public function preparedQuery($query, array $arguments = array(), $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
-        DB::getConnection($this->name); // Handles transactions
+        $this->database->handleTransaction($this);
 
         Event::emit(Event::QUERY_STARTED, array($query, $arguments, $this));
 
@@ -74,7 +88,7 @@ class Connection
      */
     public function query($query, $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
-        DB::getConnection($this->name); // Handles transactions
+        $this->database->handleTransaction($this);
 
         $arguments = array();
 
@@ -98,7 +112,7 @@ class Connection
      */
     public function execute($query)
     {
-        DB::getConnection($this->name); // Handles transactions
+        $this->database->handleTransaction($this);
 
         $arguments = array();
 
@@ -124,7 +138,7 @@ class Connection
      */
     public function preparedExecute($query, $arguments = array())
     {
-        DB::getConnection($this->name); // Handles transactions
+        $this->database->handleTransaction($this);
 
         Event::emit(Event::QUERY_STARTED, array($query, $arguments, $this));
 

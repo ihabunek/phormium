@@ -33,7 +33,14 @@ class Phormium
 
     public static function configure($config)
     {
+        self::reset();
+
         self::$instance = new self($config);
+    }
+
+    public static function isConfigured()
+    {
+        return isset(self::$instance);
     }
 
     public static function emitter()
@@ -43,7 +50,11 @@ class Phormium
 
     public static function reset()
     {
-        unset(self::$instance);
+        if (isset(self::$instance)) {
+            self::db()->disconnectAll();
+        }
+
+        self::$instance = null;
     }
 
     // -- Dynamics -------------------------------------------------------------
@@ -96,7 +107,7 @@ class Phormium
         }
 
         $processor = new Processor();
-        $configuration = new Config();
+        $configuration = new Configuration();
 
         $this->config = $processor->processConfiguration(
             $configuration,

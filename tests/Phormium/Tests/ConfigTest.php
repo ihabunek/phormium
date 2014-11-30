@@ -2,7 +2,7 @@
 
 namespace Phormium\Tests;
 
-use Phormium\Config;
+use Phormium\Phormium;
 
 use Phormium\DB;
 
@@ -18,15 +18,10 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->configDir = realpath(__DIR__ . '/../../config');
     }
 
-    public function setUp()
-    {
-        Config::reset();
-    }
-
     public function testConfigureJson()
     {
         $config = $this->configDir . '/config.json';
-        DB::configure($config);
+        Phormium::configure($config);
 
         $expected = array(
             'mydb' => array(
@@ -36,13 +31,13 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $this->assertEquals($expected, Config::getDatabases());
+        $this->assertEquals($expected, Phormium::db()->getConfig());
     }
 
     public function testConfigureYaml()
     {
         $config = $this->configDir . '/config.yaml';
-        DB::configure($config);
+        Phormium::configure($config);
 
         $expected = array(
             'mydb' => array(
@@ -52,12 +47,12 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $this->assertEquals($expected, Config::getDatabases());
+        $this->assertEquals($expected, Phormium::db()->getConfig());
     }
 
     public function testConfigureArray()
     {
-        DB::configure(array(
+        Phormium::configure(array(
             'databases' => array(
                 'mydb' => array(
                     'dsn' => 'sqlite:target/temp/test.db'
@@ -73,7 +68,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $this->assertEquals($expected, Config::getDatabases());
+        $this->assertEquals($expected, Phormium::db()->getConfig());
     }
 
     /**
@@ -83,7 +78,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testFailInvalidSyntax()
     {
         $config = $this->configDir . '/invalid.json';
-        DB::configure($config);
+        Phormium::configure($config);
     }
 
     /**
@@ -93,7 +88,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testFailFileDoesNotExist()
     {
         $config = '/should/not/exist.json';
-        DB::configure($config);
+        Phormium::configure($config);
     }
 
     /**
@@ -103,7 +98,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testFailUnknownExtension()
     {
         $config = $this->configDir . '/config.xxx';
-        DB::configure($config);
+        Phormium::configure($config);
     }
 
     /**
@@ -112,33 +107,43 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testFileExistsButIsADirectory()
     {
         $config = __DIR__;
-        @DB::configure($config);
+        @Phormium::configure($config);
     }
 
     public function testReset()
     {
+        Phormium::reset();
+
+        $this->assertFalse(Phormium::isConfigured());
+
         $config = $this->configDir . '/config.json';
-        $this->assertEmpty(Config::getDatabases());
-        Config::load($config);
-        $this->assertNotEmpty(Config::getDatabases());
-        Config::reset();
-        $this->assertEmpty(Config::getDatabases());
+        Phormium::configure($config);
+
+        $this->assertTrue(Phormium::isConfigured());
+        $this->assertNotEmpty(Phormium::db()->getConfig());
+
+        Phormium::reset();
+
+        $this->assertFalse(Phormium::isConfigured());
     }
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Database "xxx" not defined
+     * @expectedExceptionMessage Database "xxx" is not configured
      */
     public function testDatabaseDoesNotExist()
     {
-        Config::getDatabase('xxx');
+        $config = $this->configDir . '/config.json';
+        Phormium::configure($config);
+
+        Phormium::db()->getConnection('xxx');
     }
 
     public function testAddDatabase()
     {
         $dsn = 'dsn goes here';
-        Config::addDatabase('xxx', $dsn);
-        $actual = Config::getDatabase('xxx');
+        Phormium::db()->setConnectionConfig('xxx', $dsn);
+        $actual = Phormium::db()->getConnectionConfig('xxx');
 
         $expected = array(
             'dsn' => $dsn,

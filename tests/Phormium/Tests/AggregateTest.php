@@ -2,8 +2,8 @@
 
 namespace Phormium\Tests;
 
-use Phormium\DB;
 use Phormium\Aggregate;
+use Phormium\Phormium;
 
 use Phormium\Tests\Models\Person;
 use Phormium\Tests\Models\Trade;
@@ -15,7 +15,7 @@ class AggregateTest extends \PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()
     {
-        DB::configure(PHORMIUM_CONFIG_FILE);
+        Phormium::configure(PHORMIUM_CONFIG_FILE);
     }
 
     public function testAggregates()

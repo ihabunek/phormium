@@ -9,22 +9,9 @@ use \PDO;
  */
 class DB
 {
-    /** An array of established database connections. */
-    private static $connections = array();
-
-    /** Set to true when a global transaction has been triggered. */
-    private static $beginTriggered = false;
-
-    /**
-     * Configures database definitions.
-     *
-     * @param string|array $config Either a path to the JSON encoded
-     *      configuration file, or the configuration as an array.
-     */
     public static function configure($config)
     {
-        DB::disconnectAll();
-        Config::load($config);
+        throw new \Exception("DB::configure() is deprecated, please use Phormium::configure().");
     }
 
     /**
