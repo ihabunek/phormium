@@ -12,4 +12,9 @@ class Person extends Phormium\Model
     public $name;
     public $birthday;
     public $salary;
+
+    public function contacts()
+    {
+        return $this->hasMany("Contact");
+    }
 }
