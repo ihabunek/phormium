@@ -12,42 +12,36 @@ trait ModelRelationsTrait
     /**
      * Relates this model to multiple instances of another model.
      *
-     * Use when the foreign key constraint is defined on the related model.
+     * Use when the foreign key constraint is defined on the related model. That
+     * means that this model is the Parent, and the related model is the Child.
      *
-     * @param  string          $model  The related model class name.
-     * @param  string|string[] $foreignKey Foreign key column(s) in related model.
-     * @param  string|string[] $primaryKey Primary key column(s) in this model.
+     * @param  string          $child     The related model class name.
+     * @param  string|string[] $childKey  Foreign key column(s) in the child
+     *                                    model (related class).
+     * @param  string|string[] $parentKey Primary key column(s) in the parent
+     *                                    model (this class).
      *
      * @return QuerySet
      */
-    public function hasMany($relatedClass, $foreignKey = null, $primaryKey = null)
+    public function hasMany($child, $childKey = null, $parentKey = null)
     {
-        $this->checkClassIsModel($relatedClass);
+        $parent = get_class($this);
 
-        if (!isset($foreignKey)) {
-            $foreignKey = $this->guessForeignKey(get_class($this));
-        } else {
-            $foreignKey = $this->processKey($foreignKey);
-        }
+        $this->checkClassIsModel($child);
 
-        if (!isset($primaryKey)) {
-            $primaryKey = static::getMeta()->getPkColumns();
-        } else {
-            $primaryKey = $this->processKey($primaryKey);
-        }
-
-        if (count($primaryKey) !== count($foreignKey)) {
-            throw new \Exception("Primary and foreign key must have the same number of columns.");
-        }
-
-        $this->checkClassHasProperties($relatedClass, $foreignKey);
-        $this->checkClassHasProperties(get_class($this), $primaryKey);
+        // Determine which keys to use
+        list($parentKey, $childKey) = $this->determineKeys(
+            $parent,
+            $child,
+            $parentKey,
+            $childKey
+        );
 
         // Create a query set
-        $querySet = $relatedClass::objects();
+        $querySet = $child::objects();
 
         // Filter the query set
-        $pairs = array_combine($primaryKey, $foreignKey);
+        $pairs = array_combine($parentKey, $childKey);
         foreach ($pairs as $pkCol => $fkCol) {
             $querySet = $querySet->filter($fkCol, '=', $this->$pkCol);
         }
@@ -55,33 +49,68 @@ trait ModelRelationsTrait
         return $querySet;
     }
 
-    public function belongsTo($relatedClass, $foreignKey = null, $primaryKey = null)
+    /**
+     * Relates this model to a parent model.
+     *
+     * Use when a foreign key constraint is defined on this model. That means
+     * that this model is the Child, and the related model is the Parent.
+     *
+     * @param  string          $child     The related model class name.
+     * @param  string|string[] $childKey  Foreign key column(s) in the child
+     *                                    model (this class).
+     * @param  string|string[] $parentKey Primary key column(s) in the parent
+     *                                    model (related class).
+     *
+     * @return QuerySet
+     */
+    public function belongsTo($parent, $childKey = null, $parentKey = null)
     {
-        if (!isset($foreignKey)) {
-            $foreignKey = $this->guessForeignKey($relatedClass);
-        } else {
-            $foreignKey = $this->processKey($foreignKey);
-        }
+        $child = get_class($this);
 
-        if (!isset($primaryKey)) {
-            $primaryKey = $relatedClass::getMeta()->getPkColumns();
-        } else {
-            $primaryKey = $this->processKey($primaryKey);
-        }
+        $this->checkClassIsModel($parent);
 
-        $this->checkClassHasProperties($relatedClass, $primaryKey);
-        $this->checkClassHasProperties(get_class($this), $foreignKey);
+        // Determine which keys to use
+        list($parentKey, $childKey) = $this->determineKeys(
+            $parent,
+            $child,
+            $parentKey,
+            $childKey
+        );
 
         // Create a query set
-        $querySet = $relatedClass::objects();
+        $querySet = $parent::objects();
 
         // Filter the query set
-        $pairs = array_combine($primaryKey, $foreignKey);
+        $pairs = array_combine($parentKey, $childKey);
         foreach ($pairs as $pkCol => $fkCol) {
             $querySet = $querySet->filter($pkCol, '=', $this->$fkCol);
         }
 
         return $querySet;
+    }
+
+    private function determineKeys($parent, $child, $parentKey = null, $childKey = null)
+    {
+        if (!isset($childKey)) {
+            $childKey = $this->guessForeignKey($parent);
+        } else {
+            $childKey = $this->processKey($childKey);
+        }
+
+        if (!isset($parentKey)) {
+            $parentKey = $parent::getMeta()->getPkColumns();
+        } else {
+            $parentKey = $this->processKey($parentKey);
+        }
+
+        if (count($parentKey) !== count($childKey)) {
+            throw new \Exception("Primary and foreign key must have the same number of columns.");
+        }
+
+        $this->checkClassHasProperties($child, $childKey);
+        $this->checkClassHasProperties($parent, $parentKey);
+
+        return [$parentKey, $childKey];
     }
 
     /**
@@ -93,8 +122,8 @@ trait ModelRelationsTrait
             throw new \Exception("Model class \"$class\" does not exist.");
         }
 
-        if (!is_subclass_of($class, Model::class)) {
-            throw new \Exception("Given class \"$class\" is not a subclass of " . Model::class);
+        if (!is_subclass_of($class, "Phormium\\Model")) {
+            throw new \Exception("Given class \"$class\" is not a subclass of Phormium\\Model");
         }
     }
 
@@ -104,7 +133,7 @@ trait ModelRelationsTrait
     private function checkClassHasProperties($class, array $properties)
     {
         foreach ($properties as $property) {
-            if(!property_exists($class, $property)) {
+            if (!property_exists($class, $property)) {
                 throw new \Exception("Property \"$property\" does not exist in class \"$class\".");
             }
         }
@@ -118,22 +147,22 @@ trait ModelRelationsTrait
      *
      * Also works on composite keys.
      *
-     * @param  string $referencedClass The model which is referenced by the FK.
+     * @param  string $parent The model which is referenced by the FK.
      *
      * @return string[]
      */
-    private function guessForeignKey($referencedClass)
+    private function guessForeignKey($parent)
     {
-        $referencedMeta = $referencedClass::getMeta();
+        $parentMeta = $parent::getMeta();
 
-        $table = $referencedMeta->getTable();
-        $key = $referencedMeta->getPkColumns();
+        $table = $parentMeta->getTable();
+        $pkColumns = $parentMeta->getPkColumns();
 
-        foreach ($key as &$column) {
+        foreach ($pkColumns as &$column) {
             $column = $this->guessFkColumnName($table, $column);
         }
 
-        return $key;
+        return $pkColumns;
     }
 
     /**
@@ -141,7 +170,7 @@ trait ModelRelationsTrait
      */
     private function guessFkColumnName($table, $column)
     {
-        $table = preg_replace_callback("/[A-Z]/", function($matches) {
+        $table = preg_replace_callback("/[A-Z]/", function ($matches) {
             return "_" . strtolower($matches[0]);
         }, $table);
 
