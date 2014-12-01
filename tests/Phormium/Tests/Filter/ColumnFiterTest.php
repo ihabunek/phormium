@@ -346,7 +346,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException PHPUnit_Framework_Error
      */
     public function testFilterFromArrayExceptionWrongType()
     {

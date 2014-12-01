@@ -66,8 +66,7 @@ class CompositeFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Argument 1 passed to Phormium\Filter\CompositeFilter::add() must be an instance of Phormium\Filter\Filter
+     * @expectedException PHPUnit_Framework_Error
      */
     public function testAddInvalid()
     {
