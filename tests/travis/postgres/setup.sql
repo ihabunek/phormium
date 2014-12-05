@@ -9,6 +9,24 @@ CREATE TABLE person (
   PRIMARY KEY (id)
 );
 
+DROP TABLE IF EXISTS contact;
+CREATE TABLE contact(
+    id SERIAL,
+    person_id INTEGER NOT NULL,
+    value VARCHAR(255),
+    PRIMARY KEY (id),
+    FOREIGN KEY (person_id) REFERENCES person(id)
+);
+
+DROP TABLE IF EXISTS asset;
+CREATE TABLE asset(
+    id SERIAL,
+    owner_id INTEGER NOT NULL,
+    value VARCHAR(255),
+    PRIMARY KEY (id),
+    FOREIGN KEY (owner_id) REFERENCES person(id)
+);
+
 DROP TABLE IF EXISTS trade;
 CREATE TABLE trade(
     tradedate DATE NOT NULL,

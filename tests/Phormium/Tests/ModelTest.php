@@ -5,9 +5,11 @@ namespace Phormium\Tests;
 use Phormium\DB;
 use Phormium\Meta;
 use Phormium\QuerySet;
+use Phormium\Tests\Models\Asset;
+use Phormium\Tests\Models\Contact;
 use Phormium\Tests\Models\Person;
-use Phormium\Tests\Models\Trade;
 use Phormium\Tests\Models\PkLess;
+use Phormium\Tests\Models\Trade;
 
 /**
  * @group model
@@ -670,6 +672,8 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testAll()
     {
+        Contact::objects()->delete();
+        Asset::objects()->delete();
         Person::objects()->delete();
 
         $actual = Person::all();

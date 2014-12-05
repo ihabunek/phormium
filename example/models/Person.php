@@ -15,6 +15,6 @@ class Person extends Phormium\Model
 
     public function contacts()
     {
-        return $this->hasMany("Contact");
+        return $this->hasChildren("Contact");
     }
 }

@@ -6,7 +6,6 @@
 
 // Include Phormium and models
 require __DIR__ . "/../vendor/autoload.php";
-require __DIR__ . "/models/Trade.php";
 require __DIR__ . "/models/Person.php";
 
 // Configure Phormium
@@ -36,9 +35,9 @@ print_r($person);
  */
 
 $data = array(
-	'name' => 'Captain Beefheart',
-	'birthday' => '1941-01-15',
-	'salary' => 1200
+    'name' => 'Captain Beefheart',
+    'birthday' => '1941-01-15',
+    'salary' => 1200
 );
 
 $person = new Person();
@@ -53,16 +52,18 @@ print_r($person);
  * required changes and call update().
  */
 
-echo SEPARATOR . "Person #100 before changes:\n";
-print_r(Person::get(100));
+$personID = $person->id;
+
+echo SEPARATOR . "Person #$personID before changes:\n";
+print_r(Person::get($personID));
 
 // Get, change, update
-$person = Person::get(100);
+$person = Person::get($personID);
 $person->salary += 500;
 $person->update();
 
-echo SEPARATOR . "Person #100 after changes:\n";
-print_r(Person::get(100));
+echo SEPARATOR . "Person #$personID after changes:\n";
+print_r(Person::get($personID));
 
 /**
  * The magic save() method will automatically update() the record if it exists
@@ -78,6 +79,6 @@ $person->birthday = "1940-12-20";
 $person->salary = 1000;
 $person->save();
 
-$person = Person::get(100);
+$person = Person::get($personID);
 $person->salary += 500;
 $person->save();

@@ -23,7 +23,7 @@ trait ModelRelationsTrait
      *
      * @return QuerySet
      */
-    public function hasMany($child, $childKey = null, $parentKey = null)
+    public function hasChildren($child, $childKey = null, $parentKey = null)
     {
         $parent = get_class($this);
 
@@ -63,7 +63,7 @@ trait ModelRelationsTrait
      *
      * @return QuerySet
      */
-    public function belongsTo($parent, $childKey = null, $parentKey = null)
+    public function hasParent($parent, $childKey = null, $parentKey = null)
     {
         $child = get_class($this);
 
@@ -191,6 +191,7 @@ trait ModelRelationsTrait
             return $key;
         }
 
-        throw new \Exception("Invalid key given for relation.");
+        $type = gettype($key);
+        throw new \Exception("Invalid key type: \"$type\". Expected string or array.");
     }
 }

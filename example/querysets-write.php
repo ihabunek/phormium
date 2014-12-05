@@ -6,7 +6,6 @@
 
 // Include Phormium and models
 require __DIR__ . "/../vendor/autoload.php";
-require __DIR__ . "/models/Trade.php";
 require __DIR__ . "/models/Person.php";
 
 // Configure Phormium
@@ -21,10 +20,10 @@ define('SEPARATOR', str_repeat('-', 50) . "\n");
  */
 
 $count = Person::objects()
-	->filter('salary', '>', 5000)
-	->update(array(
-		'salary' => 6000
-	));
+    ->filter('salary', '>', 5000)
+    ->update(array(
+        'salary' => 6000
+    ));
 
 echo SEPARATOR . "Updated $count rich people.";
 
@@ -33,5 +32,5 @@ echo SEPARATOR . "Updated $count rich people.";
  */
 
 // Person::objects()
-// 	->filter('salary', '>', 5000)
-// 	->delete();
+//     ->filter('salary', '>', 5000)
+//     ->delete();

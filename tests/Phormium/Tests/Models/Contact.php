@@ -1,9 +1,13 @@
 <?php
 
-class Contact extends Phormium\Model
+namespace Phormium\Tests\Models;
+
+use Phormium\Model;
+
+class Contact extends Model
 {
     protected static $_meta = array(
-        'database' => 'exampledb',
+        'database' => 'testdb',
         'table' => 'contact',
         'pk' => 'id'
     );
@@ -11,9 +15,4 @@ class Contact extends Phormium\Model
     public $id;
     public $person_id;
     public $value;
-
-    public function person()
-    {
-        return $this->hasParent("Person");
-    }
 }
