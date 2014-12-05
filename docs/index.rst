@@ -23,6 +23,7 @@ Contents
    usage
    transactions
    events
+   relations
 
 License
 -------

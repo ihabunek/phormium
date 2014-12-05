@@ -6,7 +6,7 @@
 
 // Include Phormium and models
 require __DIR__ . "/../vendor/autoload.php";
-require __DIR__ . "/models/Trade.php";
+require __DIR__ . "/models/Post.php";
 require __DIR__ . "/models/Person.php";
 
 // Configure Phormium
@@ -16,48 +16,75 @@ require __DIR__ . "/models/Person.php";
 define('SEPARATOR', "\n" . str_repeat('-', 50) . "\n");
 
 /**
+ * Create some sample data.
+ */
+
+$person = Person::fromArray([
+    "name" => "Freddy Mercury"
+]);
+$person->save();
+$personID = $person->id;
+
+$postDate = date('Y-m-d');
+$postNo = 1;
+$post = Post::fromArray([
+    'date' => $postDate,
+    'no' => $postNo,
+    'title' => "My only post"
+]);
+$post->save();
+
+/**
  * To fetch a single record by it's primary key use:
  * 	- Model::get()  - throws an exception if record does not exist
  *  - Model::find() - returns NULL if record does not exist
  */
 
-$person = Person::get(10);
-$person = Person::find(10);
+$person = Person::get($personID);
+$person = Person::find($personID);
 
 /**
  * Also works for composite primary keys.
  */
 
-$trade = Trade::get('2013-10-01', 522);
-$trade = Trade::find('2013-10-01', 522);
+$post = Post::get($postDate, $postNo);
+$post = Post::find($postDate, $postNo);
 
 /**
  * You can pass the composite primary key as an array.
  */
 
-$tradeID = array('2013-10-01', 522);
-$trade = Trade::get($tradeID);
-$trade = Trade::find($tradeID);
+$postID = array($postDate, $postNo);
+$post = Post::get($postID);
+$post = Post::find($postID);
 
 echo SEPARATOR . "This is person #10:\n";
 print_r($person);
 
-echo SEPARATOR . "This is trade 2013-10-01 522:\n";
-print_r($trade);
+echo SEPARATOR . "This is Post $postDate #$postNo:\n";
+print_r($post);
 
 /**
  * To check if a model exists by primary key, without fetching it, use
  * Model::exists(). This returns a boolean.
  */
 
-$ex1 = Person::exists(100);
-$ex2 = Person::exists(200);
+$ex1 = Person::exists($personID);
+$ex2 = Person::exists(999);
 
-$ex3 = Trade::exists('2013-10-01', 522);
-$ex4 = Trade::exists('2013-10-01', 999);
+$ex3 = Post::exists($postDate, $postNo);
+$ex4 = Post::exists($postDate, 999);
 
 echo SEPARATOR;
-echo "Person #100 exists: "; var_dump($ex1);
-echo "Person #200 exists: "; var_dump($ex2);
-echo "Trade 2013-10-01 522 exists: "; var_dump($ex3);
-echo "Trade 2013-10-01 999 exists: "; var_dump($ex4);
+
+echo "Person #$personID exists: ";
+var_dump($ex1);
+
+echo "Person #999 exists: ";
+var_dump($ex2);
+
+echo "Post $postDate $postNo exists: ";
+var_dump($ex3);
+
+echo "Post $postDate 999 exists: ";
+var_dump($ex4);

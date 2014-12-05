@@ -13,6 +13,24 @@ CREATE TABLE person (
   PRIMARY KEY (id)
 );
 
+DROP TABLE IF EXISTS contact;
+CREATE TABLE contact(
+    id INTEGER NOT NULL AUTO_INCREMENT,
+    person_id INTEGER NOT NULL,
+    value VARCHAR(255),
+    PRIMARY KEY (id),
+    FOREIGN KEY (person_id) REFERENCES person(id)
+);
+
+DROP TABLE IF EXISTS asset;
+CREATE TABLE asset(
+    id INTEGER NOT NULL AUTO_INCREMENT,
+    owner_id INTEGER NOT NULL,
+    value VARCHAR(255),
+    PRIMARY KEY (id),
+    FOREIGN KEY (owner_id) REFERENCES person(id)
+);
+
 CREATE TABLE trade(
     tradedate DATE NOT NULL,
     tradeno INTEGER NOT NULL,

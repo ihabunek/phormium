@@ -24,4 +24,36 @@ class Meta
 
     /** Array of all columns except the primary key column. Only populated if pk is set. */
     public $nonPK;
+
+    // -- Accessors ------------------------------------------------------------
+
+    public function getTable()
+    {
+        return $this->table;
+    }
+
+    public function getDatabase()
+    {
+        return $this->databse;
+    }
+
+    public function getColumns()
+    {
+        return $this->columns;
+    }
+
+    public function getPkColumns()
+    {
+        return $this->pk;
+    }
+
+    public function getNonPkColumns()
+    {
+        return $this->nonPK;
+    }
+
+    public function getClass()
+    {
+        return $this->class;
+    }
 }

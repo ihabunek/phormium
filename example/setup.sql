@@ -6,214 +6,29 @@ CREATE TABLE person(
     salary DECIMAL(20,2)
 );
 
-DROP TABLE IF EXISTS trade;
-CREATE TABLE trade (
-	tradedate DATE,
-	tradeno INTEGER,
-	price DECIMAL(10,2),
-	quantity DECIMAL(10,2),
-	PRIMARY KEY (tradedate, tradeno)
+DROP TABLE IF EXISTS contact;
+CREATE TABLE contact(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    person_id INTEGER,
+    value VARCHAR(255),
+    FOREIGN KEY (person_id) REFERENCES person(id)
 );
 
--- Test data, thanks to http://www.generatedata.com
-INSERT INTO person (name,birthday,salary) VALUES ('Amy','1981-10-27',7098.22);
-INSERT INTO person (name,birthday,salary) VALUES ('Alea','2006-08-20',1482.84);
-INSERT INTO person (name,birthday,salary) VALUES ('Velma','1969-09-15',9688.74);
-INSERT INTO person (name,birthday,salary) VALUES ('Aline','1956-08-03',6771.88);
-INSERT INTO person (name,birthday,salary) VALUES ('Rinah','2000-09-13',1841.45);
-INSERT INTO person (name,birthday,salary) VALUES ('Medge','1959-03-15',1583.87);
-INSERT INTO person (name,birthday,salary) VALUES ('Rylee','1964-04-14',8055.75);
-INSERT INTO person (name,birthday,salary) VALUES ('Kirestin','1945-09-17',3498.85);
-INSERT INTO person (name,birthday,salary) VALUES ('Evelyn','1974-09-29',1874.43);
-INSERT INTO person (name,birthday,salary) VALUES ('Kareem','2012-06-14',3217.39);
-INSERT INTO person (name,birthday,salary) VALUES ('Candace','1970-01-05',6113.88);
-INSERT INTO person (name,birthday,salary) VALUES ('Damian','2004-02-05',5435.35);
-INSERT INTO person (name,birthday,salary) VALUES ('Diana','2005-10-25',4169.77);
-INSERT INTO person (name,birthday,salary) VALUES ('Hector','2010-02-03',7262.55);
-INSERT INTO person (name,birthday,salary) VALUES ('Fitzgerald','1982-01-26',8308.58);
-INSERT INTO person (name,birthday,salary) VALUES ('Hasad','2008-11-05',4353.12);
-INSERT INTO person (name,birthday,salary) VALUES ('Jolene','1988-08-18',4684.16);
-INSERT INTO person (name,birthday,salary) VALUES ('Illiana','2012-04-06',4793.29);
-INSERT INTO person (name,birthday,salary) VALUES ('Hall','1972-04-23',5128.18);
-INSERT INTO person (name,birthday,salary) VALUES ('Aretha','1978-10-12',2632.34);
-INSERT INTO person (name,birthday,salary) VALUES ('Kirby','1972-07-29',7495.18);
-INSERT INTO person (name,birthday,salary) VALUES ('Daryl','2003-07-06',4385.05);
-INSERT INTO person (name,birthday,salary) VALUES ('Justine','1977-01-03',8197.17);
-INSERT INTO person (name,birthday,salary) VALUES ('Maxine','1989-01-17',8338.68);
-INSERT INTO person (name,birthday,salary) VALUES ('Tashya','1951-03-01',2505.50);
-INSERT INTO person (name,birthday,salary) VALUES ('Arden','1985-07-06',1491.18);
-INSERT INTO person (name,birthday,salary) VALUES ('Orson','1993-04-13',3661.56);
-INSERT INTO person (name,birthday,salary) VALUES ('Kibo','1945-01-17',1014.69);
-INSERT INTO person (name,birthday,salary) VALUES ('Martin','1977-08-08',9466.20);
-INSERT INTO person (name,birthday,salary) VALUES ('Nell','1990-11-23',9731.32);
-INSERT INTO person (name,birthday,salary) VALUES ('Philip','1982-03-22',1753.79);
-INSERT INTO person (name,birthday,salary) VALUES ('Garth','1984-12-11',3181.57);
-INSERT INTO person (name,birthday,salary) VALUES ('Jordan','1968-05-19',7920.41);
-INSERT INTO person (name,birthday,salary) VALUES ('Melodie','1979-03-28',8810.85);
-INSERT INTO person (name,birthday,salary) VALUES ('Cynthia','1971-07-15',7540.04);
-INSERT INTO person (name,birthday,salary) VALUES ('Amity','1978-09-14',8018.22);
-INSERT INTO person (name,birthday,salary) VALUES ('Ivor','1994-09-30',3659.40);
-INSERT INTO person (name,birthday,salary) VALUES ('Camilla','1955-02-15',9586.15);
-INSERT INTO person (name,birthday,salary) VALUES ('Beck','2003-03-16',8287.17);
-INSERT INTO person (name,birthday,salary) VALUES ('Quinn','2005-08-31',9928.17);
-INSERT INTO person (name,birthday,salary) VALUES ('Yeo','1984-01-21',8480.90);
-INSERT INTO person (name,birthday,salary) VALUES ('Amery','2008-12-08',7412.06);
-INSERT INTO person (name,birthday,salary) VALUES ('Brielle','1942-03-04',6345.89);
-INSERT INTO person (name,birthday,salary) VALUES ('Nola','1986-07-24',7973.79);
-INSERT INTO person (name,birthday,salary) VALUES ('Kelly','2008-07-24',4703.99);
-INSERT INTO person (name,birthday,salary) VALUES ('Patrick','1949-12-17',3586.86);
-INSERT INTO person (name,birthday,salary) VALUES ('Joseph','1999-12-20',1789.55);
-INSERT INTO person (name,birthday,salary) VALUES ('Keelie','1943-08-25',9895.75);
-INSERT INTO person (name,birthday,salary) VALUES ('Sierra','2001-12-13',2743.30);
-INSERT INTO person (name,birthday,salary) VALUES ('Shoshana','1946-12-29',1758.55);
-INSERT INTO person (name,birthday,salary) VALUES ('Uma','1942-05-07',9149.78);
-INSERT INTO person (name,birthday,salary) VALUES ('Sloane','1944-04-30',4318.55);
-INSERT INTO person (name,birthday,salary) VALUES ('Ciaran','1987-02-02',1180.03);
-INSERT INTO person (name,birthday,salary) VALUES ('Flavia','1981-01-31',3665.74);
-INSERT INTO person (name,birthday,salary) VALUES ('Samuel','1949-12-10',1829.52);
-INSERT INTO person (name,birthday,salary) VALUES ('Eleanor','1949-06-21',8259.88);
-INSERT INTO person (name,birthday,salary) VALUES ('Uriel','1963-09-05',4013.25);
-INSERT INTO person (name,birthday,salary) VALUES ('Kasimir','1987-06-23',1452.87);
-INSERT INTO person (name,birthday,salary) VALUES ('Vance','1981-06-16',3098.68);
-INSERT INTO person (name,birthday,salary) VALUES ('Sade','1953-03-26',5171.23);
-INSERT INTO person (name,birthday,salary) VALUES ('Marsden','1968-01-05',6131.78);
-INSERT INTO person (name,birthday,salary) VALUES ('Petra','2013-04-09',2260.46);
-INSERT INTO person (name,birthday,salary) VALUES ('Mechelle','2000-06-15',3526.53);
-INSERT INTO person (name,birthday,salary) VALUES ('Britanni','1973-04-01',5631.29);
-INSERT INTO person (name,birthday,salary) VALUES ('Jenna','2002-09-06',9862.81);
-INSERT INTO person (name,birthday,salary) VALUES ('Lila','1947-04-08',4553.16);
-INSERT INTO person (name,birthday,salary) VALUES ('Tana','2006-10-21',5166.61);
-INSERT INTO person (name,birthday,salary) VALUES ('Quail','2000-02-23',1821.75);
-INSERT INTO person (name,birthday,salary) VALUES ('Jillian','1944-12-08',1776.41);
-INSERT INTO person (name,birthday,salary) VALUES ('Haviva','1953-05-05',3813.85);
-INSERT INTO person (name,birthday,salary) VALUES ('Chancellor','2006-03-30',7081.40);
-INSERT INTO person (name,birthday,salary) VALUES ('Brendan','1957-12-29',1916.35);
-INSERT INTO person (name,birthday,salary) VALUES ('Adena','1981-05-12',6745.67);
-INSERT INTO person (name,birthday,salary) VALUES ('Camden','2004-11-06',9453.79);
-INSERT INTO person (name,birthday,salary) VALUES ('Stella','1993-06-19',9795.91);
-INSERT INTO person (name,birthday,salary) VALUES ('Hilda','2007-03-15',5647.03);
-INSERT INTO person (name,birthday,salary) VALUES ('Kibo','2005-05-30',2383.10);
-INSERT INTO person (name,birthday,salary) VALUES ('Maya','1945-09-17',2849.01);
-INSERT INTO person (name,birthday,salary) VALUES ('Inga','1992-01-11',8063.71);
-INSERT INTO person (name,birthday,salary) VALUES ('Octavia','1944-06-03',9179.47);
-INSERT INTO person (name,birthday,salary) VALUES ('Quinn','1997-01-18',3870.15);
-INSERT INTO person (name,birthday,salary) VALUES ('Erica','1951-02-14',6939.09);
-INSERT INTO person (name,birthday,salary) VALUES ('Rana','1949-09-25',1604.34);
-INSERT INTO person (name,birthday,salary) VALUES ('Petra','2001-03-27',3383.41);
-INSERT INTO person (name,birthday,salary) VALUES ('Cameran','1955-11-09',2248.33);
-INSERT INTO person (name,birthday,salary) VALUES ('Latifah','1965-11-11',3986.70);
-INSERT INTO person (name,birthday,salary) VALUES ('Rosalyn','1946-06-19',7271.00);
-INSERT INTO person (name,birthday,salary) VALUES ('Inez','1941-10-20',8424.38);
-INSERT INTO person (name,birthday,salary) VALUES ('Gabriel','1989-05-06',6272.29);
-INSERT INTO person (name,birthday,salary) VALUES ('Quamar','1959-11-07',2861.01);
-INSERT INTO person (name,birthday,salary) VALUES ('Kylie','2002-02-08',2503.18);
-INSERT INTO person (name,birthday,salary) VALUES ('Odysseus','1942-05-09',1995.88);
-INSERT INTO person (name,birthday,salary) VALUES ('Finn','2012-05-15',4415.53);
-INSERT INTO person (name,birthday,salary) VALUES ('Fay','1959-08-18',7795.92);
-INSERT INTO person (name,birthday,salary) VALUES ('Carol','2000-03-25',1325.21);
-INSERT INTO person (name,birthday,salary) VALUES ('Melodie','1950-02-21',9405.75);
-INSERT INTO person (name,birthday,salary) VALUES ('Ginger','1951-01-30',9708.01);
-INSERT INTO person (name,birthday,salary) VALUES ('Lev','1997-04-24',2232.12);
-INSERT INTO person (name,birthday,salary) VALUES ('Allegra','2013-07-12',4105.67);
-INSERT INTO person (name,birthday,salary) VALUES ('Herrod','1964-10-10',2693.11);
+DROP TABLE IF EXISTS post;
+CREATE TABLE post(
+	date DATE,
+	no INTEGER,
+	title VARCHAR(255),
+	contents VARCHAR(1024),
+	PRIMARY KEY (date, no)
+);
 
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-08-01',761,723.20,759);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-08-02',290,980.80,268);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-08-08',904,965.26,285);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-08-14',781,698.75,981);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-08-20',261,338.53,700);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-09-08',615,159.28,880);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-09-24',26,091.26,15);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-09-28',895,443.26,190);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-10-06',877,980.16,271);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-10-13',355,291.60,232);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-10-19',378,781.12,102);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-10-21',287,740.38,962);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-10-24',577,677.29,722);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-10-28',967,679.61,149);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-11-10',68,519.32,862);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-11-16',374,648.96,885);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-11-18',722,543.69,256);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-11-28',241,366.00,788);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-12-10',493,440.24,653);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-12-16',712,134.32,185);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2012-12-27',789,386.89,768);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-01-08',257,145.88,877);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-01-15',200,204.46,370);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-01-17',488,242.93,845);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-01-18',645,418.13,962);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-01-28',833,822.67,496);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-02-04',799,730.67,261);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-02-24',969,460.72,141);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-02-27',714,854.49,399);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-03-02',182,038.84,579);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-03-07',775,546.30,207);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-03-11',376,070.32,248);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-03-16',646,470.22,8);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-03-21',109,288.99,915);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-03-24',67,671.48,201);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-04-15',76,034.22,318);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-04-24',221,247.86,976);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-04-24',222,513.47,95);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-04-29',429,494.06,802);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-05-05',644,932.71,121);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-05-17',411,081.62,339);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-05-22',947,897.44,554);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-05-29',164,730.23,376);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-06-01',363,195.42,905);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-06-11',298,949.31,360);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-06-15',641,675.20,657);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-06-17',383,862.39,264);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-06-30',571,100.52,358);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-07-05',257,765.61,68);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-07-05',880,200.73,734);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-07-09',886,138.46,352);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-07-14',543,812.64,286);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-07-17',39,912.83,254);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-07-23',12,870.33,413);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-07-25',561,389.79,806);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-07-26',681,270.80,290);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-07-29',19,011.32,955);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-07-30',724,695.38,90);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-08-01',808,678.03,755);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-08-03',891,491.11,440);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-08-04',72,579.45,421);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-08-07',860,274.69,247);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-08-12',163,936.65,686);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-08-14',410,935.92,854);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-08-23',238,990.32,75);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-08-28',712,414.36,562);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-08-29',182,186.90,83);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-09-09',565,466.67,821);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-09-09',884,216.47,573);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-09-14',29,431.54,673);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-09-15',575,753.06,485);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-09-30',7,505.47,417);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-10-01',522,407.25,742);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-10-25',390,041.61,891);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-11-07',322,682.50,346);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-11-15',315,719.01,717);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-11-15',9,680.93,443);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-12-06',255,783.96,228);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-12-06',44,191.00,429);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-12-20',289,646.11,471);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2013-12-30',90,294.09,614);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2014-01-01',542,782.43,870);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2014-01-11',247,645.10,58);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2014-01-12',689,851.08,928);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2014-01-24',464,095.26,153);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2014-02-22',987,916.57,850);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2014-03-08',56,156.11,953);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2014-04-05',681,189.98,343);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2014-04-21',89,248.76,795);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2014-05-03',300,831.79,638);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2014-05-11',693,567.75,721);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2014-05-12',633,412.28,323);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2014-05-15',899,089.86,573);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2014-05-31',991,630.73,48);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2014-06-12',335,393.24,18);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2014-06-21',831,615.18,45);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2014-06-24',440,324.84,919);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2014-07-03',486,564.98,321);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2014-07-04',509,802.05,449);
-INSERT INTO trade (tradedate,tradeno,price,quantity) VALUES ('2014-07-08',351,011.84,122);
+DROP TABLE IF EXISTS tag;
+CREATE TABLE tag(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    post_date DATE,
+    post_no INTEGER,
+    value VARCHAR(1024),
+    FOREIGN KEY (post_date, post_no) REFERENCES post(date, no)
+);
+

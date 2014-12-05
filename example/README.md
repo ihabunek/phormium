@@ -19,11 +19,8 @@ The Phormium configuration file defines where the database is located.
 Model classes
 -------------
 
-This example uses two Model classes:
-- `Person` which maps to the `person` table
-- `Trade` which maps to the `trade` table
-
-Model classes extend `Phormium\Model`.
+This example uses several Model classes, which are located in the `models`
+directory. Model classes extend `Phormium\Model` and map onto a database table.
 
 Public properties of each Model class match the column names of the
 corresponding database table.

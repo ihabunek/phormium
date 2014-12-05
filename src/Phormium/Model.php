@@ -11,6 +11,8 @@ use Symfony\Component\Yaml\Yaml;
  */
 abstract class Model
 {
+    use ModelRelationsTrait;
+
     // ******************************************
     // *** Statics                            ***
     // ******************************************

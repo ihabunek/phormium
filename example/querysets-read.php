@@ -6,7 +6,6 @@
 
 // Include Phormium and models
 require __DIR__ . "/../vendor/autoload.php";
-require __DIR__ . "/models/Trade.php";
 require __DIR__ . "/models/Person.php";
 
 // Configure Phormium
@@ -35,8 +34,8 @@ echo SEPARATOR . "The person table has " . count($persons) . " records.\n";
  */
 
 $persons = Person::objects()
-	->filter('salary', '>', 5000)
-	->fetch();
+    ->filter('salary', '>', 5000)
+    ->fetch();
 
 echo SEPARATOR . "The person table has " . count($persons) . " records with salary over 5000.\n";
 
@@ -46,8 +45,8 @@ echo SEPARATOR . "The person table has " . count($persons) . " records with sala
  */
 
 $persons = Person::objects()
-	->filter('salary', '>', 5000)
-	->filter('name', 'like', 'M%')
-	->fetch();
+    ->filter('salary', '>', 5000)
+    ->filter('name', 'like', 'M%')
+    ->fetch();
 
 echo SEPARATOR . "The person table has " . count($persons) . " records whose name starts with M and with salary over 5000.\n";
