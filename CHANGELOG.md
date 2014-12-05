@@ -1,6 +1,14 @@
 Phormium Changelog
 ==================
 
+
+0.7.0 / 2014-12-05
+------------------
+
+* **BC BREAK**: Dropped support for PHP 5.3
+* Added a shorthand for model relations with `Model->hasChildren()` and
+  `Model->hasParent()`
+
 0.6.2 / 2014-09-28
 ------------------
 
