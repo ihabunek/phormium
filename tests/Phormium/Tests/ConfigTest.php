@@ -2,8 +2,9 @@
 
 namespace Phormium\Tests;
 
-use Phormium\Config;
+use PDO;
 
+use Phormium\Config;
 use Phormium\DB;
 
 /**
@@ -30,13 +31,14 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
         $expected = array(
             'mydb' => array(
-                'dsn' => 'sqlite:target/temp/test.db',
-                'username' => '',
-                'password' => '',
+                'dsn' => 'sqlite:tmp/test.db',
+                'username' => null,
+                'password' => null,
+                'attributes' => []
             )
         );
 
-        $this->assertEquals($expected, Config::getDatabases());
+        $this->assertSame($expected, Config::getDatabases());
     }
 
     public function testConfigureYaml()
@@ -46,13 +48,14 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
         $expected = array(
             'mydb' => array(
-                'dsn' => 'sqlite:target/temp/test.db',
-                'username' => '',
-                'password' => '',
+                'dsn' => 'sqlite:tmp/test.db',
+                'username' => null,
+                'password' => null,
+                'attributes' => []
             )
         );
 
-        $this->assertEquals($expected, Config::getDatabases());
+        $this->assertSame($expected, Config::getDatabases());
     }
 
     public function testConfigureArray()
@@ -60,20 +63,21 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         DB::configure(array(
             'databases' => array(
                 'mydb' => array(
-                    'dsn' => 'sqlite:target/temp/test.db'
+                    'dsn' => 'sqlite:tmp/test.db'
                 )
             )
         ));
 
         $expected = array(
             'mydb' => array(
-                'dsn' => 'sqlite:target/temp/test.db',
-                'username' => '',
-                'password' => '',
+                'dsn' => 'sqlite:tmp/test.db',
+                'username' => null,
+                'password' => null,
+                'attributes' => []
             )
         );
 
-        $this->assertEquals($expected, Config::getDatabases());
+        $this->assertSame($expected, Config::getDatabases());
     }
 
     /**
@@ -137,15 +141,106 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testAddDatabase()
     {
         $dsn = 'dsn goes here';
-        Config::addDatabase('xxx', $dsn);
+        $user = 'foo';
+        $pass = 'bar';
+        $attrs = ["PDO::ATTR_CASE" => "PDO::CASE_NATURAL"];
+
+        Config::addDatabase('xxx', $dsn, $user, $pass, $attrs);
         $actual = Config::getDatabase('xxx');
 
-        $expected = array(
+        $expected = [
             'dsn' => $dsn,
-            'username' => null,
-            'password' => null,
-        );
+            'username' => $user,
+            'password' => $pass,
+            'attributes' => [
+                PDO::ATTR_CASE => PDO::CASE_NATURAL
+            ]
+        ];
 
         $this->assertSame($expected, $actual);
+    }
+
+    public function testAttributesStrings()
+    {
+        $dsn = 'für immer punk';
+
+        Config::load([
+            "databases" => [
+                "main" => [
+                    "dsn" => $dsn,
+                    "attributes" => [
+                        "PDO::ATTR_CASE" => "PDO::CASE_NATURAL"
+                    ]
+                ]
+            ]
+        ]);
+
+        $expected = [
+            "dsn" => $dsn,
+            'username' => null,
+            'password' => null,
+            "attributes" => [
+                PDO::ATTR_CASE => PDO::CASE_NATURAL
+            ]
+        ];
+
+        $actual = Config::getDatabase('main');
+
+        ksort($actual);
+        ksort($expected);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testAttributesInteger()
+    {
+        $dsn = 'für immer punk';
+
+        Config::load([
+            "databases" => [
+                "main" => [
+                    "dsn" => $dsn,
+                    "attributes" => [
+                        PDO::ATTR_CASE => PDO::CASE_NATURAL
+                    ]
+                ]
+            ]
+        ]);
+
+        $expected = [
+            "dsn" => $dsn,
+            'username' => null,
+            'password' => null,
+            "attributes" => [
+                PDO::ATTR_CASE => PDO::CASE_NATURAL
+            ]
+        ];
+
+        $actual = Config::getDatabase('main');
+
+        ksort($actual);
+        ksort($expected);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Invalid attribute "FOO" specified in configuration for database "main".
+     */
+    public function testAttributeNameDoesNotExist()
+    {
+        $dsn = 'für immer punk';
+
+        Config::load([
+            "databases" => [
+                "main" => [
+                    "dsn" => $dsn,
+                    "attributes" => [
+                        "FOO" => PDO::CASE_NATURAL
+                    ]
+                ]
+            ]
+        ]);
     }
 }
