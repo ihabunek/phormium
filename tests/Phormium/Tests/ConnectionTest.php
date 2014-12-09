@@ -24,7 +24,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public $triggeredEvents = array();
     public $triggeredArguments = array();
 
-    private $queryEvents = array(
+    private $events = array(
+        Event::DB_CONNECTING,
+        Event::DB_CONNECTED,
+        Event::DB_DISCONNECTING,
         'query.started',
         'query.preparing',
         'query.prepared',
@@ -51,7 +54,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $this->triggeredArguments = array();
 
         $that = $this;
-        foreach ($this->queryEvents as $event) {
+        foreach ($this->events as $event) {
             Event::removeListeners($event);
             Event::on($event, function() use ($event, $that) {
                 $that->triggeredEvents[] = $event;
@@ -135,6 +138,14 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     // ******************************************
     // *** TESTING EVENTS                     ***
     // ******************************************
+
+    public function testConnectionEvents()
+    {
+        var_dump($this->triggeredEvents);
+        DB::disconnect('testdb');
+        var_dump($this->triggeredEvents);
+        die;
+    }
 
     public function testQueryEvents()
     {

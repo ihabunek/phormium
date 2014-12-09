@@ -23,7 +23,8 @@ class DB
      */
     public static function configure($config)
     {
-        DB::disconnectAll();
+        self::disconnectAll();
+
         Config::load($config);
     }
 
@@ -87,6 +88,8 @@ class DB
         // Fetch database configuration
         $db = Config::getDatabase($name);
 
+        Event::emit(Event::DB_CONNECTING, [$name, $db]);
+
         // Establish a connection
         $pdo = new PDO($db['dsn'], $db['username'], $db['password']);
 
@@ -109,7 +112,11 @@ class DB
             }
         }
 
-        return new Connection($name, $pdo);
+        $connection = new Connection($name, $pdo);
+
+        Event::emit(Event::DB_CONNECTED, [$name, $db, $connection]);
+
+        return $connection;
     }
 
     /**
@@ -125,11 +132,15 @@ class DB
 
         $connection = self::$connections[$name];
 
+        Event::emit(Event::DB_DISCONNECTING, [$name, $connection]);
+
         if ($connection->inTransaction()) {
             $connection->rollback();
         }
 
         unset(self::$connections[$name]);
+
+        Event::emit(Event::DB_DISCONNECTED, [$name, $connection]);
     }
 
     /**
@@ -138,11 +149,9 @@ class DB
      */
     public static function disconnectAll()
     {
-        if (self::$beginTriggered) {
-            self::rollback();
+        foreach (self::$connections as $name => $connection) {
+            $this->disconnect($name);
         }
-
-        self::$connections = array();
     }
 
     /**
@@ -168,7 +177,7 @@ class DB
         }
 
         // Commit all started transactions
-        foreach(self::$connections as $name => $connection) {
+        foreach(self::$connections as $connection) {
             if ($connection->inTransaction()) {
                 $connection->commit();
             }
@@ -188,7 +197,7 @@ class DB
         }
 
         // Roll back all started transactions
-        foreach(self::$connections as $name => $connection) {
+        foreach(self::$connections as $connection) {
             if ($connection->inTransaction()) {
                 $connection->rollBack();
             }

@@ -10,6 +10,12 @@ namespace Phormium;
  */
 class Event
 {
+    // Connection events
+    const DB_CONNECTING    = 'db.connecting';
+    const DB_CONNECTED     = 'db.connected';
+    const DB_DISCONNECTING = 'db.disconnecting';
+    const DB_DISCONNECTED  = 'db.disconnected';
+
     // Query events
     const QUERY_STARTED   = 'query.started';
     const QUERY_PREPARING = 'query.preparing';

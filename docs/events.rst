@@ -14,6 +14,19 @@ the callback function depend on the event and are documented below.
         // Do something
     })
 
+Connection events
+-----------------
+
+The following events are emitted by connections.
+
+==================  ===============================  =================================
+ Event               Callback arguments               Description
+==================  ===============================  =================================
+ db.connecting       $name, $settings                 Before contacting the database.
+ db.connected        $name, $settings, $connection    Before contacting the database.
+ db.disconnecting    $name, $connection               Before preparing the query.
+==================  ===============================  =================================
+
 Query events
 ------------
 
