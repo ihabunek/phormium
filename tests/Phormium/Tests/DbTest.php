@@ -122,7 +122,7 @@ class DbTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException PHPUnit_Framework_Error_Warning
-     * @expectedExceptionMessage Phormium: On connection db1, attribute PDO::ATTR_ERRMODE is set to something other than PDO::ERRMODE_EXCEPTION. This is not allowed because Phormium depends on this setting. Skipping attribute definition.
+     * @expectedExceptionMessage Attribute PDO::ATTR_ERRMODE is set to something other than PDO::ERRMODE_EXCEPTION for database "db1". This is not allowed because Phormium depends on this setting. Skipping attribute definition.
      */
     public function testAttributesCannotChangeError()
     {

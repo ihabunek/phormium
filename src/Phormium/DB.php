@@ -96,16 +96,20 @@ class DB
         // because Phormium depends on errors throwing exceptions.
         if (isset($attributes[PDO::ATTR_ERRMODE])
             && $attributes[PDO::ATTR_ERRMODE] !== PDO::ERRMODE_EXCEPTION) {
-            trigger_error("Phormium: On connection $name, attribute PDO::ATTR_ERRMODE is set to something other than PDO::ERRMODE_EXCEPTION. This is not allowed because Phormium depends on this setting. Skipping attribute definition.", E_USER_WARNING);
+            trigger_error(
+                "Phormium: Attribute PDO::ATTR_ERRMODE is set to something other than " .
+                "PDO::ERRMODE_EXCEPTION for database \"$name\". This is not allowed because " .
+                "Phormium depends on this setting. Skipping attribute definition.",
+                E_USER_WARNING
+            );
         }
 
         $attributes[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
 
-
         // Apply the attributes
         foreach ($attributes as $key => $value) {
             if (!$pdo->setAttribute($key, $value)) {
-                throw new \Exception("Failed setting attribute \"$key\" to \"$value\"");
+                throw new \Exception("Failed setting PDO attribute \"$key\" to \"$value\" on database \"$name\".");
             }
         }
 
@@ -168,7 +172,7 @@ class DB
         }
 
         // Commit all started transactions
-        foreach(self::$connections as $name => $connection) {
+        foreach (self::$connections as $name => $connection) {
             if ($connection->inTransaction()) {
                 $connection->commit();
             }
@@ -188,7 +192,7 @@ class DB
         }
 
         // Roll back all started transactions
-        foreach(self::$connections as $name => $connection) {
+        foreach (self::$connections as $name => $connection) {
             if ($connection->inTransaction()) {
                 $connection->rollBack();
             }
