@@ -56,7 +56,8 @@ class Connection
      * from performance perspective.
      *
      * @param string $query The SQL query to execute.
-     * @param integer $fetchStyle One of PDO::FETCH_* constants.
+     * @param int $fetchStyle One of PDO::FETCH_* constants.
+     * @param null $class the optional fetch class
      * @return array The resulting data.
      */
     public function query($query, $fetchStyle = PDO::FETCH_ASSOC, $class = null)
@@ -76,7 +77,7 @@ class Connection
      * The method is useful for updates or deletes, which do
      * not return anything.
      *
-     * @param $query The SQL query to execute.
+     * @param $query string The SQL query to execute.
      * @return integer Number of rows affected by the query.
      */
     public function execute($query)

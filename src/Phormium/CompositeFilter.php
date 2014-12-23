@@ -48,7 +48,7 @@ class CompositeFilter extends Filter
     public function render()
     {
         if (empty($this->filters)) {
-            throw new \Exception("Canot render composite filter. No filters defined.");
+            throw new \Exception("Cannot render composite filter. No filters defined.");
         }
 
         $where = array();

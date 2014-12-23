@@ -56,6 +56,7 @@ class QuerySet
      *   - an array with three values [$column, $operation, $value]
      *
      * @return QuerySet
+     * @throws \Exception
      */
     public function filter()
     {
@@ -87,6 +88,8 @@ class QuerySet
      * @param string $column Name of the column to order by.
      * @param string $direction Direction to sort by: 'asc' (default)
      *      or 'desc'. Optional.
+     *
+     * @return QuerySet
      */
     public function orderBy($column, $direction = 'asc')
     {
@@ -98,6 +101,11 @@ class QuerySet
     /**
      * Returns a new QuerySet with the limit and offset populated with given
      * values.
+     *
+     * @param $limit
+     * @param null $offset
+     * @return QuerySet
+     * @throws \Exception
      */
     public function limit($limit, $offset = null)
     {
@@ -133,6 +141,8 @@ class QuerySet
     /**
      * Returns the AVG aggregate on the given column, using the current filters.
      * @param string $column
+     *
+     * @return string
      */
     public function avg($column)
     {
@@ -143,6 +153,7 @@ class QuerySet
     /**
      * Returns the MAX aggregate on the given column, using the current filters.
      * @param string $column
+     * @return string
      */
     public function max($column)
     {
@@ -153,6 +164,8 @@ class QuerySet
     /**
      * Returns the MIN aggregate on the given column, using the current filters.
      * @param string $column
+     *
+     * @return string
      */
     public function min($column)
     {
@@ -163,6 +176,8 @@ class QuerySet
     /**
      * Returns the SUM aggregate on the given column, using the current filters.
      * @param string $column
+     *
+     * @return string
      */
     public function sum($column)
     {
@@ -184,6 +199,8 @@ class QuerySet
     /**
      * Performs a SELECT query on the table, and returns rows matching the
      * current filter.
+     *
+     * @return array of models
      */
     public function fetch()
     {
@@ -246,7 +263,7 @@ class QuerySet
 
     /**
      * Performs a SELECT query on the table, and returns rows matching the
-     * current filter as number-indqexed arrays (instead of objects which are
+     * current filter as number-indexed arrays (instead of objects which are
      * returned by fetch().
      *
      * One or more column names can be provided as parameters, and only these
@@ -278,6 +295,7 @@ class QuerySet
      * where values() would return a 2D array.
      *
      * @param $column string The name of the column to fetch
+     * @return array
      */
     public function valuesFlat($column)
     {
@@ -329,6 +347,7 @@ class QuerySet
      *
      * @param boolean $return If set to TRUE, will return the dump as a string,
      *     otherwise, it will write it to the console (default).
+     * @return string
      */
     public function dump($return = false)
     {
@@ -342,6 +361,7 @@ class QuerySet
     /**
      * Adds a new filter to the queryset. If multiple filters are added, they
      * will be joined by an AND composite filter.
+     * @param Filter $filter the filter to add
      */
     private function addFilter(Filter $filter)
     {

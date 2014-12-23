@@ -31,7 +31,7 @@ class Query
      * @param Filter $filter A filter instance used to form the WHERE clause.
      * @param array $order Array of strings used to form the ORDER BY clause.
      *
-     * @return array An array of {@link Model} instances corresponing to given
+     * @return array An array of {@link Model} instances corresponding to given
      *      criteria.
      */
     public function select($filter, $order, array $columns = null, $limit = null, $offset = null, $fetchType = PDO::FETCH_CLASS)
@@ -66,6 +66,7 @@ class Query
      *      will return an array of arrays, and each of these will have
      *      the distinct values indexed by column name. If a single column is
      *      given will return an array of distinct values for that column.
+     * @throws \Exception
      */
     public function selectDistinct($filter, $order, array $columns)
     {
@@ -120,6 +121,7 @@ class Query
      * @param Filter $filter A filter instance used to form the WHERE clause.
      * @param Aggregate $aggregate The aggregate to perform.
      * @return string Result of the aggregate query.
+     * @throws \Exception
      */
     public function aggregate($filter, $aggregate)
     {
@@ -142,6 +144,8 @@ class Query
 
     /**
      * Constructs and executes an INSERT statement for a single Model instance.
+     * @param Model $model the model
+     * @throws \Exception
      */
     public function insert(Model $model)
     {
@@ -218,6 +222,9 @@ class Query
 
     /**
      * Constructs and executes an UPDATE statement for a single Model instance.
+     * @param Model $model the model to operate with
+     * @return int
+     * @throws \Exception if updating failed
      */
     public function update(Model $model)
     {
@@ -262,6 +269,9 @@ class Query
 
     /**
      * Deletes a single model from the database.
+     * @param Model $model the model to delete
+     * @return int
+     * @throws \Exception
      */
     public function delete(Model $model)
     {
@@ -337,7 +347,7 @@ class Query
     // ******************************************
 
     /**
-     * Checks that each of the columns in $columns exists in the uderlying
+     * Checks that each of the columns in $columns exists in the underlying
      * model.
      */
     private function checkColumnsExist(array $columns)

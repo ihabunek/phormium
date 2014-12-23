@@ -14,7 +14,7 @@ abstract class Filter
      * Creates a new AND composite filter from given filter components.
      *
      * @param mixed One or more Filter objects or array($column, $op, $value)
-     *      triplets which will be coverted to corresponding ColumnFilter
+     *      triplets which will be converted to corresponding ColumnFilter
      *      objects.
      *
      * @return CompositeFilter
@@ -31,7 +31,7 @@ abstract class Filter
      * Creates a new OR composite filter from given filter components.
      *
      * @param mixed One or more Filter objects or array($column, $op, $value)
-     *      triplets which will be coverted to corresponding ColumnFilter
+     *      triplets which will be converted to corresponding ColumnFilter
      *      objects.
      *
      * @return CompositeFilter

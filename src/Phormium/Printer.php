@@ -10,7 +10,7 @@ class Printer
     /** Number of spaces to leave between columns. */
     const COLUMN_PADDING = 3;
 
-    /** Maximum number of chars in a column. Longer values will be trucnated. */
+    /** Maximum number of chars in a column. Longer values will be truncated. */
     const COLUMN_MAX_LENGTH = 50;
 
     /**
@@ -18,12 +18,13 @@ class Printer
      * prints it to the console in a human readable way.
      *
      * If using non-ascii characters, make sure to set mb_internal_encoding
-     * to the appropreiate value, e.g.:
+     * to the appropriate value, e.g.:
      * <pre>mb_internal_encoding('UTF-8');</pre>
      *
-     * @param array $array Input array.
-     * @param array $return If set to true, the dump will be returned as string
+     * @param QuerySet $querySet
+     * @param array|bool $return If set to true, the dump will be returned as string
      *         instead of printing it.
+     * @throws \Exception
      */
     public static function dump(QuerySet $querySet, $return = false)
     {

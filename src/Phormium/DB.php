@@ -92,7 +92,7 @@ class DB
     }
 
     /**
-     * Ends the global transaction by commiting all changes on all connections.
+     * Ends the global transaction by committing all changes on all connections.
      */
     public static function commit()
     {
