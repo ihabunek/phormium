@@ -113,11 +113,11 @@ class Query
     /**
      * Constructs and executes a SELECT aggregate query.
      *
-     * @param Filter $filter A filter instance used to form the WHERE clause.
-     * @param Aggregate $aggregate The aggregate to perform.
-     * @return string Result of the aggregate query.
+     * @param  Filter    $filter     A filter instance used to form the WHERE clause.
+     * @param  Aggregate $aggregate  The aggregate to perform.
+     * @return string                Result of the aggregate query.
      */
-    public function aggregate($filter, $aggregate)
+    public function aggregate($filter, Aggregate $aggregate)
     {
         $table = $this->meta->table;
         $column = $aggregate->column;
@@ -363,7 +363,7 @@ class Query
     }
 
     /** Constructs a WHERE clause for a given filter. */
-    private function constructWhere($filter)
+    private function constructWhere(Filter $filter = null)
     {
         if ($filter === null) {
             return array("", array());
