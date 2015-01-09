@@ -2,8 +2,6 @@
 
 namespace Phormium\Config;
 
-use Symfony\Component\Config\Loader\Loader;
-
 /**
  * Loads array configurations (passthrough).
  */

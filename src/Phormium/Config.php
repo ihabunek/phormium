@@ -2,8 +2,6 @@
 
 namespace Phormium;
 
-use PDO;
-
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Exception\FileLoaderLoadException;
@@ -141,7 +139,9 @@ class Config
     {
         $treeBuilder = new TreeBuilder();
 
-        $rootNode = $treeBuilder->root('phormium')
+        $rootNode = $treeBuilder->root('phormium');
+
+        $rootNode
             ->children()
                 ->arrayNode('databases')
                     ->prototype('array')

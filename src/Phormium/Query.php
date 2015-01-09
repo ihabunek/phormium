@@ -124,7 +124,7 @@ class Query
         $type = $aggregate->type;
 
         if (!in_array($column, $this->meta->columns)) {
-            if (!($aggregate->type === Aggregate::COUNT && $column === '*')) {
+            if (!($type === Aggregate::COUNT && $column === '*')) {
                 throw new \Exception(
                     "Error forming aggregate query. " .
                     "Column [$column] does not exist in table [$table]."
@@ -269,7 +269,6 @@ class Query
         $args = array();
         $where = array();
         foreach ($pk as $column => $value) {
-
             // All PK fields must be set
             if (!isset($value)) {
                 throw new \Exception("Cannot delete. Primary key column [$column] is not set.");

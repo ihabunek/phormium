@@ -2,8 +2,6 @@
 
 namespace Phormium;
 
-use Phormium\Model;
-
 /**
  * Implements relation forming functions for Models.
  */
