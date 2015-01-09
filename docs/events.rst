@@ -17,15 +17,29 @@ the callback function depend on the event and are documented below.
 Connection events
 -----------------
 
-The following events are emitted by connections.
+The following events are emitted by database connections.
 
-==================  ===============================  =================================
- Event               Callback arguments               Description
-==================  ===============================  =================================
- db.connecting       $name, $settings                 Before contacting the database.
- db.connected        $name, $settings, $connection    Before contacting the database.
- db.disconnecting    $name, $connection               Before preparing the query.
-==================  ===============================  =================================
+==================  ======================= ====================================
+ Event               Callback arguments      Description
+==================  ======================= ====================================
+ db.connecting       $name, $settings        Before creating a PDO connection.
+ db.connected        $name, $connection      After creating a PDO connection.
+ db.disconnecting    $name, $connection      Before disconnecting.
+ db.disconnected     $name, $connection      After disconnectine.
+ db.begin            $name, $connection      When a transaction is started.
+ db.commit           $name, $connection      When a transaction is committed.
+ db.rollback         $name, $connection      When a transaction is rolled back.
+==================  ======================= ====================================
+
+Event callback functions use the following arguments:
+
+ =============== ====================== ======================================
+  Name            Type                   Description
+ =============== ====================== ======================================
+  $name           string                 Connection name.
+  $settings       array                  Database configuration options.
+  $connection     Phormium\\Connection   Connection being handled.
+ =============== ====================== ======================================
 
 Query events
 ------------
@@ -60,19 +74,15 @@ will trigger `fetching` and `fetched` events.
 
 Event callback functions use the following arguments:
 
-+---------------+----------------------+--------------------------------------+
-| Name          | Type                 | Description                          |
-+===============+======================+======================================+
-| $query        | string               | Query SQL code                       |
-+---------------+----------------------+--------------------------------------+
-| $arguments    | array                | Query arguments                      |
-+---------------+----------------------+--------------------------------------+
-| $connection   | Phormium\\Connection | Connection on which the query is run |
-+---------------+----------------------+--------------------------------------+
-| $data         | array                | The data fetched from the database.  |
-+---------------+----------------------+--------------------------------------+
-| $exception    | Exception            | Exception thrown on query failure    |
-+---------------+----------------------+--------------------------------------+
+ =============== ====================== ======================================
+  Name            Type                   Description
+ =============== ====================== ======================================
+  $query          string                 Query SQL code
+  $arguments      array                  Query arguments
+  $connection     Phormium\\Connection   Connection on which the query is run
+  $data           array                  The data fetched from the database.
+  $exception      Exception              Exception thrown on query failure
+ =============== ====================== ======================================
 
 Transaction events
 ------------------

@@ -150,7 +150,7 @@ class DB
     public static function disconnectAll()
     {
         foreach (self::$connections as $name => $connection) {
-            $this->disconnect($name);
+            self::disconnect($name);
         }
     }
 
