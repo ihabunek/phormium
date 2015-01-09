@@ -48,28 +48,10 @@ It would return something like:
 ]
 ```
 
-Raw filters
------------
+Enable custom FK guessers
+-------------------------
 
-Implement raw filters for user to write manually, instead of using existing
-ones. Some examples:
+Enable setting a custom ModelRelationsTrait::guessForeignKey() function.
 
-Can have literals left of the operator:
-
-```
-$qs->rawFilter("1=1");
-```
-
-Arguments passed to perform a prepared query:
-
-```
-$qs->rawFilter("column = :value", ['value' => 3]);
-```
-
-Can use functions and operators:
-
-```
-$qs->rawFilter("column = :value * 2", ['value' => 3]);
-$qs->rawFilter("lower(column) like lower(:value)", ['value' => "FOO"]);
-```
-
+This will enable custome db naming schemas to be guessed by phormium, instead
+of having to be set manually.
