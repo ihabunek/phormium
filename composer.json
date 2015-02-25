@@ -16,6 +16,7 @@
         "symfony/config": "~2.6.0",
         "symfony/yaml": "~2.6.0",
         "pimple/pimple": "~3.0.0",
+        "evenement/evenement": "~2.0.0",
         "ext-pdo": "*"
     },
     "require-dev": {

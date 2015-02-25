@@ -60,5 +60,10 @@ class Orm extends Container
             // Additional postprocessing to handle
             return $this['config.postprocessor']->processConfig($config);
         };
+
+        // Event emitter
+        $this['emitter'] = function () {
+            return new Evenement\EventEmitter();
+        };
     }
 }
