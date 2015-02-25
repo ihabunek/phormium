@@ -15,19 +15,21 @@
         "php": ">=5.4.0",
         "symfony/config": "~2.6.0",
         "symfony/yaml": "~2.6.0",
+        "pimple/pimple": "~3.0.0",
         "ext-pdo": "*"
     },
     "require-dev": {
         "mockery/mockery": "@stable"
     },
-    "suggest": {
-        "apache/log4php": "Required for query logging"
-    },
     "autoload": {
-        "psr-0": {"Phormium": "src/"}
+        "psr-0": {
+            "Phormium": "src/"
+        }
     },
     "autoload-dev": {
-        "psr-0": {"Phormium\\Tests": "tests/"}
+        "psr-0": {
+            "Phormium\\Tests": "tests/unit"
+        }
     },
     "support": {
         "issues": "https://github.com/ihabunek/phormium/issues"

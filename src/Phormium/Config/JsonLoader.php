@@ -2,23 +2,23 @@
 
 namespace Phormium\Config;
 
-use Symfony\Component\Yaml\Yaml;
+use Phormium\Helper\Json;
 
 /**
- * Loads and decodes YAML configuration files.
+ * Loads and decodes JSON configuration files.
  */
-class YamlConfigLoader extends FileLoader
+class JsonLoader extends FileLoader
 {
     public function load($resource, $type = null)
     {
         $data = $this->loadFile($resource);
 
-        return Yaml::parse($data);
+        return Json::parse($data, true);
     }
 
     public function supports($resource, $type = null)
     {
         return is_string($resource) &&
-            in_array(pathinfo($resource, PATHINFO_EXTENSION), array('yaml', 'yml'));
+            pathinfo($resource, PATHINFO_EXTENSION) === 'json';
     }
 }
