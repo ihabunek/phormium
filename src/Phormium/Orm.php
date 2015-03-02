@@ -65,5 +65,47 @@ class Orm extends Container
         $this['emitter'] = function () {
             return new Evenement\EventEmitter();
         };
+
+        // Parser for model metadata
+        $this['meta.builder'] = function () {
+            return new MetaParser();
+        };
+
+        // Model metadata cache
+        $this['meta.cache'] = function () {
+            return new \ArrayObject();
+        };
+    }
+
+    /**
+     * Constructs a QuerySet for a given model.
+     *
+     * @param string $model The name of the model class.
+     *
+     * @return Phormium\QuerySet
+     */
+    public function objects($model)
+    {
+        $meta = $this->getModelMeta($model);
+        $query = new Query($meta);
+
+        return new QuerySet($query, $meta);
+    }
+
+    /**
+     * Returns the Meta object for a given Model.
+     *
+     * Results are cached to avoid multiple parsing.
+     *
+     * @param  string $model Model class name.
+     * @return Meta          Model's meta
+     */
+    public function getModelMeta($model)
+    {
+        if (!isset($this['meta.cache'][$model])) {
+            $this['meta.cache'][$model] = $this['meta.builder']->buildMeta($model);
+        }
+
+        return $this['meta.cache'][$model];
     }
 }

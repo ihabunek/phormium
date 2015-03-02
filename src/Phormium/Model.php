@@ -29,10 +29,7 @@ abstract class Model
      */
     public static function getMeta()
     {
-        return Parser::getMeta(
-            get_called_class(),
-            static::$_meta
-        );
+        return static::$_meta;
     }
 
     /**

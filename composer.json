@@ -24,12 +24,12 @@
     },
     "autoload": {
         "psr-0": {
-            "Phormium": "src/"
+            "Phormium\\": "src/"
         }
     },
     "autoload-dev": {
-        "psr-0": {
-            "Phormium\\Tests": "tests/unit"
+        "psr-4": {
+            "Phormium\\Tests\\": "tests/unit"
         }
     },
     "support": {
