@@ -4,18 +4,13 @@ namespace Phormium\Tests;
 
 use Phormium\Meta;
 use Phormium\MetaBuilder;
-use Phormium\Tests\Models\InvalidModel1;
-use Phormium\Tests\Models\InvalidModel2;
-use Phormium\Tests\Models\NotModel;
-use Phormium\Tests\Models\Model1;
-use Phormium\Tests\Models\Model2;
 
 class MetaBuilderTest extends \PHPUnit_Framework_TestCase
 {
     public function testParse1()
     {
         $builder = new MetaBuilder();
-        $meta = $builder->build(Model1::class);
+        $meta = $builder->build("Phormium\\Tests\\Models\\Model1");
 
         $this->assertSame('model1', $meta->table);
         $this->assertSame('database1', $meta->database);
@@ -28,7 +23,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     public function testParse2()
     {
         $builder = new MetaBuilder();
-        $meta = $builder->build(Model2::class);
+        $meta = $builder->build("Phormium\\Tests\\Models\\Model2");
 
         $this->assertSame('model2', $meta->table);
         $this->assertSame('database1', $meta->database);
@@ -65,7 +60,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     public function testInvalidClass3()
     {
         $builder = new MetaBuilder();
-        $builder->build(NotModel::class);
+        $builder->build("Phormium\\Tests\\Models\\NotModel");
     }
 
     /**
@@ -75,7 +70,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     public function testParseErrorNotArray()
     {
         $builder = new MetaBuilder();
-        $builder->build(InvalidModel1::class);
+        $builder->build("Phormium\\Tests\\Models\\InvalidModel1");
     }
 
     /**
@@ -85,7 +80,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     public function testParseNoColumns()
     {
         $builder = new MetaBuilder();
-        $builder->build(InvalidModel2::class);
+        $builder->build("Phormium\\Tests\\Models\\InvalidModel2");
     }
 
     /**

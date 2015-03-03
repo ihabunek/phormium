@@ -10,7 +10,7 @@ use ReflectionProperty;
  */
 class MetaBuilder
 {
-    const DEFAULT_PRIMARY_KEY = ['id'];
+    private static $defaultPK = ['id'];
 
     /**
      * Creates a Meta object for the given model class.
@@ -80,7 +80,7 @@ class MetaBuilder
             throw new \InvalidArgumentException("Class \"$class\" does not exist.");
         }
 
-        if (!is_subclass_of($class, Model::class)) {
+        if (!is_subclass_of($class, "Phormium\\Model")) {
             throw new \InvalidArgumentException("Class \"$class\" is not a subclass of Phormium\\Model.");
         }
     }
@@ -89,7 +89,7 @@ class MetaBuilder
     protected function getPK($class, $meta, $columns)
     {
         if (empty($meta['pk'])) {
-            $pk = self::DEFAULT_PRIMARY_KEY;
+            $pk = self::$defaultPK;
         } elseif (is_string($meta['pk'])) {
             $pk = [$meta['pk']];
         } elseif (is_array($meta['pk'])) {
