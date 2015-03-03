@@ -18,9 +18,24 @@ class PostProcessor
 
     public function processDbConfig($name, $config)
     {
+        // Add the driver name to database config, needed to tailor db queries
+        $config['driver'] = $this->parseDriver($config['dsn']);
+
         $config['attributes'] = $this->processAttributes($name, $config['attributes']);
 
         return $config;
+    }
+
+    /** Parses the DSN and extracts the driver name. */
+    public function parseDriver($dsn)
+    {
+        $count = preg_match('/^([a-z]+):/', $dsn, $matches);
+
+        if ($count !== 1) {
+            throw new \Exception("Invalid DSN: \"$dsn\". The DSN should start with '<driver>:'");
+        }
+
+        return $matches[1];
     }
 
     public function processAttributes($dbName, $attributes)

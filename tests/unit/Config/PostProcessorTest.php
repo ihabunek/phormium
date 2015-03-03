@@ -55,6 +55,7 @@ class PostProcessorTest extends \PHPUnit_Framework_TestCase
         $config = [
             "databases" => [
                 "one" => [
+                    "dsn" => "mysql:host=localhost",
                     "attributes" => [
                         "PDO::ATTR_CASE" => "PDO::CASE_LOWER",
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -68,6 +69,8 @@ class PostProcessorTest extends \PHPUnit_Framework_TestCase
         $expected = [
             "databases" => [
                 "one" => [
+                    "dsn" => "mysql:host=localhost",
+                    "driver" => "mysql",
                     "attributes" => [
                         PDO::ATTR_CASE => PDO::CASE_LOWER,
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -80,7 +83,7 @@ class PostProcessorTest extends \PHPUnit_Framework_TestCase
 
         $processor = new PostProcessor();
         $actual = $processor->processConfig($config);
-        $this->assertSame($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     /**
@@ -93,6 +96,7 @@ class PostProcessorTest extends \PHPUnit_Framework_TestCase
         $processor->processConfig([
             "databases" => [
                 "one" => [
+                    "dsn" => "mysql:host=localhost",
                     "attributes" => [
                         "foo" => 10
                     ]
@@ -111,11 +115,22 @@ class PostProcessorTest extends \PHPUnit_Framework_TestCase
         $processor->processConfig([
             "databases" => [
                 "one" => [
+                    "dsn" => "mysql:host=localhost",
                     "attributes" => [
                         "PDO::ATTR_TIMEOUT" => []
                     ]
                 ]
             ]
         ]);
+    }
+
+    public function testParseDriver()
+    {
+        $proc = new PostProcessor();
+
+        $this->assertSame('informix', $proc->parseDriver('informix:host=localhost'));
+        $this->assertSame('mysql', $proc->parseDriver('mysql:host=localhost'));
+        $this->assertSame('pgsql', $proc->parseDriver('pgsql:host=localhost'));
+        $this->assertSame('sqlite', $proc->parseDriver('sqlite:host=localhost'));
     }
 }
