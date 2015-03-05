@@ -2,17 +2,27 @@
 
 namespace Phormium\Tests;
 
+use Evenement\EventEmitter;
+
 use Mockery as m;
 
 use Phormium\Database\Database;
+use Phormium\Event;
 
 use PDO;
 
 class DatabaseTest extends \PHPUnit_Framework_TestCase
 {
-    private $config1 = [
+    private $config = [
         "db1" => [
-            "dsn" => "sqlite:tmp/test.db",
+            "dsn" => "sqlite:tmp/db1.db",
+            "driver" => "sqlite",
+            "username" => null,
+            "password" => null,
+            "attributes" => []
+        ],
+        "db2" => [
+            "dsn" => "sqlite:tmp/db2.db",
             "driver" => "sqlite",
             "username" => null,
             "password" => null,
@@ -25,10 +35,35 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
         m::close();
     }
 
+    protected function getMockEmitter()
+    {
+        $emitter = m::mock("Evenement\\EventEmitter");
+
+        $emitter->shouldReceive('on')->once()
+            ->with(Event::QUERY_STARTED, m::type('callable'));
+
+        $emitter->shouldReceive('emit');
+
+        return $emitter;
+    }
+
+    protected function getDatabase(array $config = null, EventEmitter $emitter = null)
+    {
+        if (!isset($config)) {
+            $config = $this->config;
+        }
+
+        if (!isset($emitter)) {
+            $emitter = $this->getMockEmitter();
+        }
+
+        return new Database($config, $emitter);
+    }
+
     public function testSetConnection()
     {
         $conn = m::mock("Phormium\\Database\\Connection");
-        $emitter = m::mock("Evenement\EventEmitter");
+        $emitter = $this->getMockEmitter();
 
         $database = new Database([], $emitter);
         $database->setConnection('foo', $conn);
@@ -44,7 +79,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
     public function testSetConnectionError()
     {
         $conn = m::mock("Phormium\\Database\\Connection");
-        $emitter = m::mock("Evenement\EventEmitter");
+        $emitter = $this->getMockEmitter();
 
         $database = new Database([], $emitter);
         $database->setConnection('foo', $conn);
@@ -57,7 +92,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
     public function testDisconnect()
     {
         $conn = m::mock("Phormium\\Database\\Connection");
-        $emitter = m::mock("Evenement\EventEmitter");
+        $emitter = $this->getMockEmitter();
 
         $database = new Database([], $emitter);
         $database->setConnection('foo', $conn);
@@ -77,9 +112,9 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
     public function testNewConnectionWithAttributes1()
     {
-        $emitter = m::mock("Evenement\EventEmitter");
+        $emitter = $this->getMockEmitter();
 
-        $config = $this->config1;
+        $config = $this->config;
         $config['db1']['attributes'] = [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
         ];
@@ -96,9 +131,9 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
     public function testNewConnectionWithAttributes2()
     {
-        $emitter = m::mock("Evenement\EventEmitter");
+        $emitter = $this->getMockEmitter();
 
-        $config = $this->config1;
+        $config = $this->config;
         $config['db1']['attributes'] = [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_BOTH
         ];
@@ -113,9 +148,9 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
     public function testAttributesCannotChange()
     {
-        $emitter = m::mock("Evenement\EventEmitter");
+        $emitter = $this->getMockEmitter();
 
-        $config = $this->config1;
+        $config = $this->config;
         $config['db1']['attributes'] = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT
         ];
@@ -137,9 +172,9 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
      */
     public function testAttributesCannotChangeError()
     {
-        $emitter = m::mock("Evenement\EventEmitter");
+        $emitter = $this->getMockEmitter();
 
-        $config = $this->config1;
+        $config = $this->config;
         $config['db1']['attributes'] = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT
         ];
@@ -156,13 +191,48 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidAttribute()
     {
-        $emitter = m::mock("Evenement\EventEmitter");
+        $emitter = $this->getMockEmitter();
 
-        $config = $this->config1;
+        $config = $this->config;
         $config['db1']['attributes'] = ["foo" => "bar"];
 
         $database = new Database($config, $emitter);
 
         @$database->getConnection("db1");
+    }
+
+    public function testTransaction()
+    {
+        $emitter = new EventEmitter();
+        $database = new Database($this->config, $emitter);
+
+        $database->begin();
+
+        $db1 = $database->getConnection('db1');
+        $db2 = $database->getConnection('db2');
+
+        // Check db transaction is not started by starting a global transaction
+        $this->assertTrue($database->beginTriggered());
+        $this->assertFalse($db1->inTransaction());
+        $this->assertFalse($db2->inTransaction());
+
+        // Check db transaction is started when executing a query
+        $db1->query("SELECT 1");
+
+        $this->assertTrue($database->beginTriggered());
+        $this->assertTrue($db1->inTransaction());
+        $this->assertFalse($db2->inTransaction());
+
+        $db2->query("SELECT 2");
+
+        $this->assertTrue($database->beginTriggered());
+        $this->assertTrue($db1->inTransaction());
+        $this->assertTrue($db2->inTransaction());
+
+        $database->commit();
+
+        $this->assertFalse($database->beginTriggered());
+        $this->assertFalse($db1->inTransaction());
+        $this->assertFalse($db2->inTransaction());
     }
 }

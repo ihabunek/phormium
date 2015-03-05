@@ -25,13 +25,6 @@ class Connection
     private $pdo;
 
     /**
-     * The parent Database object.
-     *
-     * @var Phormium\Database
-     */
-    private $database;
-
-    /**
      * The driver name extracted from the PDO connection DSN.
      *
      * @var string
@@ -50,12 +43,10 @@ class Connection
      *
      * @param string       $name     Connection name.
      * @param PDO          $pdo      Underlying PDO connection.
-     * @param Database     $database The database manager object.
      * @param EventEmitter $emitter  Event emitter.
      */
-    public function __construct($name, PDO $pdo, Database $database, EventEmitter $emitter)
+    public function __construct($name, PDO $pdo, EventEmitter $emitter)
     {
-        $this->database = $database;
         $this->emitter = $emitter;
         $this->name = $name;
         $this->pdo = $pdo;
@@ -76,8 +67,6 @@ class Connection
      */
     public function preparedQuery($query, array $arguments = array(), $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
-        $this->handleTransaction();
-
         $this->emitter->emit(Event::QUERY_STARTED, array($query, $arguments, $this));
 
         $stmt = $this->pdoPrepare($query, $arguments);
@@ -102,8 +91,6 @@ class Connection
      */
     public function query($query, $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
-        $this->handleTransaction();
-
         $arguments = array();
 
         $this->emitter->emit(Event::QUERY_STARTED, array($query, $arguments, $this));
@@ -126,8 +113,6 @@ class Connection
      */
     public function execute($query)
     {
-        $this->handleTransaction();
-
         $arguments = array();
 
         $this->emitter->emit(Event::QUERY_STARTED, array($query, $arguments, $this));
@@ -152,8 +137,6 @@ class Connection
      */
     public function preparedExecute($query, $arguments = array())
     {
-        $this->handleTransaction();
-
         $this->emitter->emit(Event::QUERY_STARTED, array($query, $arguments, $this));
 
         $stmt = $this->pdoPrepare($query, $arguments);
@@ -311,12 +294,5 @@ class Connection
         $this->emitter->emit(Event::QUERY_FETCHED, array($query, $arguments, $this));
 
         return $data;
-    }
-
-    protected function handleTransaction()
-    {
-        if ($this->database->beginTriggered() && !$this->inTransaction()) {
-            $this->beginTransaction();
-        }
     }
 }

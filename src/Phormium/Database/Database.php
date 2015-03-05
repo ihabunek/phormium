@@ -44,11 +44,21 @@ class Database
     {
         $this->databases = $databases;
         $this->emitter = $emitter;
+
+        // Handle database transactions
+        // If a global transaction is triggered, start the database transaction
+        // before executing a query on the connection.
+        $emitter->on(Event::QUERY_STARTED, function($query, $args, $conn) {
+            if ($this->beginTriggered() && !$conn->inTransaction()) {
+                $conn->beginTransaction();
+            }
+        });
     }
 
     /**
-     * Returns a PDO connection for the given database name. If the connection
-     * does not exist, it is established.
+     * Returns a PDO connection for the given database name.
+     *
+     * If the connection does not exist, it is established.
      *
      * @param  string $name Connection name.
      *
@@ -61,13 +71,7 @@ class Database
                 $this->newConnection($name, $this, $this->emitter);
         }
 
-        $connection = $this->connections[$name];
-
-        if ($this->beginTriggered && !$connection->inTransaction()) {
-            $connection->beginTransaction();
-        }
-
-        return $connection;
+        return $this->connections[$name];
     }
 
     /**
@@ -250,6 +254,6 @@ class Database
             }
         }
 
-        return new Connection($name, $pdo, $this, $this->emitter);
+        return new Connection($name, $pdo, $this->emitter);
     }
 }
