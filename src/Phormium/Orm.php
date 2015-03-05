@@ -2,11 +2,15 @@
 
 namespace Phormium;
 
+use Evenement\EventEmitter;
+
 use Phormium\Config\ArrayLoader;
 use Phormium\Config\JsonLoader;
 use Phormium\Config\YamlLoader;
 use Phormium\Config\PostProcessor;
 use Phormium\Config\Configuration;
+use Phormium\Database\Database;
+use Phormium\Database\Factory;
 
 use Pimple\Container;
 
@@ -63,17 +67,25 @@ class Orm extends Container
 
         // Event emitter
         $this['emitter'] = function () {
-            return new Evenement\EventEmitter();
+            return new EventEmitter();
         };
 
         // Parser for model metadata
         $this['meta.builder'] = function () {
-            return new MetaParser();
+            return new MetaBuilder();
         };
 
         // Model metadata cache
         $this['meta.cache'] = function () {
             return new \ArrayObject();
+        };
+
+        // Database manager
+        $this['database'] = function() {
+            return new Database(
+                $this['config']['databases'],
+                $this['emitter']
+            );
         };
     }
 
@@ -87,7 +99,10 @@ class Orm extends Container
     public function objects($model)
     {
         $meta = $this->getModelMeta($model);
-        $query = new Query($meta);
+
+        $driver = $this['config']['databases'][$meta->database]['driver'];
+
+        $query = new Query($meta, $this['database'], $driver);
 
         return new QuerySet($query, $meta);
     }
@@ -103,7 +118,7 @@ class Orm extends Container
     public function getModelMeta($model)
     {
         if (!isset($this['meta.cache'][$model])) {
-            $this['meta.cache'][$model] = $this['meta.builder']->buildMeta($model);
+            $this['meta.cache'][$model] = $this['meta.builder']->build($model);
         }
 
         return $this['meta.cache'][$model];
