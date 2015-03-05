@@ -18,9 +18,19 @@ class PostProcessor
 
     public function processDbConfig($name, $config)
     {
+        // Ensure username and password keys exist
+        if (!array_key_exists("username", $config)) {
+            $config['username'] = null;
+        }
+
+        if (!array_key_exists("password", $config)) {
+            $config['password'] = null;
+        }
+
         // Add the driver name to database config, needed to tailor db queries
         $config['driver'] = $this->parseDriver($config['dsn']);
 
+        // Convert string attributes to actual values
         $config['attributes'] = $this->processAttributes($name, $config['attributes']);
 
         return $config;

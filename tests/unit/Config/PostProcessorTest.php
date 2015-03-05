@@ -70,6 +70,8 @@ class PostProcessorTest extends \PHPUnit_Framework_TestCase
             "databases" => [
                 "one" => [
                     "dsn" => "mysql:host=localhost",
+                    "username" => null,
+                    "password" => null,
                     "driver" => "mysql",
                     "attributes" => [
                         PDO::ATTR_CASE => PDO::CASE_LOWER,
