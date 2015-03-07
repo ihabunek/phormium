@@ -5,4 +5,5 @@ php:
   - hhvm
 
 before_script:
+  - mkdir tmp
   - composer install
