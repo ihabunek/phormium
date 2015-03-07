@@ -13,11 +13,11 @@ use PDO;
 class Database
 {
     /**
-     * An array of established database connections.
+     * The connection factory.
      *
-     * @var array
+     * @var Phormium\Database\Factory
      */
-    private $connections = [];
+    private $factory;
 
     /**
      * Set to true when a global transaction has been triggered.
@@ -40,9 +40,9 @@ class Database
      */
     protected $databases;
 
-    public function __construct($databases, EventEmitter $emitter)
+    public function __construct(Factory $factory, EventEmitter $emitter)
     {
-        $this->databases = $databases;
+        $this->factory = $factory;
         $this->emitter = $emitter;
 
         // Handle database transactions
@@ -67,8 +67,7 @@ class Database
     public function getConnection($name)
     {
         if (!isset($this->connections[$name])) {
-            $this->connections[$name] =
-                $this->newConnection($name, $this, $this->emitter);
+            $this->connections[$name] = $this->factory->newConnection($name);
         }
 
         return $this->connections[$name];
@@ -136,7 +135,11 @@ class Database
             $this->rollback();
         }
 
-        $this->connections = [];
+        // Disconnect all connections
+        $names = array_keys($this->connections);
+        foreach ($names as $name) {
+            $this->disconnect($name);
+        }
     }
 
     /**
@@ -213,47 +216,5 @@ class Database
     public function beginTriggered()
     {
         return $this->beginTriggered;
-    }
-
-    /** Creates a new connection. */
-    public function newConnection($name)
-    {
-        if (!isset($this->databases[$name])) {
-            throw new \Exception("Database \"$name\" is not configured.");
-        }
-
-        // Extract settings
-        $dsn = $this->databases[$name]['dsn'];
-        $username = $this->databases[$name]['username'];
-        $password = $this->databases[$name]['password'];
-        $attributes = $this->databases[$name]['attributes'];
-        $driver = $this->databases[$name]['driver'];
-
-        // Create a PDO connection
-        $pdo = new PDO($dsn, $username, $password);
-
-        // Don't allow ATTR_ERRORMODE to be changed by the configuration,
-        // because Phormium depends on errors throwing exceptions.
-        if (isset($attributes[PDO::ATTR_ERRMODE])
-            && $attributes[PDO::ATTR_ERRMODE] !== PDO::ERRMODE_EXCEPTION) {
-            // Warn the user
-            $msg = "Phormium: Attribute PDO::ATTR_ERRMODE is set to something ".
-                "other than PDO::ERRMODE_EXCEPTION for database \"$name\".".
-                " This is not allowed because Phormium depends on this ".
-                "setting. Skipping attribute definition.";
-
-            trigger_error($msg, E_USER_WARNING);
-        }
-
-        $attributes[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
-
-        // Apply the attributes
-        foreach ($attributes as $key => $value) {
-            if (!@$pdo->setAttribute($key, $value)) {
-                throw new \Exception("Failed setting PDO attribute \"$key\" to \"$value\" on database \"$name\".");
-            }
-        }
-
-        return new Connection($name, $pdo, $this->emitter);
     }
 }

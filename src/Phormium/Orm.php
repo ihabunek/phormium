@@ -80,10 +80,18 @@ class Orm extends Container
             return new \ArrayObject();
         };
 
-        // Database manager
+        // Database connection factory
+        $this['database.factory'] = function() {
+            return new Factory(
+                $this['config']['databases'],
+                $this['emitter']
+            );
+        };
+
+        // Database connection manager
         $this['database'] = function() {
             return new Database(
-                $this['config']['databases'],
+                $this['database.factory'],
                 $this['emitter']
             );
         };
@@ -98,13 +106,92 @@ class Orm extends Container
      */
     public function objects($model)
     {
-        $meta = $this->getModelMeta($model);
-
-        $driver = $this['config']['databases'][$meta->database]['driver'];
-
-        $query = new Query($meta, $this['database'], $driver);
+        $meta = $this->getMeta($model);
+        $query = $this->getQuery($model, $meta);
 
         return new QuerySet($query, $meta);
+    }
+
+    /**
+     * Fetches a single record by primary key, throws an exception if not found.
+     *
+     * @param mixed $ids The primary key value, either as one or several
+     *                   arguments, or as an array of one or several values.
+     *
+     * @return Model
+     */
+    public function get($model, ...$pk)
+    {
+        $pk = $this->normalizePk($model, $pk);
+
+        $instance = $this->qsForPK($model, $pk)->single(true);
+
+        if ($instance === null) {
+            $pk = implode(',', $pk);
+            throw new \Exception("A record of \"$model\" with primary key [$pk] does not exist.");
+        }
+
+        return $instance;
+    }
+
+    public function find($model, ...$pk)
+    {
+        $pk = $this->normalizePk($model, $pk);
+
+        return $this->qsForPK($model, $pk)->single(true);
+    }
+
+    public function exists($model, ...$pk)
+    {
+        $pk = $this->normalizePk($model, $pk);
+
+        return $this->qsForPK($model, $pk)->exists();
+    }
+
+    protected function qsForPK($model, array $pk)
+    {
+        // Create a QuerySet
+        $qs = $this->objects($model);
+
+        // Filter it by primary key
+        $meta = $this->getMeta($model);
+        foreach ($meta->pk as $name) {
+            $value = array_shift($pk);
+            $qs = $qs->filter($name, '=', $value);
+        }
+
+        return $qs;
+    }
+
+    protected function normalizePk($model, array $pk)
+    {
+        $meta = $this->getMeta($model);
+        $countIDs = count($pk);
+
+        // Allow passing the PK as an array
+        if ($countIDs == 1 && is_array($pk[0])) {
+            $pk = $pk[0];
+        }
+
+        // Model must have PK defined
+        if (!isset($meta->pk)) {
+            throw new \Exception("Primary key not defined for model \"$model\".");
+        }
+
+        // Check correct number of columns is given
+        $countPK = count($meta->pk);
+        if ($countIDs !== $countPK) {
+            throw new \Exception("Model \"$model\" has $countPK primary key columns. $countIDs arguments given.");
+        }
+
+        // Check all PK values are scalars
+        foreach ($pk as $value) {
+            if (!is_scalar($value)) {
+                throw new \Exception("Nonscalar value given for primary key value.");
+            }
+        }
+
+        return $pk;
     }
 
     /**
@@ -115,12 +202,24 @@ class Orm extends Container
      * @param  string $model Model class name.
      * @return Meta          Model's meta
      */
-    public function getModelMeta($model)
+    public function getMeta($model)
     {
         if (!isset($this['meta.cache'][$model])) {
             $this['meta.cache'][$model] = $this['meta.builder']->build($model);
         }
 
         return $this['meta.cache'][$model];
+    }
+
+    public function getQuery($model, Meta $meta)
+    {
+        $driver = $this['config']['databases'][$meta->database]['driver'];
+
+        return new Query($meta, $this['database'], $driver);
+    }
+
+    public function getEmitter()
+    {
+        return $this['emitter'];
     }
 }
