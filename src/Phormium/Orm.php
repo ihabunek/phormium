@@ -107,16 +107,18 @@ class Orm extends Container
     public function objects($model)
     {
         $meta = $this->getMeta($model);
-        $query = $this->getQuery($model, $meta);
+        $query = $this->getQuery($model);
 
         return new QuerySet($query, $meta);
     }
 
     /**
-     * Fetches a single record by primary key, throws an exception if not found.
+     * Fetches a single record by primary key, throwing an exception if not
+     * found.
      *
-     * @param mixed $ids The primary key value, either as one or several
-     *                   arguments, or as an array of one or several values.
+     * @param string $model The name of the Model class.
+     * @param mixed  $ids   The primary key value, either as one or several
+     *                      arguments, or as an array of one or several values.
      *
      * @return Model
      */
@@ -134,6 +136,15 @@ class Orm extends Container
         return $instance;
     }
 
+    /**
+     * Fetches a single record by primary key, returning NULL if not found.
+     *
+     * @param string $model The name of the Model class.
+     * @param mixed  $ids   The primary key value, either as one or several
+     *                      arguments, or as an array of one or several values.
+     *
+     * @return Model
+     */
     public function find($model, ...$pk)
     {
         $pk = $this->normalizePk($model, $pk);
@@ -141,12 +152,114 @@ class Orm extends Container
         return $this->qsForPK($model, $pk)->single(true);
     }
 
+    /**
+     * Checks whether a record with the given primary key exists.
+     *
+     * @param string $model The name of the Model class.
+     * @param mixed  $ids   The primary key value, either as one or several
+     *                      arguments, or as an array of one or several values.
+     *
+     * @return boolean
+     */
     public function exists($model, ...$pk)
     {
         $pk = $this->normalizePk($model, $pk);
 
         return $this->qsForPK($model, $pk)->exists();
     }
+
+    /**
+     * Saves a Model to the database.
+     *
+     * If it already exists, performs an UPDATE, otherwise an INSERT.
+     *
+     * This method can be sub-optimal since it may do an additional query to
+     * determine if the model exists in the database. If performance is
+     * important, use update() and insert() explicitely.
+     */
+    public function save(Model $model)
+    {
+        $meta = $this->getMeta($model);
+
+        if (!isset($meta->pk)) {
+            throw new \Exception("Model not writable because primary key is not defined in _meta.");
+        }
+
+        // Check if all primary key columns are populated
+        $pkSet = true;
+        foreach ($meta->pk as $col) {
+            if (empty($model->{$col})) {
+                $pkSet = false;
+                break;
+            }
+        }
+
+        // If primary key is populated, check whether the record with given
+        // primary key exists, and update it if it does. Otherwise insert.
+        if ($pkSet) {
+            $exists = $this->exists(get_class($model), $this->getPK($model));
+            if ($exists) {
+                $this->update($model);
+            } else {
+                $this->insert($model);
+            }
+        } else {
+            $this->insert($model);
+        }
+    }
+
+    /**
+     * Performs an INSERT query with the data from the model.
+     */
+    public function insert(Model $model)
+    {
+        return $this->getQuery($model)->insert($model);
+    }
+
+    /**
+     * Performs an UPDATE query with the data from the model.
+     *
+     * @returns integer The number of affected rows.
+     */
+    public function update(Model $model)
+    {
+        return $this->getQuery($model)->update($model);
+    }
+
+    /**
+     * Performs an DELETE query filtering by model's primary key.
+     *
+     * @returns integer The number of affected rows.
+     */
+    public function delete(Model $model)
+    {
+        return $this->getQuery($model)->delete($model);
+    }
+
+    /**
+     * Returns the model's primary key value as an associative array.
+     *
+     * @param Model $model
+     *
+     * @return array The primary key.
+     */
+    public function getPK(Model $model)
+    {
+        $meta = $this->getMeta($model);
+
+        if (!isset($meta->pk)) {
+            return [];
+        }
+
+        $pk = [];
+        foreach ($meta->pk as $column) {
+            $pk[$column] = $model->{$column};
+        }
+        return $pk;
+    }
+
+
+    // -- Helpers --------------------------------------------------------------
 
     protected function qsForPK($model, array $pk)
     {
@@ -199,11 +312,15 @@ class Orm extends Container
      *
      * Results are cached to avoid multiple parsing.
      *
-     * @param  string $model Model class name.
-     * @return Meta          Model's meta
+     * @param  mixed $model An instance or class name of a Model .
+     * @return Meta         Model's meta
      */
     public function getMeta($model)
     {
+        if ($model instanceof Model) {
+            $model = get_class($model);
+        }
+
         if (!isset($this['meta.cache'][$model])) {
             $this['meta.cache'][$model] = $this['meta.builder']->build($model);
         }
@@ -211,8 +328,10 @@ class Orm extends Container
         return $this['meta.cache'][$model];
     }
 
-    public function getQuery($model, Meta $meta)
+    public function getQuery($model)
     {
+        $meta = $this->getMeta($model);
+
         $driver = $this['config']['databases'][$meta->database]['driver'];
 
         return new Query($meta, $this['database'], $driver);

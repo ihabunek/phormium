@@ -19,106 +19,19 @@ abstract class Model
 
     /**
      * User-populated meta-data. Used to construct a Meta object.
+     *
      * @var array
      */
     protected static $_meta;
 
     /**
      * Returns the Model's Meta object.
+     *
      * @return Meta
      */
     public static function getMeta()
     {
         return static::$_meta;
-    }
-
-    /**
-     * Returns the Query object used to run queries for this model.
-     * @return Query
-     */
-    public static function getQuery()
-    {
-        return new Query(self::getMeta());
-    }
-
-    /**
-     * Constructs a QuerySet for the model.
-     * @return QuerySet
-     */
-    public static function objects()
-    {
-        $meta = self::getMeta();
-        $query = self::getQuery();
-        return new QuerySet($query, $meta);
-    }
-
-    /**
-     * Fetches all records from the table.
-     *
-     * @return array An array of models.
-     */
-    public static function all()
-    {
-        return self::objects()->fetch();
-    }
-
-    /**
-     * Fetches a single record by primary key, throws an exception if the model
-     * is not found. This method requires the model to have a PK defined.
-     *
-     * @param mixed The primary key value, either as one or several arguments,
-     *      or as an array of one or several values.
-     * @return Model
-     */
-    public static function get()
-    {
-        $argv = func_get_args();
-        $argc = func_num_args();
-
-        $qs = self::getQuerySetForPK($argv, $argc);
-        $model = $qs->single(true);
-
-        if ($model === null) {
-            $class = get_called_class();
-            $pk = implode(',', $argv);
-            throw new \Exception("[$class] record with primary key [$pk] does not exist.");
-        }
-
-        return $model;
-    }
-
-    /**
-     * Fetches a single record by primary key, returns NULL if the model is not
-     * found. This method requires the model to have a PK defined.
-     *
-     * @param mixed The primary key value, either as one or several arguments,
-     *      or as an array of one or several values.
-     * @return Model|null The Model instance or NULL if not found.
-     */
-    public static function find()
-    {
-        $argv = func_get_args();
-        $argc = func_num_args();
-
-        $qs = self::getQuerySetForPK($argv, $argc);
-        return $qs->single(true);
-    }
-
-    /**
-     * Checks whether a record with the given Primary Key exists in the
-     * database. This method requires the model to have a PK defined.
-     *
-     * @param mixed The primary key value, either as one or several arguments,
-     *      or as an array of one or several values.
-     * @return boolean
-     */
-    public static function exists()
-    {
-        $argv = func_get_args();
-        $argc = func_num_args();
-
-        $qs = self::getQuerySetForPK($argv, $argc);
-        return $qs->exists();
     }
 
     /**
@@ -176,135 +89,9 @@ abstract class Model
         return self::fromArray($array, $strict);
     }
 
-
-    /** Inner method used by get(), search() and exists(). */
-    private static function getQuerySetForPK($argv, $argc)
-    {
-        // Allow passing the PK as an array
-        if ($argc == 1 && is_array($argv[0])) {
-            $argv = $argv[0];
-            $argc = count($argv);
-        }
-
-        // Model must have PK defined
-        $meta = self::getMeta();
-        if (!isset($meta->pk)) {
-            $class = get_called_class();
-            throw new \Exception("Primary key not defined for model [$class].");
-        }
-
-        // Check correct number of columns is given
-        $countPK = count($meta->pk);
-        if ($argc !== $countPK) {
-            $class = get_called_class();
-            throw new \Exception("Model [$class] has $countPK primary key columns. $argc arguments given.");
-        }
-
-        // Create a queryset and filter by PK
-        $qs = self::objects();
-        foreach ($meta->pk as $name) {
-            $value = array_shift($argv);
-
-            if (!is_scalar($value)) {
-                throw new \Exception("Nonscalar value given for primary key value.");
-            }
-
-            $qs = $qs->filter($name, '=', $value);
-        }
-
-        return $qs;
-    }
-
     // ******************************************
     // *** Dynamics                           ***
     // ******************************************
-
-    /**
-     * Saves the current Model to the database. If it already exists, performs
-     * an UPDATE, otherwise an INSERT.
-     *
-     * This method can be sub-optimal since it may do an additional query to
-     * determine if the model exists in the database. If performance is
-     * important, use update() and insert() explicitely.
-     */
-    public function save()
-    {
-        $meta = self::getMeta();
-
-        if (!isset($meta->pk)) {
-            throw new \Exception("Model not writable because primary key is not defined in _meta.");
-        }
-
-        // Check if all primary key columns are populated
-        $pkSet = true;
-        foreach ($meta->pk as $col) {
-            if (empty($this->{$col})) {
-                $pkSet = false;
-                break;
-            }
-        }
-
-        // If primary key is populated, check whether the record with given
-        // primary key exists, and update it if it does. Otherwise insert.
-        if ($pkSet) {
-            $exists = static::exists($this->getPK());
-            if ($exists) {
-                $this->update();
-            } else {
-                $this->insert();
-            }
-        } else {
-            $this->insert();
-        }
-    }
-
-    /**
-     * Performs an INSERT query with the data from the model.
-     */
-    public function insert()
-    {
-        return self::getQuery()->insert($this);
-    }
-
-    /**
-     * Performs an UPDATE query with the data from the model.
-     *
-     * @returns integer The number of affected rows.
-     */
-    public function update()
-    {
-        return self::getQuery()->update($this);
-    }
-
-    /**
-     * Performs an DELETE query filtering by model's primary key.
-     *
-     * @returns integer The number of affected rows.
-     */
-    public function delete()
-    {
-        return self::getQuery()->delete($this);
-    }
-
-    /**
-     * Returns the model's primary key value as an associative array.
-     *
-     * @return array The primary key.
-     */
-    public function getPK()
-    {
-        $meta = self::getMeta();
-
-        if (!isset($meta->pk)) {
-            return array();
-        }
-
-        $pk = array();
-        foreach ($meta->pk as $column) {
-            $pk[$column] = $this->{$column};
-        }
-        return $pk;
-    }
 
     /**
      * Merges values from an associative array into the model.
