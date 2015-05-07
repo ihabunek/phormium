@@ -90,11 +90,28 @@ class DB
         // Establish a connection
         $pdo = new PDO($db['dsn'], $db['username'], $db['password']);
 
-        // Force lower case column names
-        $pdo->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
+        $attributes = $db['attributes'];
 
-        // Force an exception to be thrown on error
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        // Don't allow ATTR_ERRORMODE to be changed by the configuration,
+        // because Phormium depends on errors throwing exceptions.
+        if (isset($attributes[PDO::ATTR_ERRMODE])
+            && $attributes[PDO::ATTR_ERRMODE] !== PDO::ERRMODE_EXCEPTION) {
+            trigger_error(
+                "Phormium: Attribute PDO::ATTR_ERRMODE is set to something other than " .
+                "PDO::ERRMODE_EXCEPTION for database \"$name\". This is not allowed because " .
+                "Phormium depends on this setting. Skipping attribute definition.",
+                E_USER_WARNING
+            );
+        }
+
+        $attributes[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
+
+        // Apply the attributes
+        foreach ($attributes as $key => $value) {
+            if (!$pdo->setAttribute($key, $value)) {
+                throw new \Exception("Failed setting PDO attribute \"$key\" to \"$value\" on database \"$name\".");
+            }
+        }
 
         return new Connection($name, $pdo);
     }
@@ -155,7 +172,7 @@ class DB
         }
 
         // Commit all started transactions
-        foreach(self::$connections as $name => $connection) {
+        foreach (self::$connections as $name => $connection) {
             if ($connection->inTransaction()) {
                 $connection->commit();
             }
@@ -175,7 +192,7 @@ class DB
         }
 
         // Roll back all started transactions
-        foreach(self::$connections as $name => $connection) {
+        foreach (self::$connections as $name => $connection) {
             if ($connection->inTransaction()) {
                 $connection->rollBack();
             }

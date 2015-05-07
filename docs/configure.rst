@@ -2,59 +2,51 @@
 Configuration
 =============
 
-Phormium uses a configuration file to configure databases to which to connect.
-JSON and YAML notations are natively supported.
+Phormium uses a configuration array to configure the databases to which to
+connect. JSON and YAML files are also supported. To configure Phormium, pass the
+configuration array, or a path to the configuration file to
+``Phormium\DB::configure()``.
 
-The configuration comprises of the following options:
+The configuration array comprises of the following options:
 
 `databases`
-    One or more databases to which you wish to connect. Indexed by a database
-    name (here `mydb1` and `mydb2`) which will be used later in the model to
-    determine in which database the table is located. Each database should
-    contain the DSN (see PDO_ for details). Username and password are optional.
+    Configuration for one or more databases to which you wish to connect,
+    indexed by a database name which is used in the model to determine in which
+    database the table is located.
 
-.. _PDO: http://www.php.net/manual/en/pdo.construct.php
+Databases
+---------
 
+Each entry in ``databases`` has the following configuration options:
 
-JSON example:
+`dsn`
+    The Data Source Name, or DSN, contains the information required to connect
+    to the database. See `PDO documentation`_ for more information.
 
-.. code-block:: javascript
+`username`
+    The username used to connect to the database.
 
-    {
-        "databases": {
-            "mydb1": {
-                "dsn": "mysql:host=localhost;dbname=db1",
-                "username": "myuser",
-                "password": "mypass"
-            },
-            "mydb2": {
-                "dsn": "sqlite:/path/to/db2.sqlite"
-            }
-        }
-    }
+`password`
+    The username used to connect to the database.
 
-YAML example:
+`attributes`
+    Associative array of PDO attributes with corresponding values to be set on
+    the PDO connection after it has been created.
 
-.. code-block:: yaml
+    When using a configuration array PDO constants can be used directly
+    (e.g. ``PDO::ATTR_CASE``), whereas when using a config file, the constant
+    can be given as a string (e.g. ``"PDO::ATTR_CASE"``) instead.
 
-    databases:
-        mydb1:
-            dsn: mysql:host=localhost;dbname=db1
-            username: myuser
-            password: mypass
-        mydb2:
-            dsn: sqlite:/path/to/db2.sqlite
+    For available attributes see the `PDO attributes`_ documentation.
 
-To configure Phormium, pass the path to the configuration file to the configure
-method.
+.. _PDO documentation: http://www.php.net/manual/en/pdo.construct.php
+.. _PDO attributes: http://php.net/manual/en/pdo.setattribute.php
 
-.. code-block:: php
+Examples
+--------
 
-    Phormium\DB::configure('/path/to/config.json');
-    Phormium\DB::configure('/path/to/config.yaml');
-
-Alternatively, you can configure Phormium using an array instead of a
-configuration file:
+PHP example
+~~~~~~~~~~~
 
 .. code-block:: php
 
@@ -63,7 +55,11 @@ configuration file:
             "db1" => [
                 "dsn" => "mysql:host=localhost;dbname=db1",
                 "username" => "myuser",
-                "password" => "mypass"
+                "password" => "mypass",
+                "attributes" => [
+                    PDO::ATTR_CASE => PDO::CASE_LOWER,
+                    PDO::ATTR_STRINGIFY_FETCHES => true
+                ]
             ],
             "db2" => [
                 "dsn" => "sqlite:/path/to/db2.sqlite"
@@ -72,3 +68,54 @@ configuration file:
     ]);
 
 .. note:: Short array syntax `[ ... ]` requires PHP 5.4+.
+
+JSON example
+~~~~~~~~~~~~
+
+This is the equivalent configuration in JSON.
+
+.. code-block:: javascript
+
+    {
+        "databases": {
+            "db1": {
+                "dsn": "mysql:host=localhost;dbname=db1",
+                "username": "myuser",
+                "password": "mypass",
+                "attributes": {
+                    "PDO::ATTR_CASE": "PDO::CASE_LOWER",
+                    "PDO::ATTR_STRINGIFY_FETCHES": true
+                }
+            },
+            "db2": {
+                "dsn": "sqlite:\/path\/to\/db2.sqlite"
+            }
+        }
+    }
+
+.. code-block:: php
+
+    Phormium\DB::configure('/path/to/config.json');
+
+YAML example
+~~~~~~~~~~~~
+
+This is the equivalent configuration in YAML.
+
+.. code-block:: yaml
+
+    databases:
+        db1:
+            dsn: 'mysql:host=localhost;dbname=db1'
+            username: myuser
+            password: mypass
+            attributes:
+                'PDO::ATTR_CASE': 'PDO::CASE_LOWER'
+                'PDO::ATTR_STRINGIFY_FETCHES': true
+        db2:
+            dsn: 'sqlite:/path/to/db2.sqlite'
+
+.. code-block:: php
+
+    Phormium\DB::configure('/path/to/config.yaml');
+

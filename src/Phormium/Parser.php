@@ -47,7 +47,6 @@ class Parser
 
         // Primary key is optional
         if (isset($meta->pk)) {
-
             // Verify primary key columns exist
             foreach ($meta->pk as $column) {
                 if (!in_array($column, $meta->columns)) {

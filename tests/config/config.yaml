@@ -1,3 +1,3 @@
 databases:
     mydb:
-        dsn: sqlite:target/temp/test.db
+        dsn: sqlite:tmp/test.db

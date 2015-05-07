@@ -1,6 +1,13 @@
 Phormium Changelog
 ==================
 
+0.8.0 / 2015-05-07
+------------------
+
+* Added database attributes to configuration
+* **BC BREAK**: Phormium will no longer force lowercase column names on
+  database tables. This can still be done manually by setting the
+  `PDO::ATTR_CASE:` attribute to `PDO::CASE_LOWER` in the configuration.
 
 0.7.0 / 2014-12-05
 ------------------

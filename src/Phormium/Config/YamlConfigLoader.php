@@ -12,6 +12,7 @@ class YamlConfigLoader extends FileLoader
     public function load($resource, $type = null)
     {
         $data = $this->loadFile($resource);
+
         return Yaml::parse($data);
     }
 

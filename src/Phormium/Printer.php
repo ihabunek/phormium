@@ -78,7 +78,6 @@ class Printer
 
         // Process data for display and record data lengths
         foreach ($data as &$item) {
-
             if ($item instanceof Model) {
                 $item = $item->toArray();
             }
@@ -141,7 +140,6 @@ class Printer
      */
     private static function strpad($value, $length)
     {
-        $buf = "";
         $padLength = $length - mb_strlen($value);
 
         // Sanity check: $padLength can be sub-zero when incorrect

@@ -2,8 +2,6 @@
 
 namespace Phormium;
 
-use Phormium\Model;
-
 /**
  * Implements relation forming functions for Models.
  */
@@ -156,25 +154,14 @@ trait ModelRelationsTrait
         $parentMeta = $parent::getMeta();
 
         $table = $parentMeta->getTable();
-        $pkColumns = $parentMeta->getPkColumns();
+        $parentPK = $parentMeta->getPkColumns();
 
-        foreach ($pkColumns as &$column) {
-            $column = $this->guessFkColumnName($table, $column);
+        $fk = [];
+        foreach ($parentPK as $column) {
+            $fk[] = $table . "_" . $column;
         }
 
-        return $pkColumns;
-    }
-
-    /**
-     * TODO: Enable setting this function from outside.
-     */
-    private function guessFkColumnName($table, $column)
-    {
-        $table = preg_replace_callback("/[A-Z]/", function ($matches) {
-            return "_" . strtolower($matches[0]);
-        }, $table);
-
-        return trim($table, "_") . "_" . $column;
+        return $fk;
     }
 
     private function processKey($key)
