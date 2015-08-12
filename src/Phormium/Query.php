@@ -213,7 +213,7 @@ class Query
         }
         return $id;
     }
-    }
+    
 
     /**
      * Constructs and executes an UPDATE statement for a single Model instance.
