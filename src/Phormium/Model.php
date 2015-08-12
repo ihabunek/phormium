@@ -254,10 +254,10 @@ abstract class Model
             if ($exists) {
                 $this->update();
             } else {
-                $this->insert();
+                return $this->insert();
             }
         } else {
-            $this->insert();
+            return $this->insert();
         }
     }
 
