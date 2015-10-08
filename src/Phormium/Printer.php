@@ -25,19 +25,19 @@ class Printer
      * @param array $return If set to true, the dump will be returned as string
      * instead of printing it.
      */
-    public static function dump($input, $return = false)
+    public function dump($input, $return = false)
     {
         if ($input instanceof QuerySet) {
-            return self::dumpQS($input, $return);
+            return $this->dumpQS($input, $return);
         } elseif (is_array($input)) {
-            return self::dumpArray($input, $return);
+            return $this->dumpArray($input, $return);
         }
 
         throw new \Exception("Invalid input for dump(): not array or QuerySet.");
     }
 
     /** Dump implementation for arrays. */
-    private static function dumpArray(array $array, $return = false)
+    private function dumpArray(array $array, $return = false)
     {
         if (empty($array)) {
             return;
@@ -50,11 +50,11 @@ class Printer
 
         $columns = array_keys($firstRow);
 
-        return self::dumpData($array, $columns, $return);
+        return $this->dumpData($array, $columns, $return);
     }
 
     /** Dump implementation for QuerySets. */
-    private static function dumpQS(QuerySet $querySet, $return = false)
+    private function dumpQS(QuerySet $querySet, $return = false)
     {
         $data = $querySet->fetch();
 
@@ -65,10 +65,10 @@ class Printer
         $meta = $querySet->getMeta();
         $columns = $meta->columns;
 
-        return self::dumpData($data, $columns, $return);
+        return $this->dumpData($data, $columns, $return);
     }
 
-    private static function dumpData($data, $columns, $return = false)
+    private function dumpData($data, $columns, $return = false)
     {
         // Record column names lengths
         $lengths = array();
@@ -87,7 +87,7 @@ class Printer
             }
 
             foreach ($columns as $column) {
-                $value = self::prepareValue($item[$column]);
+                $value = $this->prepareValue($item[$column]);
                 $item[$column] = $value;
 
                 if (mb_strlen($value) > $lengths[$column]) {
@@ -111,7 +111,7 @@ class Printer
 
         // Print the titles
         foreach ($columns as $column) {
-            $output .= self::strpad($column, $lengths[$column]);
+            $output .= $this->strpad($column, $lengths[$column]);
             $output .= str_repeat(" ", self::COLUMN_PADDING);
         }
         $output .= PHP_EOL;
@@ -122,7 +122,7 @@ class Printer
         // Print the rows
         foreach ($data as $model) {
             foreach ($model as $column => $value) {
-                $output .= self::strpad($value, $lengths[$column]);
+                $output .= $this->strpad($value, $lengths[$column]);
                 $output .= str_repeat(" ", self::COLUMN_PADDING);
             }
             $output .= PHP_EOL;
@@ -138,7 +138,7 @@ class Printer
     /**
      * Replacement for strpad() which uses mb_* functions.
      */
-    private static function strpad($value, $length)
+    private function strpad($value, $length)
     {
         $padLength = $length - mb_strlen($value);
 
@@ -155,7 +155,7 @@ class Printer
      * Makes sure the value is a string and trims it to MAX_LENGTH chars if
      * needed.
      */
-    private static function prepareValue($value)
+    private function prepareValue($value)
     {
         if (is_array($value)) {
             $value = implode(', ', $value);

@@ -357,7 +357,9 @@ class QuerySet
      */
     public function dump($return = false)
     {
-        return Printer::dump(clone($this), $return);
+        $printer = new Printer();
+
+        return $printer->dump(clone($this), $return);
     }
 
     // ******************************************

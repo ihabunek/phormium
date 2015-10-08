@@ -51,7 +51,8 @@ class PrinterTest extends \PHPUnit_Framework_TestCase
             array("id" => 3, "name" => $name, "email" => "freddy@queen.org", "income" => 300),
         );
 
-        $actual = Printer::dump($data, true);
+        $printer = new Printer();
+        $actual = $printer->dump($data, true);
         $lines = explode(PHP_EOL, $actual);
 
         $this->assertRegExp("/^\\s*id\\s+name\\s+email\\s+income\\s*$/", $lines[0]);
@@ -104,7 +105,8 @@ class PrinterTest extends \PHPUnit_Framework_TestCase
     public function testDumpEchoEmptyArray()
     {
         ob_start();
-        Printer::dump(array());
+        $printer = new Printer();
+        $printer->dump(array());
         $actual = ob_get_clean();
 
         $this->assertSame("", $actual);

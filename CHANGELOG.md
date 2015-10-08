@@ -1,6 +1,12 @@
 Phormium Changelog
 ==================
 
+0.8.1 / TBA
+-----------
+
+* Made `Printer` methods non-static
+
+
 0.8.0 / 2015-05-07
 ------------------
 
