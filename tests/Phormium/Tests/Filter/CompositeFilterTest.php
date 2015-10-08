@@ -66,15 +66,6 @@ class CompositeFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error
-     */
-    public function testAddInvalid()
-    {
-        $filter = new CompositeFilter("AND");
-        $filter->add(1);
-    }
-
-    /**
      * @expectedException \Exception
      * @expectedExceptionMessage Canot render composite filter. No filters defined.
      */

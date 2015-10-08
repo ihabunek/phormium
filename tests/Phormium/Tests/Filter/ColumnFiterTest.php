@@ -344,12 +344,4 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     {
         $actual = ColumnFilter::fromArray(array(1));
     }
-
-    /**
-     * @expectedException PHPUnit_Framework_Error
-     */
-    public function testFilterFromArrayExceptionWrongType()
-    {
-        $actual = ColumnFilter::fromArray(1);
-    }
 }
