@@ -279,11 +279,12 @@ class Orm extends Container
     protected function normalizePk($model, array $pk)
     {
         $meta = $this->getMeta($model);
-        $countIDs = count($pk);
+        $count = count($pk);
 
         // Allow passing the PK as an array
-        if ($countIDs == 1 && is_array($pk[0])) {
+        if ($count == 1 && is_array($pk[0])) {
             $pk = $pk[0];
+            $count = count($pk);
         }
 
         // Model must have PK defined
@@ -292,9 +293,9 @@ class Orm extends Container
         }
 
         // Check correct number of columns is given
-        $countPK = count($meta->pk);
-        if ($countIDs !== $countPK) {
-            throw new \Exception("Model \"$model\" has $countPK primary key columns. $countIDs arguments given.");
+        $expected = count($meta->pk);
+        if ($count !== $expected) {
+            throw new \Exception("Model \"$meta->class\" has $expected primary key column(s). $count values given.");
         }
 
         // Check all PK values are scalars
