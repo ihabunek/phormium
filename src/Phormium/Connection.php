@@ -26,6 +26,7 @@ class Connection
     /**
      * Constructs a new wrapper with the given PDO connection
      *
+     * @param string $name Unique connection name
      * @param PDO $pdo
      */
     public function __construct($name, PDO $pdo)
@@ -68,9 +69,12 @@ class Connection
      * If queries are repeated it's often the better to use preparedQuery()
      * from performance perspective.
      *
-     * @param string $query The SQL query to execute.
-     * @param integer $fetchStyle One of PDO::FETCH_* constants.
-     * @return array The resulting data.
+     * @param string    $query      The SQL query to execute.
+     * @param integer   $fetchStyle One of PDO::FETCH_* constants.
+     * @param string    $class      Specifies that the fetch method shall return a new instance of the
+     *                              requested class, mapping the columns to named properties in the class
+     *
+     * @return array                The resulting data.
      */
     public function query($query, $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
@@ -93,7 +97,8 @@ class Connection
      * The method is useful for updates or deletes, which do
      * not return anything.
      *
-     * @param $query The SQL query to execute.
+     * @param string $query The SQL query to execute.
+     *
      * @return integer Number of rows affected by the query.
      */
     public function execute($query)
@@ -118,9 +123,10 @@ class Connection
      * The method is useful for updates or deletes, which do
      * not return anything.
      *
-     * @param string $query The SQL query to execute.
-     * @param array $arguments The arguments used to substitute params.
-     * @return integer Number of rows affected by the query.
+     * @param string    $query      The SQL query to execute.
+     * @param array     $arguments  The arguments used to substitute params.
+     *
+     * @return integer              Number of rows affected by the query.
      */
     public function preparedExecute($query, $arguments = array())
     {

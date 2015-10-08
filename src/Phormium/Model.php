@@ -25,7 +25,8 @@ abstract class Model
 
     /**
      * Returns the Model's Meta object.
-     * @return Meta
+     *
+     * @return \Phormium\Meta
      */
     public static function getMeta()
     {
@@ -37,7 +38,8 @@ abstract class Model
 
     /**
      * Returns the Query object used to run queries for this model.
-     * @return Query
+     *
+     * @return \Phormium\Query
      */
     public static function getQuery()
     {
@@ -46,7 +48,8 @@ abstract class Model
 
     /**
      * Constructs a QuerySet for the model.
-     * @return QuerySet
+     *
+     * @return \Phormium\QuerySet
      */
     public static function objects()
     {
@@ -70,8 +73,10 @@ abstract class Model
      * is not found. This method requires the model to have a PK defined.
      *
      * @param mixed The primary key value, either as one or several arguments,
-     *      or as an array of one or several values.
+     *              or as an array of one or several values.
+     *
      * @return Model
+     * @throws \Exception thrown when passed values do not exist as primary key
      */
     public static function get()
     {
@@ -94,9 +99,10 @@ abstract class Model
      * Fetches a single record by primary key, returns NULL if the model is not
      * found. This method requires the model to have a PK defined.
      *
-     * @param mixed The primary key value, either as one or several arguments,
-     *      or as an array of one or several values.
-     * @return Model|null The Model instance or NULL if not found.
+     * @param mixed         The primary key value, either as one or several arguments,
+     *                      or as an array of one or several values.
+     *
+     * @return Model|null   The Model instance or NULL if not found.
      */
     public static function find()
     {
@@ -111,8 +117,8 @@ abstract class Model
      * Checks whether a record with the given Primary Key exists in the
      * database. This method requires the model to have a PK defined.
      *
-     * @param mixed The primary key value, either as one or several arguments,
-     *      or as an array of one or several values.
+     * @param mixed     The primary key value, either as one or several arguments,
+     *                  or as an array of one or several values.
      * @return boolean
      */
     public static function exists()
@@ -127,11 +133,12 @@ abstract class Model
     /**
      * Creates a Model instance from data in the given array or object.
      *
-     * @param array|stdClass $array The input array or stdClass object.
-     * @param boolean $strict If set to TRUE, will throw an exception if the
-     *      array contains a property which does not exist in the Model. Default
-     *      value is FALSE which means these will be ignored.
-     * @return Model
+     * @param array|\stdClass  $array     The input array or stdClass object.
+     * @param boolean          $strict    If set to TRUE, will throw an exception if the
+     *                                    array contains a property which does not exist in the Model.
+     *                                    Default value is FALSE which means these will be ignored.
+     *
+     * @return \Phormium\Model
      */
     public static function fromArray($array, $strict = false)
     {
@@ -145,12 +152,12 @@ abstract class Model
     /**
      * Creates a Model instance from data in JSON.
      *
-     * @param string $json The input data in JSON.
-     * @param boolean $strict If set to TRUE, will throw an exception if the
-     *      json contains a property which does not exist in the Model. Default
-     *      value is FALSE which means these will be ignored.
+     * @param string    $json      The input data in JSON.
+     * @param boolean   $strict    If set to TRUE, will throw an exception if the
+     *                             json contains a property which does not exist in the Model.
+     *                             Default value is FALSE which means these will be ignored.
      *
-     * @return Model
+     * @return \Phormium\Model
      */
     public static function fromJSON($json, $strict = false)
     {
@@ -166,12 +173,12 @@ abstract class Model
     /**
      * Creates a Model instance from data in YAML.
      *
-     * @param string $yaml The input data in YAML.
-     * @param boolean $strict If set to TRUE, will throw an exception if the
-     *      json contains a property which does not exist in the Model. Default
-     *      value is FALSE which means these will be ignored.
+     * @param string    $yaml   The input data in YAML.
+     * @param boolean   $strict If set to TRUE, will throw an exception if the
+     *                          json contains a property which does not exist in the Model.
+     *                          Default value is FALSE which means these will be ignored.
      *
-     * @return Model
+     * @return \Phormium\Model
      */
     public static function fromYAML($yaml, $strict = false)
     {
@@ -312,9 +319,13 @@ abstract class Model
     /**
      * Merges values from an associative array into the model.
      *
-     * @param array|stdClass $values Associative array (or stdClass object)
+     * @param array|\stdClass $values Associative array (or stdClass object)
      *      where keys are names of properties of the model, and values are
      *      desired values for those properties.
+     * @param boolean $strict If set to TRUE, will throw an exception if the
+     *      json contains a property which does not exist in the Model. Default
+     *      value is FALSE which means these will be ignored.
+     * @throws \Exception
      */
     public function merge($values, $strict = false)
     {

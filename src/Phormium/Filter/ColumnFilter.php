@@ -207,6 +207,10 @@ class ColumnFilter extends Filter
     /**
      * Creates a new ColumnFilter from values in an array [$column, $operation,
      * $value] where $value is optional.
+     *
+     * @param array $array [$column, $operation, $value=null]
+     * @return \Phormium\Filter\ColumnFilter
+     * @throws \Exception
      */
     public static function fromArray(array $array)
     {

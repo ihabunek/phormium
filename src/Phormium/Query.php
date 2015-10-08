@@ -77,6 +77,7 @@ class Query
      * @param Filter $filter A filter instance used to form the WHERE clause.
      * @param array $order Array of strings used to form the ORDER BY clause.
      *
+     * @param array $columns
      * @return array An array distinct values. If multiple columns are given,
      *      will return an array of arrays, and each of these will have
      *      the distinct values indexed by column name. If a single column is
@@ -113,9 +114,9 @@ class Query
     /**
      * Constructs and executes a SELECT aggregate query.
      *
-     * @param  Filter    $filter     A filter instance used to form the WHERE clause.
-     * @param  Aggregate $aggregate  The aggregate to perform.
-     * @return string                Result of the aggregate query.
+     * @param  Filter    $filter    A filter instance used to form the WHERE clause.
+     * @param  Aggregate $aggregate The aggregate to perform.
+     * @return string               Result of the aggregate query.
      */
     public function aggregate($filter, Aggregate $aggregate)
     {
@@ -144,6 +145,8 @@ class Query
 
     /**
      * Constructs and executes an INSERT statement for a single Model instance.
+     *
+     * @param \Phormium\Model $model
      */
     public function insert(Model $model)
     {
@@ -214,6 +217,9 @@ class Query
 
     /**
      * Constructs and executes an UPDATE statement for a single Model instance.
+     *
+     * @param \Phormium\Model $model
+     * @return integer Number of rows affected by the query.
      */
     public function update(Model $model)
     {
@@ -258,6 +264,8 @@ class Query
 
     /**
      * Deletes a single model from the database.
+     *
+     * @param \Phormium\Model $model
      */
     public function delete(Model $model)
     {
@@ -315,6 +323,9 @@ class Query
     /**
      * Constructs and executes a DELETE statement for all records matching
      * the given filters.
+     *
+     * @param Filter $filter
+     * @return integer Number of rows affected by the query.
      */
     public function batchDelete($filter)
     {
@@ -332,7 +343,7 @@ class Query
     // ******************************************
 
     /**
-     * Checks that each of the columns in $columns exists in the uderlying
+     * Checks that each of the columns in $columns exists in the underlying
      * model.
      */
     private function checkColumnsExist(array $columns)

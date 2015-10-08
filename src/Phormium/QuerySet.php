@@ -17,14 +17,14 @@ class QuerySet
     /**
      * Meta data of the Model this QuerySet is handling.
      *
-     * @var Phormium\Meta
+     * @var \Phormium\Meta
      */
     private $meta;
 
     /**
      * The Query object used for constructing queries.
      *
-     * @var Phormium\Query
+     * @var \Phormium\Query
      */
     private $query;
 
@@ -34,7 +34,7 @@ class QuerySet
     /**
      * The root filter.
      *
-     * @var Phormium\Filter\Filter
+     * @var \Phormium\Filter\Filter
      */
     private $filter;
 
@@ -65,7 +65,7 @@ class QuerySet
     /**
      * Returns a new QuerySet that is a copy of the current one.
      *
-     * @return Phormium\QuerySet
+     * @return \Phormium\QuerySet
      */
     public function all()
     {
@@ -81,7 +81,7 @@ class QuerySet
      *   - an array with two values or three values [$column, $operation,
      *     $value] will be converted to a ColumnFilter object.
      *
-     * @return Phormium\QuerySet
+     * @return \Phormium\QuerySet
      */
     public function filter()
     {
@@ -101,6 +101,7 @@ class QuerySet
      * @param string $column Name of the column to order by.
      * @param string $direction Direction to sort by: 'asc' (default)
      *      or 'desc'. Optional.
+     * @return \Phormium\QuerySet
      */
     public function orderBy($column, $direction = 'asc')
     {
@@ -112,6 +113,12 @@ class QuerySet
     /**
      * Returns a new QuerySet with the limit and offset populated with given
      * values.
+     *
+     * @param integer $limit SQL LIMIT
+     * @param integer $offset SQL OFFSET
+     *
+     * @return \Phormium\QuerySet
+     * @throws \Exception
      */
     public function limit($limit, $offset = null)
     {
@@ -150,6 +157,7 @@ class QuerySet
 
     /**
      * Returns the AVG aggregate on the given column, using the current filters.
+     *
      * @param string $column
      */
     public function avg($column)
@@ -225,7 +233,8 @@ class QuerySet
      *
      * @throws \Exception If multiple rows are found.
      * @throws \Exception If no rows are found and $allowEmpty is FALSE.
-     * @return Model
+     *
+     * @return \Phormium\Model
      */
     public function single($allowEmpty = false)
     {
@@ -395,7 +404,7 @@ class QuerySet
      * a) Use them to construct a ColumnFilter.
      *    e.g. `->filter('foo', '=', 'bar')
      *
-     * @return Phormium\Filter\Filter.
+     * @return \Phormium\Filter\Filter
      */
     private function parseFilterArgs($argv, $argc)
     {
@@ -483,16 +492,31 @@ class QuerySet
     // *** Accessors                          ***
     // ******************************************
 
+    /**
+     * Returns all set filters
+     *
+     * @return \Phormium\Filter\Filter
+     */
     public function getFilter()
     {
         return $this->filter;
     }
 
+    /**
+     * Returns a set of ORDER BY definitions
+     *
+     * @return array
+     */
     public function getOrder()
     {
         return $this->order;
     }
 
+    /**
+     * Returns the table metadata
+     *
+     * @return \Phormium\Meta
+     */
     public function getMeta()
     {
         return $this->meta;
@@ -505,7 +529,6 @@ class QuerySet
 
     /**
      * When cloning a QuerySet, also clone the root Filter.
-     *
      * The Query and Meta objects can stay the same, they do not change.
      */
     public function __clone()

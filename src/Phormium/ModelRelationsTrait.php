@@ -53,7 +53,7 @@ trait ModelRelationsTrait
      * Use when a foreign key constraint is defined on this model. That means
      * that this model is the Child, and the related model is the Parent.
      *
-     * @param  string          $child     The related model class name.
+     * @param  string          $parent    The related model class name.
      * @param  string|string[] $childKey  Foreign key column(s) in the child
      *                                    model (this class).
      * @param  string|string[] $parentKey Primary key column(s) in the parent
@@ -111,9 +111,7 @@ trait ModelRelationsTrait
         return [$parentKey, $childKey];
     }
 
-    /**
-     * Throws an exception if the given class does not exist or is not a Model.
-     */
+    /** Throws an exception if the given class does not exist or is not a Model. */
     private function checkClassIsModel($class)
     {
         if (!class_exists($class)) {
@@ -125,9 +123,7 @@ trait ModelRelationsTrait
         }
     }
 
-    /**
-     * Throws an exception any of the $properties don't exist in the $class.
-     */
+    /** Throws an exception any of the $properties don't exist in the $class. */
     private function checkClassHasProperties($class, array $properties)
     {
         foreach ($properties as $property) {
@@ -146,7 +142,6 @@ trait ModelRelationsTrait
      * Also works on composite keys.
      *
      * @param  string $parent The model which is referenced by the FK.
-     *
      * @return string[]
      */
     private function guessForeignKey($parent)

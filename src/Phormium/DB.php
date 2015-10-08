@@ -32,7 +32,7 @@ class DB
      * does not exist, it is established.
      *
      * @param string $name Connection name.
-     * @return Connection
+     * @return \Phormium\Connection
      */
     public static function getConnection($name)
     {
@@ -205,6 +205,10 @@ class DB
     /**
      * Executes given callback within a transaction. Rolls back if an
      * exception is thrown within the callback.
+     *
+     * @param callable $callback closure to execute
+     * @throws \Exception thrown when given argument is not callable
+     *                    or when the transaction caused an Exception
      */
     public static function transaction($callback)
     {
