@@ -646,7 +646,7 @@ To create a new record in `person`, just create a new `Person` object and
 
     $person = new Person();
     $person->name = "Frank Zappa";
-    $person->birthday = "1940-12-20";
+    $person->birthday = "1940-12-21";
     $person->save();
 
 If the primary key column is auto-incremented, it is not necessary to manually
@@ -662,7 +662,7 @@ object) by using the static `fromArray()` method.
     // This is quivalent to the above example
     $personData = array(
         "name" => "Frank Zappa",
-        "birthday" => "1940-12-20"
+        "birthday" => "1940-12-21"
     );
     Person::fromArray($personData)->save();
 

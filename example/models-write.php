@@ -22,7 +22,7 @@ define('SEPARATOR', "\n" . str_repeat('-', 50) . "\n");
 
 $person = new Person();
 $person->name = "Frank Zappa";
-$person->birthday = "1940-12-20";
+$person->birthday = "1940-12-21";
 $person->salary = 1000;
 $person->insert();
 
@@ -75,7 +75,7 @@ print_r(Person::get($personID));
 // Both of these work:
 $person = new Person();
 $person->name = "Frank Zappa";
-$person->birthday = "1940-12-20";
+$person->birthday = "1940-12-21";
 $person->salary = 1000;
 $person->save();
 
