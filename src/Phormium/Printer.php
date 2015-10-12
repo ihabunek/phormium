@@ -19,11 +19,13 @@ class Printer
      * readable way.
      *
      * If using non-ascii characters, make sure to set mb_internal_encoding to
-     * the appropreiate value, e.g.: <pre>mb_internal_encoding('UTF-8');</pre>
+     * the appropriate value, e.g.: <pre>mb_internal_encoding('UTF-8');</pre>
      *
-     * @param array $array Input array.
-     * @param array $return If set to true, the dump will be returned as string
+     * @param array $input Input array
+     * @param array|bool $return If set to true, the dump will be returned as string
      * instead of printing it.
+     * @return string String representation of the input value
+     * @throws \Exception If input is not of type array or QuerySet
      */
     public function dump($input, $return = false)
     {
@@ -135,9 +137,7 @@ class Printer
         echo $output;
     }
 
-    /**
-     * Replacement for strpad() which uses mb_* functions.
-     */
+    /** Replacement for strpad() which uses mb_* functions. */
     private function strpad($value, $length)
     {
         $padLength = $length - mb_strlen($value);

@@ -48,7 +48,12 @@ class Config
         self::$config['databases'][$name] = compact('dsn', 'username', 'password', 'attributes');
     }
 
-    /** Load configuration from array or file. */
+    /**
+     * Load configuration from array or file.
+     *
+     * @param array|string $config configuration array or file path
+     * @throws \Exception Thrown when the given config is in a unsupported format
+     */
     public static function load($config)
     {
         $loaderResolver = new LoaderResolver(array(
@@ -72,9 +77,7 @@ class Config
         self::$config = self::processConfig($config);
     }
 
-    /**
-     * Process and validate a configuration array.
-     */
+    /** Process and validate a configuration array. */
     private static function processConfig(array $config)
     {
         foreach ($config['databases'] as $name => $dbConfig) {
