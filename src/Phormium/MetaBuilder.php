@@ -34,15 +34,20 @@ class MetaBuilder
         }
 
         // Construct the Meta
-        $meta = new Meta();
-        $meta->class = $class;
-        $meta->database = $this->getDatabase($class, $_meta);
-        $meta->table = $this->getTable($class, $_meta);
-        $meta->columns = $this->getColumns($class);
-        $meta->pk = $this->getPK($class, $_meta, $meta->columns);
-        $meta->nonPK = $this->getNonPK($class, $meta->columns, $meta->pk);
+        $database = $this->getDatabase($class, $_meta);
+        $table = $this->getTable($class, $_meta);
+        $columns = $this->getColumns($class);
+        $pk = $this->getPK($class, $_meta, $columns);
+        $nonPK = $this->getNonPK($class, $columns, $pk);
 
-        return $meta;
+        return new Meta(
+            $table,
+            $database,
+            $class,
+            $columns,
+            $pk,
+            $nonPK
+        );
     }
 
     /**

@@ -452,8 +452,8 @@ class QuerySet
 
     private function checkColumnFilter(ColumnFilter $filter)
     {
-        if (isset($filter->column) && !in_array($filter->column, $this->meta->columns)) {
-            $table = $this->meta->table;
+        if (isset($filter->column) && !in_array($filter->column, $this->meta->getColumns())) {
+            $table = $this->meta->getTable();
             throw new \Exception("Invalid filter: Column [$filter->column] does not exist in table [$table].");
         }
     }
@@ -471,8 +471,8 @@ class QuerySet
             throw new \Exception("Invalid order direction [$direction]. Expected 'asc' or 'desc'.");
         }
 
-        if (!in_array($column, $this->meta->columns)) {
-            $table = $this->meta->table;
+        if (!in_array($column, $this->meta->getColumns())) {
+            $table = $this->meta->getTable();
             throw new \Exception("Cannot order by column [$column] because it does not exist in table [$table].");
         }
 

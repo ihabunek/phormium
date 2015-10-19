@@ -198,13 +198,15 @@ abstract class Model
 
         // Model must have PK defined
         $meta = self::getMeta();
-        if (!isset($meta->pk)) {
+        $pkColumns = $meta->getPkColumns();
+
+        if ($pkColumns === null) {
             $class = get_called_class();
             throw new \Exception("Primary key not defined for model [$class].");
         }
 
         // Check correct number of columns is given
-        $countPK = count($meta->pk);
+        $countPK = count($pkColumns);
         if ($argc !== $countPK) {
             $class = get_called_class();
             throw new \Exception("Model [$class] has $countPK primary key columns. $argc arguments given.");
@@ -212,7 +214,7 @@ abstract class Model
 
         // Create a queryset and filter by PK
         $qs = self::objects();
-        foreach ($meta->pk as $name) {
+        foreach ($pkColumns as $name) {
             $value = array_shift($argv);
 
             if (!is_scalar($value)) {
@@ -239,15 +241,15 @@ abstract class Model
      */
     public function save()
     {
-        $meta = self::getMeta();
+        $pkColumns = self::getMeta()->getPkColumns();
 
-        if (!isset($meta->pk)) {
+        if ($pkColumns === null) {
             throw new \Exception("Model not writable because primary key is not defined in _meta.");
         }
 
         // Check if all primary key columns are populated
         $pkSet = true;
-        foreach ($meta->pk as $col) {
+        foreach ($pkColumns as $col) {
             if (empty($this->{$col})) {
                 $pkSet = false;
                 break;
@@ -303,16 +305,17 @@ abstract class Model
      */
     public function getPK()
     {
-        $meta = self::getMeta();
+        $pkColumns = self::getMeta()->getPkColumns();
 
-        if (!isset($meta->pk)) {
+        if ($pkColumns === null) {
             return array();
         }
 
         $pk = array();
-        foreach ($meta->pk as $column) {
+        foreach ($pkColumns as $column) {
             $pk[$column] = $this->{$column};
         }
+
         return $pk;
     }
 
@@ -381,12 +384,17 @@ abstract class Model
     public function dump()
     {
         $meta = self::getMeta();
-        $name = get_class($this) . " ($meta->database.$meta->table)";
+        $database = $meta->getDatabase();
+        $table = $meta->getTable();
+        $columns = $meta->getColumns();
+        $pkColumns = $meta->getPkColumns();
+
+        $name = get_class($this) . " ($database.$table)";
 
         echo "$name\n";
         echo str_repeat("=", strlen($name)) . "\n";
 
-        foreach ($meta->columns as $column) {
+        foreach ($columns as $column) {
             $value = $this->$column;
             if ($value === null) {
                 $value = 'NULL';
@@ -396,7 +404,7 @@ abstract class Model
                 $value = (string) $value;
             }
 
-            if (in_array($column, $meta->pk)) {
+            if (in_array($column, $pkColumns)) {
                 $value .= ' (PK)';
             }
 

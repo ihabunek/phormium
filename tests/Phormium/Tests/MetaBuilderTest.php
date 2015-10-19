@@ -12,12 +12,12 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = new MetaBuilder();
         $meta = $builder->build("Phormium\\Tests\\Models\\Model1");
 
-        $this->assertSame('model1', $meta->table);
-        $this->assertSame('database1', $meta->database);
-        $this->assertSame(['id', 'foo', 'bar', 'baz'], $meta->columns);
-        $this->assertSame('Phormium\\Tests\\Models\\Model1', $meta->class);
-        $this->assertSame(['id'], $meta->pk);
-        $this->assertSame(['foo', 'bar', 'baz'], $meta->nonPK);
+        $this->assertSame('model1', $meta->getTable());
+        $this->assertSame('database1', $meta->getDatabase());
+        $this->assertSame(['id', 'foo', 'bar', 'baz'], $meta->getColumns());
+        $this->assertSame('Phormium\\Tests\\Models\\Model1', $meta->getClass());
+        $this->assertSame(['id'], $meta->getPkColumns());
+        $this->assertSame(['foo', 'bar', 'baz'], $meta->getNonPkColumns());
     }
 
     public function testParse2()
@@ -25,12 +25,12 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = new MetaBuilder();
         $meta = $builder->build("Phormium\\Tests\\Models\\Model2");
 
-        $this->assertSame('model2', $meta->table);
-        $this->assertSame('database1', $meta->database);
-        $this->assertSame(['foo', 'bar', 'baz'], $meta->columns);
-        $this->assertSame('Phormium\\Tests\\Models\\Model2', $meta->class);
-        $this->assertSame(['foo'], $meta->pk);
-        $this->assertSame(['bar', 'baz'], $meta->nonPK);
+        $this->assertSame('model2', $meta->getTable());
+        $this->assertSame('database1', $meta->getDatabase());
+        $this->assertSame(['foo', 'bar', 'baz'], $meta->getColumns());
+        $this->assertSame('Phormium\\Tests\\Models\\Model2', $meta->getClass());
+        $this->assertSame(['foo'], $meta->getPkColumns());
+        $this->assertSame(['bar', 'baz'], $meta->getNonPkColumns());
     }
 
     /**

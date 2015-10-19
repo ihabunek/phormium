@@ -8,24 +8,32 @@ namespace Phormium;
 class Meta
 {
     /** Database table onto which the object is mapped. */
-    public $table;
+    private $table;
 
     /** The database in which the table is located (as defined in JSON config). */
-    public $database;
-
-    /** Array of columns, and associated data. */
-    public $columns;
+    private $database;
 
     /** The name of the class onto which the table is mapped. */
-    public $class;
+    private $class;
+
+    /** Array of columns, and associated data. */
+    private $columns;
 
     /** Array of columns which form the primary key. If not set, the model will not be writable. */
-    public $pk;
+    private $pk;
 
     /** Array of all columns except the primary key column. Only populated if pk is set. */
-    public $nonPK;
+    private $nonPK;
 
-    // -- Accessors ------------------------------------------------------------
+    public function __construct($table, $database, $class, array $columns, $pk, array $nonPK)
+    {
+        $this->table = $table;
+        $this->database = $database;
+        $this->class = $class;
+        $this->columns = $columns;
+        $this->pk = $pk;
+        $this->nonPK = $nonPK;
+    }
 
     public function getTable()
     {
@@ -34,7 +42,12 @@ class Meta
 
     public function getDatabase()
     {
-        return $this->databse;
+        return $this->database;
+    }
+
+    public function getClass()
+    {
+        return $this->class;
     }
 
     public function getColumns()
@@ -50,10 +63,5 @@ class Meta
     public function getNonPkColumns()
     {
         return $this->nonPK;
-    }
-
-    public function getClass()
-    {
-        return $this->class;
     }
 }

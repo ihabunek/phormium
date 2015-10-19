@@ -21,42 +21,42 @@ class MetaTest extends \PHPUnit_Framework_TestCase
 
     public function testPersonMeta()
     {
-        $expected = new Meta();
-        $expected->table = 'person';
-        $expected->class = 'Phormium\\Tests\\Models\\Person';
-        $expected->database = 'testdb';
-        $expected->columns = array('id', 'name', 'email', 'birthday', 'created', 'income');
-        $expected->pk = array('id');
-        $expected->nonPK = array('name', 'email', 'birthday', 'created', 'income');
+        $table = 'person';
+        $class = 'Phormium\\Tests\\Models\\Person';
+        $database = 'testdb';
+        $columns = array('id', 'name', 'email', 'birthday', 'created', 'income');
+        $pk = array('id');
+        $nonPK = array('name', 'email', 'birthday', 'created', 'income');
 
+        $expected = new Meta($table, $database, $class, $columns, $pk, $nonPK);
         $actual = Person::getMeta();
         $this->assertEquals($expected, $actual);
     }
 
     public function testTradeMeta()
     {
-        $expected = new Meta();
-        $expected->table = 'trade';
-        $expected->class = 'Phormium\\Tests\\Models\\Trade';
-        $expected->database = 'testdb';
-        $expected->columns = array('tradedate', 'tradeno', 'price', 'quantity');
-        $expected->pk = array('tradedate', 'tradeno');
-        $expected->nonPK = array('price', 'quantity');
+        $table = 'trade';
+        $class = 'Phormium\\Tests\\Models\\Trade';
+        $database = 'testdb';
+        $columns = array('tradedate', 'tradeno', 'price', 'quantity');
+        $pk = array('tradedate', 'tradeno');
+        $nonPK = array('price', 'quantity');
 
+        $expected = new Meta($table, $database, $class, $columns, $pk, $nonPK);
         $actual = Trade::getMeta();
         $this->assertEquals($expected, $actual);
     }
 
     public function testPkLessMeta()
     {
-        $expected = new Meta();
-        $expected->table = 'pkless';
-        $expected->class = 'Phormium\\Tests\\Models\\PkLess';
-        $expected->database = 'testdb';
-        $expected->columns = array('foo', 'bar', 'baz');
-        $expected->pk = null;
-        $expected->nonPK = array('foo', 'bar', 'baz');
+        $table = 'pkless';
+        $class = 'Phormium\\Tests\\Models\\PkLess';
+        $database = 'testdb';
+        $columns = array('foo', 'bar', 'baz');
+        $pk = null;
+        $nonPK = array('foo', 'bar', 'baz');
 
+        $expected = new Meta($table, $database, $class, $columns, $pk, $nonPK);
         $actual = PkLess::getMeta();
         $this->assertEquals($expected, $actual);
     }

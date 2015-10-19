@@ -62,8 +62,7 @@ class Printer
             return;
         }
 
-        $meta = $querySet->getMeta();
-        $columns = $meta->columns;
+        $columns = $querySet->getMeta()->getColumns();
 
         return $this->dumpData($data, $columns, $return);
     }
