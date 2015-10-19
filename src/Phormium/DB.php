@@ -2,6 +2,7 @@
 
 namespace Phormium;
 
+use Phormium\Database\Connection;
 
 /**
  * Legacy database handler class.

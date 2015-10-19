@@ -28,7 +28,7 @@ class MetaBuilder
         $this->checkModel($class);
 
         // Fetch user-defined model meta-data
-        $_meta = $class::getRawMeta();
+        $_meta = call_user_func([$class, 'getRawMeta']);
         if (!is_array($_meta)) {
             throw new \Exception("Invalid $class::\$_meta. Not an array.");
         }
@@ -38,7 +38,7 @@ class MetaBuilder
         $table = $this->getTable($class, $_meta);
         $columns = $this->getColumns($class);
         $pk = $this->getPK($class, $_meta, $columns);
-        $nonPK = $this->getNonPK($class, $columns, $pk);
+        $nonPK = $this->getNonPK($columns, $pk);
 
         return new Meta(
             $table,
@@ -61,7 +61,7 @@ class MetaBuilder
 
         $rc = new ReflectionClass($class);
         $props = $rc->getProperties(ReflectionProperty::IS_PUBLIC);
-        $columns = array_map(function ($prop) {
+        $columns = array_map(function (ReflectionProperty $prop) {
             return $prop->name;
         }, $props);
 
@@ -127,7 +127,7 @@ class MetaBuilder
     }
 
     /** Extracts the non-primary key columns. */
-    private function getNonPK($class, $columns, $pk)
+    private function getNonPK($columns, $pk)
     {
         if ($pk === null) {
             return $columns;

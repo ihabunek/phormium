@@ -27,13 +27,6 @@ class Database
     private $beginTriggered = false;
 
     /**
-     * Event emitter.
-     *
-     * @var Evenement\EventEmitter
-     */
-    private $emitter;
-
-    /**
      * Database configuration array.
      *
      * @var array
@@ -43,12 +36,11 @@ class Database
     public function __construct(Factory $factory, EventEmitter $emitter)
     {
         $this->factory = $factory;
-        $this->emitter = $emitter;
 
         // Handle database transactions
         // If a global transaction is triggered, start the database transaction
         // before executing a query on the connection.
-        $emitter->on(Event::QUERY_STARTED, function($query, $args, $conn) {
+        $emitter->on(Event::QUERY_STARTED, function($query, $args, Connection $conn) {
             if ($this->beginTriggered() && !$conn->inTransaction()) {
                 $conn->beginTransaction();
             }

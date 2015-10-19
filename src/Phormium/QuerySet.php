@@ -428,7 +428,7 @@ class QuerySet
      * Adds a new filter to the queryset. If multiple filters are added, they
      * will be joined by an AND composite filter.
      */
-    private function addFilter(Filter $filter)
+    public function addFilter(Filter $filter)
     {
         // Start with an empty AND composite filter
         if (!isset($this->filter)) {
@@ -465,7 +465,7 @@ class QuerySet
         }
     }
 
-    private function addOrder($column, $direction)
+    public function addOrder($column, $direction)
     {
         if ($direction !== 'asc' && $direction !== 'desc') {
             throw new \Exception("Invalid order direction [$direction]. Expected 'asc' or 'desc'.");

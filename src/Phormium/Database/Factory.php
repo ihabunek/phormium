@@ -44,7 +44,6 @@ class Factory
         $username = $this->databases[$name]['username'];
         $password = $this->databases[$name]['password'];
         $attributes = $this->databases[$name]['attributes'];
-        $driver = $this->databases[$name]['driver'];
 
         // Create a PDO connection
         $pdo = new PDO($dsn, $username, $password);
@@ -66,11 +65,11 @@ class Factory
 
         // Apply the attributes
         foreach ($attributes as $key => $value) {
-            if (!@$pdo->setAttribute($key, $value)) {
+            if (!$pdo->setAttribute($key, $value)) {
                 throw new \Exception("Failed setting PDO attribute \"$key\" to \"$value\" on database \"$name\".");
             }
         }
 
-        return new Connection($name, $pdo, $this->emitter);
+        return new Connection($pdo, $this->emitter);
     }
 }

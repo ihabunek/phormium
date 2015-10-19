@@ -36,7 +36,7 @@ trait ModelRelationsTrait
         );
 
         // Create a query set
-        $querySet = $child::objects();
+        $querySet = call_user_func([$child, 'objects']);
 
         // Filter the query set
         $pairs = array_combine($parentKey, $childKey);
@@ -76,7 +76,7 @@ trait ModelRelationsTrait
         );
 
         // Create a query set
-        $querySet = $parent::objects();
+        $querySet = call_user_func([$parent, 'objects']);
 
         // Filter the query set
         $pairs = array_combine($parentKey, $childKey);
@@ -96,7 +96,8 @@ trait ModelRelationsTrait
         }
 
         if (!isset($parentKey)) {
-            $parentKey = $parent::getMeta()->getPkColumns();
+            $parentMeta = call_user_func([$parent, 'getMeta']);
+            $parentKey = $parentMeta->getPkColumns();
         } else {
             $parentKey = $this->processKey($parentKey);
         }
@@ -151,7 +152,7 @@ trait ModelRelationsTrait
      */
     private function guessForeignKey($parent)
     {
-        $parentMeta = $parent::getMeta();
+        $parentMeta = call_user_func([$parent, 'getMeta']);
 
         $table = $parentMeta->getTable();
         $parentPK = $parentMeta->getPkColumns();

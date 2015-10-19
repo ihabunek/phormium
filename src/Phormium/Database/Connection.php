@@ -14,9 +14,6 @@ use PDOStatement;
  */
 class Connection
 {
-    /** Name of the connection. */
-    private $name;
-
     /**
      * The wrapped PDO connection.
      *
@@ -41,14 +38,12 @@ class Connection
     /**
      * Constructs a new wrapper with the given PDO connection
      *
-     * @param string       $name     Connection name.
      * @param PDO          $pdo      Underlying PDO connection.
      * @param EventEmitter $emitter  Event emitter.
      */
-    public function __construct($name, PDO $pdo, EventEmitter $emitter)
+    public function __construct(PDO $pdo, EventEmitter $emitter)
     {
         $this->emitter = $emitter;
-        $this->name = $name;
         $this->pdo = $pdo;
 
         $this->driver = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
