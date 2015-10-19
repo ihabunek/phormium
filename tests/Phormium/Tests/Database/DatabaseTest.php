@@ -34,7 +34,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
     protected function newDatabase(Factory $factory = null, EventEmitter $emitter = null)
     {
         if (!isset($factory)) {
-            $factory = m::mock(Factory::class);
+            $factory = m::mock("Phormium\Database\Factory");
         }
 
         if (!isset($emitter)) {
@@ -116,7 +116,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
     {
         $conn = m::mock("Phormium\\Database\\Connection");
 
-        $factory = m::mock(Factory::class);
+        $factory = m::mock("Phormium\Database\Factory");
         $factory->shouldReceive('newConnection')
             ->once()
             ->with('db1')

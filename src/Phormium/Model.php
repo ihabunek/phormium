@@ -375,7 +375,7 @@ abstract class Model
      */
     public function toYAML()
     {
-        return Yaml::dump(self::toArray($this));
+        return Yaml::dump(self::toArray());
     }
 
     /**
