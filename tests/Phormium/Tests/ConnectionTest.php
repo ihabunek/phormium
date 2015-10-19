@@ -52,8 +52,8 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
         $that = $this;
         foreach ($this->queryEvents as $event) {
-            Event::removeListeners($event);
-            Event::on($event, function() use ($event, $that) {
+            Orm::emitter()->removeAllListeners($event);
+            Orm::emitter()->on($event, function() use ($event, $that) {
                 $that->triggeredEvents[] = $event;
                 $that->triggeredArguments[] = func_get_args();
             });

@@ -13,8 +13,6 @@ require __DIR__ . "/models/Person.php";
 // Configure Phormium
 Orm::configure('config.json');
 
-use Phormium\Event;
-
 /** A class which collects query execution durations */
 class Stats
 {
@@ -25,8 +23,8 @@ class Stats
     /** Hooks onto relevant events. */
     public function register()
     {
-        Event::on('query.started', array($this, 'started'));
-        Event::on('query.completed', array($this, 'completed'));
+        Orm::emitter()->on('query.started', array($this, 'started'));
+        Orm::emitter()->on('query.completed', array($this, 'completed'));
     }
 
     /** Called when a query has started. */

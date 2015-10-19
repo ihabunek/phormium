@@ -3,7 +3,9 @@
 namespace Phormium;
 
 /**
- * A static event emitter interface.
+ * A catalogue of Phormium events.
+ *
+ * The static event functions are deprecated. Use `Orm::emitter()` instead.
  */
 class Event
 {
@@ -23,33 +25,64 @@ class Event
     const TRANSACTION_COMMIT   = 'transaction.commit';
     const TRANSACTION_ROLLBACK = 'transaction.rollback';
 
+    /**
+     * @deprecated 0.9.0 Use Orm::emitter()->on(). Will be removed in 1.0.0.
+     */
     public static function on($event, $listener)
     {
+        self::deprecationNotice(__METHOD__, "Orm::emitter()->on()");
         return Orm::emitter()->on($event, $listener);
     }
 
+    /**
+     * @deprecated 0.9.0 Use Orm::emitter()->once(). Will be removed in 1.0.0.
+     */
     public static function once($event, $listener)
     {
+        self::deprecationNotice(__METHOD__, "Orm::emitter()->once()");
         return Orm::emitter()->once($event, $listener);
     }
 
+    /**
+     * @deprecated 0.9.0 Use Orm::emitter()->emit(). Will be removed in 1.0.0.
+     */
     public static function emit($event, array $arguments = array())
     {
+        self::deprecationNotice(__METHOD__, "Orm::emitter()->emit()");
         return Orm::emitter()->emit($event, $arguments);
     }
 
+    /**
+     * @deprecated 0.9.0 Use Orm::emitter()->listeners(). Will be removed in 1.0.0.
+     */
     public static function listeners($event)
     {
+        self::deprecationNotice(__METHOD__, "Orm::emitter()->listeners()");
         return Orm::emitter()->listeners($event);
     }
 
+    /**
+     * @deprecated 0.9.0 Use Orm::emitter()->removeAllListeners(). Will be removed in 1.0.0.
+     */
     public static function removeListeners($event = null)
     {
+        self::deprecationNotice(__METHOD__, "Orm::emitter()->removeAllListeners()");
         return Orm::emitter()->removeAllListeners($event);
     }
 
+    /**
+     * @deprecated 0.9.0 Use Orm::emitter()->removeListener(). Will be removed in 1.0.0.
+     */
     public static function removeListener($event, $listener)
     {
+        self::deprecationNotice(__METHOD__, "Orm::emitter()->removeListener()");
         return Orm::emitter()->removeListener($event, $listener);
+    }
+
+    private static function deprecationNotice($method, $new)
+    {
+        $msg = "Method $method is deprecated and will be removed.";
+        $msg .= " Please use $new instead.";
+        trigger_error($msg, E_USER_WARNING);
     }
 }
