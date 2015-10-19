@@ -2,7 +2,6 @@
 
 namespace Phormium\Tests;
 
-use Phormium\Tests\Models\Person;
 
 use Phormium\Filter\ColumnFilter;
 use Phormium\Filter\CompositeFilter;

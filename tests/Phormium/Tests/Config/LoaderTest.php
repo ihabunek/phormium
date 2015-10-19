@@ -2,7 +2,6 @@
 
 namespace Phormium\Tests\Config;
 
-use Phormium\Config\Configuration;
 use Phormium\Config\ArrayLoader;
 use Phormium\Config\JsonLoader;
 use Phormium\Config\YamlLoader;

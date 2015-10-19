@@ -3,7 +3,6 @@
 namespace Phormium\Tests\Config;
 
 use Phormium\Config\Configuration;
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 /**
  * @group config

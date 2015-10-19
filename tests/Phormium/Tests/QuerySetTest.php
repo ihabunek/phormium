@@ -2,11 +2,8 @@
 
 namespace Phormium\Tests;
 
-use Phormium\Aggregate;
 use Phormium\Filter\ColumnFilter;
-use Phormium\Filter\CompositeFilter;
 use Phormium\Filter\Filter;
-use Phormium\Meta;
 use Phormium\Orm;
 use Phormium\QuerySet;
 

@@ -2,7 +2,6 @@
 
 namespace Phormium\Tests;
 
-use Phormium\Meta;
 use Phormium\MetaBuilder;
 
 class MetaBuilderTest extends \PHPUnit_Framework_TestCase

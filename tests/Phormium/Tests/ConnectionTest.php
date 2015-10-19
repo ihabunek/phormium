@@ -5,11 +5,7 @@ namespace Phormium\Tests;
 use Phormium\Connection;
 use Phormium\Orm;
 use Phormium\Event;
-use Phormium\Meta;
-use Phormium\QuerySet;
 use Phormium\Tests\Models\Person;
-use Phormium\Tests\Models\Trade;
-use Phormium\Tests\Models\PkLess;
 
 use PDOException;
 

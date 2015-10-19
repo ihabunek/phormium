@@ -13,7 +13,6 @@ use Phormium\Database\Database;
 use Phormium\Database\Factory;
 
 use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
 

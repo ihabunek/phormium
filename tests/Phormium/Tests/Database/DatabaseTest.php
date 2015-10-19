@@ -10,7 +10,6 @@ use Phormium\Database\Database;
 use Phormium\Database\Factory;
 use Phormium\Event;
 
-use PDO;
 
 class DatabaseTest extends \PHPUnit_Framework_TestCase
 {

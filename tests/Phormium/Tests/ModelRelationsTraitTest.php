@@ -2,9 +2,7 @@
 
 namespace Phormium\Tests;
 
-use Phormium\Meta;
 use Phormium\Orm;
-use Phormium\QuerySet;
 use Phormium\Tests\Models\Person;
 use Phormium\Tests\Models\Contact;
 use Phormium\Tests\Models\Asset;

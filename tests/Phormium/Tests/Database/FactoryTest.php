@@ -2,7 +2,6 @@
 
 namespace Phormium\Tests;
 
-use Evenement\EventEmitter;
 
 use Mockery as m;
 

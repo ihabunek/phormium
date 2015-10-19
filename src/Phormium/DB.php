@@ -2,7 +2,6 @@
 
 namespace Phormium;
 
-use \PDO;
 
 /**
  * Legacy database handler class.

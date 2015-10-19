@@ -5,7 +5,6 @@ namespace Phormium\Tests;
 use Phormium\Orm;
 use Phormium\Aggregate;
 
-use Phormium\Tests\Models\Person;
 use Phormium\Tests\Models\Trade;
 
 /**

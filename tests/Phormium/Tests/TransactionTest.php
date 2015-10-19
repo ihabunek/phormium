@@ -2,9 +2,7 @@
 
 namespace Phormium\Tests;
 
-use Mockery as m;
 
-use Phormium\Connection;
 use Phormium\Orm;
 
 use Phormium\Tests\Models\Person;
