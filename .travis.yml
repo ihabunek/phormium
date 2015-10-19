@@ -13,10 +13,8 @@ env:
   - DB=postgres
 
 matrix:
-  allow_failures:
-    - php: hhvm
   # hhvm doesn't support postgres currently
-  exclude:
+  allow_failures:
     - php: hhvm
       env: DB=postgres
   fast_finish: true
@@ -26,4 +24,3 @@ before_script: sh tests/travis/before.sh
 script: phpunit --configuration tests/travis/$DB/phpunit.xml
 
 sudo: false
-
