@@ -100,7 +100,8 @@ class MetaBuilder
         // If the primary key is not defined
         if (!isset($meta['pk'])) {
             // If the model has an "id" field, use that as the PK
-            if (empty(array_diff(self::$defaultPK, $columns))) {
+            $diff = array_diff(self::$defaultPK, $columns);
+            if (empty($diff)) {
                 return self::$defaultPK;
             } else {
                 return null;
