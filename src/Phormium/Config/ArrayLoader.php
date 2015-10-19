@@ -5,7 +5,7 @@ namespace Phormium\Config;
 /**
  * Loads array configurations (passthrough).
  */
-class ArrayConfigLoader extends FileLoader
+class ArrayLoader extends FileLoader
 {
     public function load($resource, $type = null)
     {

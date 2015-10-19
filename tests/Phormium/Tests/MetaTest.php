@@ -2,9 +2,7 @@
 
 namespace Phormium\Tests;
 
-use Phormium\DB;
 use Phormium\Meta;
-use Phormium\Parser;
 
 use Phormium\Tests\Models\Person;
 use Phormium\Tests\Models\Trade;
@@ -61,59 +59,6 @@ class MetaTest extends \PHPUnit_Framework_TestCase
 
         $actual = PkLess::getMeta();
         $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Not an array.
-     */
-    public function testParserInvalidMeta()
-    {
-        Parser::getMeta('xxx', 'xxx');
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Missing 'database'
-     */
-    public function testParserNoDatabase()
-    {
-        $meta = $this->testMeta;
-        unset($meta['database']);
-        Parser::getMeta('xxx', $meta);
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Missing 'table'
-     */
-    public function testParserNoTable()
-    {
-        $meta = $this->testMeta;
-        unset($meta['table']);
-        Parser::getMeta('xxx', $meta);
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Invalid \Phormium\Tests\Models\Person::$_meta['pk']. Not a string or array.
-     */
-    public function testParserInvalidPK()
-    {
-        $meta = $this->testMeta;
-        $meta['pk'] = 1;
-        Parser::getMeta('\Phormium\Tests\Models\Person', $meta);
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Given primary key column [xxx] does not exist.
-     */
-    public function testParserNonexistantPK()
-    {
-        $meta = $this->testMeta;
-        $meta['pk'] = 'xxx';
-        Parser::getMeta('\Phormium\Tests\Models\Person', $meta);
     }
 
     public function testGetMeta()

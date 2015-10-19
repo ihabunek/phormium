@@ -2,8 +2,8 @@
 
 namespace Phormium\Tests;
 
-use Phormium\DB;
 use Phormium\Meta;
+use Phormium\Orm;
 use Phormium\QuerySet;
 use Phormium\Tests\Models\Asset;
 use Phormium\Tests\Models\Contact;
@@ -18,7 +18,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()
     {
-        DB::configure(PHORMIUM_CONFIG_FILE);
+        Orm::configure(PHORMIUM_CONFIG_FILE);
     }
 
     public function testNewPerson()
@@ -133,7 +133,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $p2->email = 'peter2@peterson.com';
         $p2->save();
 
-        // Load from DB
+        // Load from database
         $p3 = Person::get($id);
         $this->assertEquals($p2, $p3);
         $this->assertEquals($id, $p3->id);

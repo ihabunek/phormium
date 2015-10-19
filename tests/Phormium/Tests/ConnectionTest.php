@@ -3,7 +3,7 @@
 namespace Phormium\Tests;
 
 use Phormium\Connection;
-use Phormium\DB;
+use Phormium\Orm;
 use Phormium\Event;
 use Phormium\Meta;
 use Phormium\QuerySet;
@@ -38,12 +38,12 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        DB::configure(PHORMIUM_CONFIG_FILE);
+        Orm::configure(PHORMIUM_CONFIG_FILE);
     }
 
     public function setUp()
     {
-        $this->connection = DB::getConnection('testdb');
+        $this->connection = Orm::database()->getConnection('testdb');
         $this->driver = $this->connection->getDriver();
 
         // Clean up events before every test
@@ -338,7 +338,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             // Checks valid for all events
             $this->assertSame($query, $tArgs[0]);
             $this->assertSame($arguments, $tArgs[1]);
-            $this->assertInstanceOf("Phormium\\Connection", $tArgs[2]);
+            $this->assertInstanceOf("Phormium\\Database\\Connection", $tArgs[2]);
 
             // Check event argument count
             switch ($event) {

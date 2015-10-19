@@ -29,10 +29,17 @@ abstract class Model
      */
     public static function getMeta()
     {
-        return Parser::getMeta(
-            get_called_class(),
-            static::$_meta
-        );
+        return Orm::getMeta(get_called_class());
+    }
+
+    /**
+     * Returns the raw $_meta array.
+     *
+     * @return array
+     */
+    public static function getRawMeta()
+    {
+        return static::$_meta;
     }
 
     /**

@@ -2,8 +2,8 @@
 
 namespace Phormium\Tests;
 
-use Phormium\DB;
 use Phormium\Meta;
+use Phormium\Orm;
 use Phormium\QuerySet;
 use Phormium\Tests\Models\Person;
 use Phormium\Tests\Models\Contact;
@@ -18,7 +18,7 @@ class ModelRelationsTraitTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        DB::configure(PHORMIUM_CONFIG_FILE);
+        Orm::configure(PHORMIUM_CONFIG_FILE);
 
         self::$person = Person::fromArray(['name' => 'Udo Dirkschneider']);
         self::$person->save();

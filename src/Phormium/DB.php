@@ -5,222 +5,76 @@ namespace Phormium;
 use \PDO;
 
 /**
- * Handles database connections.
+ * Legacy database handler class.
+ *
+ * @deprecated 0.9.0 Will be removed in 1.0.0
  */
 class DB
 {
-    /** An array of established database connections. */
-    private static $connections = array();
-
-    /** Set to true when a global transaction has been triggered. */
-    private static $beginTriggered = false;
-
-    /**
-     * Configures database definitions.
-     *
-     * @param string|array $config Either a path to the JSON encoded
-     *      configuration file, or the configuration as an array.
-     */
     public static function configure($config)
     {
-        DB::disconnectAll();
-        Config::load($config);
+        self::deprecationNotice(__METHOD__, "Orm::configure()");
+        return Orm::configure($config);
     }
 
-    /**
-     * Returns a PDO connection for the given database name. If the connection
-     * does not exist, it is established.
-     *
-     * @param string $name Connection name.
-     * @return Connection
-     */
     public static function getConnection($name)
     {
-        if (!isset(self::$connections[$name])) {
-            self::$connections[$name] = self::newConnection($name);
-        }
-
-        $connection = self::$connections[$name];
-
-        if (self::$beginTriggered && !$connection->inTransaction()) {
-            $connection->beginTransaction();
-        }
-
-        return $connection;
+        self::deprecationNotice(__METHOD__, "Orm::database()->getConnection()");
+        return Orm::database()->getConnection($name);
     }
 
-    /**
-     * Checks whether a connection is connnected (a PDO object exists).
-     *
-     * @param string $name Connection name.
-     *
-     * @return boolean
-     */
     public static function isConnected($name)
     {
-        return isset(self::$connections[$name]);
+        self::deprecationNotice(__METHOD__, "Orm::database()->isConnected()");
+        return Orm::database()->isConnected($name);
     }
 
-    /**
-     * Manually set a connection. Useful for mocking.
-     *
-     * If you want to replace an existing connection call `disconnect()` before
-     * `setConnection()`.
-     *
-     * @param string     $name       Connection name
-     * @param Connection $connection The connection object
-     *
-     * @throws \Exception If the connection with the given name already exists.
-     */
     public static function setConnection($name, Connection $connection)
     {
-        if (isset(self::$connections[$name])) {
-            throw new \Exception("Connection \"$name\" is already connected. Please disconnect it before calling setConnection().");
-        }
-
-        self::$connections[$name] = $connection;
+        self::deprecationNotice(__METHOD__, "Orm::database()->setConnection()");
+        return Orm::database()->setConnection($name, $connection);
     }
 
-    /** Connection factory */
-    private static function newConnection($name)
-    {
-        // Fetch database configuration
-        $db = Config::getDatabase($name);
-
-        // Establish a connection
-        $pdo = new PDO($db['dsn'], $db['username'], $db['password']);
-
-        $attributes = $db['attributes'];
-
-        // Don't allow ATTR_ERRORMODE to be changed by the configuration,
-        // because Phormium depends on errors throwing exceptions.
-        if (isset($attributes[PDO::ATTR_ERRMODE])
-            && $attributes[PDO::ATTR_ERRMODE] !== PDO::ERRMODE_EXCEPTION) {
-            trigger_error(
-                "Phormium: Attribute PDO::ATTR_ERRMODE is set to something other than " .
-                "PDO::ERRMODE_EXCEPTION for database \"$name\". This is not allowed because " .
-                "Phormium depends on this setting. Skipping attribute definition.",
-                E_USER_WARNING
-            );
-        }
-
-        $attributes[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
-
-        // Apply the attributes
-        foreach ($attributes as $key => $value) {
-            if (!$pdo->setAttribute($key, $value)) {
-                throw new \Exception("Failed setting PDO attribute \"$key\" to \"$value\" on database \"$name\".");
-            }
-        }
-
-        return new Connection($name, $pdo);
-    }
-
-    /**
-     * Closes a connection if it's established.
-     *
-     * @param string $name Connection name
-     */
     public static function disconnect($name)
     {
-        if (!isset(self::$connections[$name])) {
-            return;
-        }
-
-        $connection = self::$connections[$name];
-
-        if ($connection->inTransaction()) {
-            $connection->rollback();
-        }
-
-        unset(self::$connections[$name]);
+        self::deprecationNotice(__METHOD__, "Orm::database()->disconnect()");
+        return Orm::database()->disconnect($name);
     }
 
-    /**
-     * Closes all active connections. If in global transaction, the transaction
-     * is rolled back.
-     */
     public static function disconnectAll()
     {
-        if (self::$beginTriggered) {
-            self::rollback();
-        }
-
-        self::$connections = array();
+        self::deprecationNotice(__METHOD__, "Orm::database()->disconnectAll()");
+        return Orm::database()->disconnectAll();
     }
 
-    /**
-     * Starts the global transaction. This causes any connection which is
-     * used to have "BEGIN" executed before any other transactions.
-     */
     public static function begin()
     {
-        if (self::$beginTriggered) {
-            throw new \Exception("Already in transaction.");
-        }
-
-        self::$beginTriggered = true;
+        self::deprecationNotice(__METHOD__, "Orm::begin()");
+        return Orm::begin();
     }
 
-    /**
-     * Ends the global transaction by committing changes on all connections.
-     */
     public static function commit()
     {
-        if (!self::$beginTriggered) {
-            throw new \Exception("Cannot commit. Not in transaction.");
-        }
-
-        // Commit all started transactions
-        foreach (self::$connections as $name => $connection) {
-            if ($connection->inTransaction()) {
-                $connection->commit();
-            }
-        }
-
-        // End global transaction
-        self::$beginTriggered = false;
+        self::deprecationNotice(__METHOD__, "Orm::commit()");
+        return Orm::commit();
     }
 
-    /**
-     * Ends the global transaction by rolling back changes on all connections.
-     */
     public static function rollback()
     {
-        if (!self::$beginTriggered) {
-            throw new \Exception("Cannot roll back. Not in transaction.");
-        }
-
-        // Roll back all started transactions
-        foreach (self::$connections as $name => $connection) {
-            if ($connection->inTransaction()) {
-                $connection->rollBack();
-            }
-        }
-
-        // End global transaction
-        self::$beginTriggered = false;
+        self::deprecationNotice(__METHOD__, "Orm::rollback()");
+        return Orm::rollback();
     }
 
-    /**
-     * Executes given callback within a transaction. Rolls back if an
-     * exception is thrown within the callback.
-     */
-    public static function transaction($callback)
+    public static function transaction(callback $callback)
     {
-        if (!is_callable($callback)) {
-            throw new \Exception("Given argument is not callable.");
-        }
+        self::deprecationNotice(__METHOD__, "Orm::commit()");
+        return Orm::transaction($callback);
+    }
 
-        self::begin();
-
-        try {
-            $callback();
-        } catch (\Exception $ex) {
-            self::rollback();
-            throw new \Exception("Transaction failed. Rolled back.", 0, $ex);
-        }
-
-        self::commit();
+    private static function deprecationNotice($method, $new)
+    {
+        $msg = "Method $method is deprecated and will be removed.";
+        $msg .= " Please use $new instead.";
+        trigger_error($msg, E_USER_WARNING);
     }
 }

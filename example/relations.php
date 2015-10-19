@@ -6,6 +6,8 @@
  * @see https://phormium.readthedocs.org/en/latest/relations.html
  */
 
+use Phormium\Orm;
+
 // Include Phormium and models
 require __DIR__ . "/../vendor/autoload.php";
 require __DIR__ . "/models/Contact.php";
@@ -16,7 +18,7 @@ require __DIR__ . "/models/Tag.php";
 $date = date('Y-m-d');
 
 // Configure Phormium
-\Phormium\DB::configure('config.json');
+Orm::configure('config.json');
 
 // Create a person and three contacts
 Person::fromArray(["id" => 1, "name" => "Ivan"])->save();

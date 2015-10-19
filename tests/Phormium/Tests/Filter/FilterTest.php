@@ -2,9 +2,8 @@
 
 namespace Phormium\Tests;
 
+use Phormium\Orm;
 use Phormium\Tests\Models\Person;
-
-use Phormium\DB;
 
 /**
  * Tests in this class actually run some queries, unlike other test classes in
@@ -16,7 +15,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()
     {
-        DB::configure(PHORMIUM_CONFIG_FILE);
+        Orm::configure(PHORMIUM_CONFIG_FILE);
     }
 
     public function testCaseInsensitiveLike()

@@ -10,7 +10,7 @@ require "../../vendor/autoload.php";
 require "model.php";
 require "functions.php";
 
-Phormium\DB::configure([
+Phormium\Orm::configure([
     'databases' => [
         'test' => [
             'dsn' => 'pgsql:host=localhost;dbname=phtest',

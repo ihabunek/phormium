@@ -4,12 +4,14 @@
  * Demonstrates using QuerySets to write data.
  */
 
+use Phormium\Orm;
+
 // Include Phormium and models
 require __DIR__ . "/../vendor/autoload.php";
 require __DIR__ . "/models/Person.php";
 
 // Configure Phormium
-\Phormium\DB::configure('config.json');
+Orm::configure('config.json');
 
 // A separator for cosmetic outuput
 define('SEPARATOR', str_repeat('-', 50) . "\n");

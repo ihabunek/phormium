@@ -2,7 +2,7 @@
 
 namespace Phormium\Tests;
 
-use Phormium\DB;
+use Phormium\Orm;
 use Phormium\Printer;
 
 use Phormium\Tests\Models\Person;
@@ -14,7 +14,7 @@ class PrinterTest extends \PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()
     {
-        DB::configure(PHORMIUM_CONFIG_FILE);
+        Orm::configure(PHORMIUM_CONFIG_FILE);
     }
 
     public function testDumpQSReturn()

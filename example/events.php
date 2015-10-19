@@ -4,13 +4,14 @@
  * Demonstrates using query events for collecting statistics.
  */
 
+use Phormium\Orm;
+
 // Include Phormium and models
 require __DIR__ . "/../vendor/autoload.php";
-require __DIR__ . "/models/Trade.php";
 require __DIR__ . "/models/Person.php";
 
 // Configure Phormium
-\Phormium\DB::configure('config.json');
+Orm::configure('config.json');
 
 use Phormium\Event;
 

@@ -5,7 +5,7 @@ namespace Phormium\Tests;
 use Mockery as m;
 
 use Phormium\Connection;
-use Phormium\DB;
+use Phormium\Orm;
 
 use Phormium\Tests\Models\Person;
 
@@ -16,7 +16,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()
     {
-        DB::configure(PHORMIUM_CONFIG_FILE);
+        Orm::configure(PHORMIUM_CONFIG_FILE);
     }
 
     public function testManualBeginCommit()
@@ -28,13 +28,13 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
         $id = $person->id;
 
-        DB::begin();
+        Orm::begin();
 
         $p = Person::get($id);
         $p->income = 54321;
         $p->save();
 
-        DB::commit();
+        Orm::commit();
 
         $this->assertEquals(54321, Person::get($id)->income);
     }
@@ -48,13 +48,13 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
         $id = $person->id;
 
-        DB::begin();
+        Orm::begin();
 
         $p = Person::get($id);
         $p->income = 54321;
         $p->save();
 
-        DB::rollback();
+        Orm::rollback();
 
         $this->assertEquals(12345, Person::get($id)->income);
     }
@@ -68,7 +68,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
         $id = $person->id;
 
-        DB::transaction(function() use ($id) {
+        Orm::transaction(function() use ($id) {
             $p = Person::get($id);
             $p->income = 54321;
             $p->save();
@@ -87,7 +87,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $id = $person->id;
 
         try {
-            DB::transaction(function() use ($id) {
+            Orm::transaction(function() use ($id) {
                 $p = Person::get($id);
                 $p->income = 54321;
                 $p->save();
@@ -106,12 +106,11 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Given argument is not callable.
+     * @expectedException PHPUnit_Framework_Error
      */
     public function testCallbackInvalidArgument()
     {
-        DB::transaction(10);
+        Orm::transaction(10);
     }
 
     public function testDisconnectRollsBackTransaction()
@@ -123,17 +122,17 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
         $id = $person->id;
 
-        DB::begin();
+        Orm::begin();
 
         $p = Person::get($id);
         $p->income = 54321;
         $p->save();
 
         // This should roll back changes
-        DB::disconnect('testdb');
+        Orm::database()->disconnect('testdb');
 
         // So they won't be commited here
-        DB::commit();
+        Orm::commit();
 
         $this->assertEquals(12345, Person::get($id)->income);
     }
@@ -147,13 +146,13 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
         $id = $person->id;
 
-        DB::begin();
+        Orm::begin();
 
         $p = Person::get($id);
         $p->income = 54321;
         $p->save();
 
-        DB::disconnectAll();
+        Orm::database()->disconnectAll();
 
         $this->assertEquals(12345, Person::get($id)->income);
     }
@@ -166,17 +165,17 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $person->insert();
 
         $id = $person->id;
-        $conn = DB::getConnection('testdb');
+        $conn = Orm::database()->getConnection('testdb');
 
-        DB::begin();
+        Orm::begin();
         $conn->execute("UPDATE person SET income = income + 1");
-        DB::rollback();
+        Orm::rollback();
 
         $this->assertEquals(100, Person::get($id)->income);
 
-        DB::begin();
+        Orm::begin();
         $conn->execute("UPDATE person SET income = income + 1");
-        DB::commit();
+        Orm::commit();
 
         $this->assertEquals(101, Person::get($id)->income);
     }
@@ -189,17 +188,17 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $person->insert();
 
         $id = $person->id;
-        $conn = DB::getConnection('testdb');
+        $conn = Orm::database()->getConnection('testdb');
 
-        DB::begin();
+        Orm::begin();
         $conn->preparedExecute("UPDATE person SET income = ?", array(200));
-        DB::rollback();
+        Orm::rollback();
 
         $this->assertEquals(100, Person::get($id)->income);
 
-        DB::begin();
+        Orm::begin();
         $conn->preparedExecute("UPDATE person SET income = ?", array(200));
-        DB::commit();
+        Orm::commit();
 
         $this->assertEquals(200, Person::get($id)->income);
     }
@@ -210,7 +209,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
      */
     public function testRollbackBeforeBegin()
     {
-        DB::rollback();
+        Orm::rollback();
     }
 
     /**
@@ -219,20 +218,20 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
      */
     public function testCommitBeforeBegin()
     {
-        DB::commit();
+        Orm::commit();
     }
 
     public function testDoubleBegin()
     {
-        DB::begin();
+        Orm::begin();
 
         try {
-            DB::begin();
+            Orm::begin();
             $this->fail('Expected an exception here.');
         } catch (\Exception $e) {
             $this->assertContains("Already in transaction.", $e->getMessage());
         }
 
-        DB::rollback();
+        Orm::rollback();
     }
 }

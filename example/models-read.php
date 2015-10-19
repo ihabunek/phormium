@@ -1,5 +1,7 @@
 <?php
 
+use Phormium\Orm;
+
 /**
  * Demonstrates using Model objects to fetch data.
  */
@@ -10,7 +12,7 @@ require __DIR__ . "/models/Post.php";
 require __DIR__ . "/models/Person.php";
 
 // Configure Phormium
-\Phormium\DB::configure('config.json');
+Orm::configure('config.json');
 
 // A separator for cosmetic outuput
 define('SEPARATOR', "\n" . str_repeat('-', 50) . "\n");

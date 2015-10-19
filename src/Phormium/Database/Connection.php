@@ -1,6 +1,9 @@
 <?php
 
-namespace Phormium;
+namespace Phormium\Database;
+
+use Evenement\EventEmitter;
+use Phormium\Event;
 
 use PDO;
 use PDOStatement;
@@ -14,24 +17,40 @@ class Connection
     /** Name of the connection. */
     private $name;
 
-    /** The wrapped PDO connection */
+    /**
+     * The wrapped PDO connection.
+     *
+     * @var PDO
+     */
     private $pdo;
 
-    /** The driver name extracted from the PDO connection. */
+    /**
+     * The driver name extracted from the PDO connection DSN.
+     *
+     * @var string
+     */
     private $driver;
 
-    /** Flag to determine if the connection is currently in a transaction. */
+    /**
+     * Flag to determine if the connection is currently in a transaction.
+     *
+     * @var boolean
+     */
     private $inTransaction = false;
 
     /**
      * Constructs a new wrapper with the given PDO connection
      *
-     * @param PDO $pdo
+     * @param string       $name     Connection name.
+     * @param PDO          $pdo      Underlying PDO connection.
+     * @param EventEmitter $emitter  Event emitter.
      */
-    public function __construct($name, PDO $pdo)
+    public function __construct($name, PDO $pdo, EventEmitter $emitter)
     {
+        $this->emitter = $emitter;
         $this->name = $name;
         $this->pdo = $pdo;
+
         $this->driver = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
     }
 
@@ -48,15 +67,13 @@ class Connection
      */
     public function preparedQuery($query, array $arguments = array(), $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
-        DB::getConnection($this->name); // Handles transactions
-
-        Event::emit(Event::QUERY_STARTED, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_STARTED, array($query, $arguments, $this));
 
         $stmt = $this->pdoPrepare($query, $arguments);
         $this->pdoExecute($query, $arguments, $stmt);
         $data = $this->pdoFetch($query, $arguments, $stmt, $fetchStyle, $class);
 
-        Event::emit(Event::QUERY_COMPLETED, array($query, $arguments, $this, $data));
+        $this->emitter->emit(Event::QUERY_COMPLETED, array($query, $arguments, $this, $data));
 
         return $data;
     }
@@ -74,16 +91,14 @@ class Connection
      */
     public function query($query, $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
-        DB::getConnection($this->name); // Handles transactions
-
         $arguments = array();
 
-        Event::emit(Event::QUERY_STARTED, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_STARTED, array($query, $arguments, $this));
 
         $stmt = $this->pdoQuery($query, $arguments);
         $data = $this->pdoFetch($query, $arguments, $stmt, $fetchStyle, $class);
 
-        Event::emit(Event::QUERY_COMPLETED, array($query, $arguments, $this, $data));
+        $this->emitter->emit(Event::QUERY_COMPLETED, array($query, $arguments, $this, $data));
 
         return $data;
     }
@@ -98,15 +113,13 @@ class Connection
      */
     public function execute($query)
     {
-        DB::getConnection($this->name); // Handles transactions
-
         $arguments = array();
 
-        Event::emit(Event::QUERY_STARTED, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_STARTED, array($query, $arguments, $this));
 
         $numRows = $this->pdoExec($query);
 
-        Event::emit(Event::QUERY_COMPLETED, array($query, $arguments, $this, null));
+        $this->emitter->emit(Event::QUERY_COMPLETED, array($query, $arguments, $this, null));
 
         return $numRows;
     }
@@ -124,14 +137,12 @@ class Connection
      */
     public function preparedExecute($query, $arguments = array())
     {
-        DB::getConnection($this->name); // Handles transactions
-
-        Event::emit(Event::QUERY_STARTED, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_STARTED, array($query, $arguments, $this));
 
         $stmt = $this->pdoPrepare($query, $arguments);
         $this->pdoExecute($query, $arguments, $stmt);
 
-        Event::emit(Event::QUERY_COMPLETED, array($query, $arguments, $this, null));
+        $this->emitter->emit(Event::QUERY_COMPLETED, array($query, $arguments, $this, null));
 
         return $stmt->rowCount();
     }
@@ -155,7 +166,7 @@ class Connection
     /** Calls BEGIN on the underlying PDO connection */
     public function beginTransaction()
     {
-        Event::emit(Event::TRANSACTION_BEGIN, array($this));
+        $this->emitter->emit(Event::TRANSACTION_BEGIN, array($this));
         $this->pdo->beginTransaction();
 
         $this->inTransaction = true;
@@ -164,7 +175,7 @@ class Connection
     /** Calls COMMIT on the underlying PDO connection */
     public function commit()
     {
-        Event::emit(Event::TRANSACTION_COMMIT, array($this));
+        $this->emitter->emit(Event::TRANSACTION_COMMIT, array($this));
         $this->pdo->commit();
 
         $this->inTransaction = false;
@@ -173,7 +184,7 @@ class Connection
     /** Calls ROLLBACK on the underlying PDO connection */
     public function rollback()
     {
-        Event::emit(Event::TRANSACTION_ROLLBACK, array($this));
+        $this->emitter->emit(Event::TRANSACTION_ROLLBACK, array($this));
         $this->pdo->rollback();
 
         $this->inTransaction = false;
@@ -187,16 +198,16 @@ class Connection
 
     private function pdoPrepare($query, $arguments)
     {
-        Event::emit(Event::QUERY_PREPARING, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_PREPARING, array($query, $arguments, $this));
 
         try {
             $stmt = $this->pdo->prepare($query);
         } catch (\Exception $ex) {
-            Event::emit(Event::QUERY_ERROR, array($query, $arguments, $this, $ex));
+            $this->emitter->emit(Event::QUERY_ERROR, array($query, $arguments, $this, $ex));
             throw $ex;
         }
 
-        Event::emit(Event::QUERY_PREPARED, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_PREPARED, array($query, $arguments, $this));
 
         return $stmt;
     }
@@ -205,44 +216,44 @@ class Connection
     {
         $arguments = array();
 
-        Event::emit(Event::QUERY_EXECUTING, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_EXECUTING, array($query, $arguments, $this));
 
         try {
             $this->pdo->exec($query);
         } catch (\Exception $ex) {
-            Event::emit(Event::QUERY_ERROR, array($query, $arguments, $this, $ex));
+            $this->emitter->emit(Event::QUERY_ERROR, array($query, $arguments, $this, $ex));
             throw $ex;
         }
 
-        Event::emit(Event::QUERY_EXECUTED, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_EXECUTED, array($query, $arguments, $this));
     }
 
     private function pdoExecute($query, $arguments, PDOStatement $stmt)
     {
-        Event::emit(Event::QUERY_EXECUTING, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_EXECUTING, array($query, $arguments, $this));
 
         try {
             $stmt->execute($arguments);
         } catch (\Exception $ex) {
-            Event::emit(Event::QUERY_ERROR, array($query, $arguments, $this, $ex));
+            $this->emitter->emit(Event::QUERY_ERROR, array($query, $arguments, $this, $ex));
             throw $ex;
         }
 
-        Event::emit(Event::QUERY_EXECUTED, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_EXECUTED, array($query, $arguments, $this));
     }
 
     private function pdoQuery($query, $arguments)
     {
-        Event::emit(Event::QUERY_EXECUTING, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_EXECUTING, array($query, $arguments, $this));
 
         try {
             $stmt = $this->pdo->query($query);
         } catch (\Exception $ex) {
-            Event::emit(Event::QUERY_ERROR, array($query, $arguments, $this, $ex));
+            $this->emitter->emit(Event::QUERY_ERROR, array($query, $arguments, $this, $ex));
             throw $ex;
         }
 
-        Event::emit(Event::QUERY_EXECUTED, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_EXECUTED, array($query, $arguments, $this));
 
         return $stmt;
     }
@@ -250,7 +261,7 @@ class Connection
     /** Fetches all resulting records from a PDO statement. */
     private function pdoFetch($query, $arguments, PDOStatement $stmt, $fetchStyle, $class)
     {
-        Event::emit(Event::QUERY_FETCHING, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_FETCHING, array($query, $arguments, $this));
 
         $fetchIntoClass = $fetchStyle === PDO::FETCH_CLASS && isset($class);
 
@@ -276,11 +287,11 @@ class Connection
                 }
             }
         } catch (\Exception $ex) {
-            Event::emit(Event::QUERY_ERROR, array($query, $arguments, $this, $ex));
+            $this->emitter->emit(Event::QUERY_ERROR, array($query, $arguments, $this, $ex));
             throw $ex;
         }
 
-        Event::emit(Event::QUERY_FETCHED, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_FETCHED, array($query, $arguments, $this));
 
         return $data;
     }
