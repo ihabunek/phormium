@@ -105,14 +105,6 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(12345, Person::get($id)->income);
     }
 
-    /**
-     * @expectedException PHPUnit_Framework_Error
-     */
-    public function testCallbackInvalidArgument()
-    {
-        Orm::transaction(10);
-    }
-
     public function testDisconnectRollsBackTransaction()
     {
         $person = new Person();
