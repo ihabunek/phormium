@@ -13,6 +13,7 @@
     ],
     "require": {
         "php": ">=5.4.0",
+        "evenement/evenement": "^2.0",
         "pimple/pimple": "^3.0",
         "symfony/config": "~2.6.0",
         "symfony/yaml": "~2.6.0",
