@@ -65,7 +65,7 @@ class DB
         return Orm::rollback();
     }
 
-    public static function transaction(callback $callback)
+    public static function transaction(callable $callback)
     {
         self::deprecationNotice(__METHOD__, "Orm::commit()");
         return Orm::transaction($callback);
