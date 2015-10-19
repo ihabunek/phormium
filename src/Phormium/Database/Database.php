@@ -5,8 +5,6 @@ namespace Phormium\Database;
 use Evenement\EventEmitter;
 use Phormium\Event;
 
-use PDO;
-
 /**
  * Handles database connections.
  */

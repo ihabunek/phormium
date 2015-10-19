@@ -3,7 +3,6 @@
 namespace Phormium\Database;
 
 use Evenement\EventEmitter;
-use Phormium\Event;
 
 use PDO;
 
