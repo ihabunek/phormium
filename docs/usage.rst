@@ -16,7 +16,7 @@ configure Phormium using your `configuration file <setup.html>`_.
 
     require 'vendor/autoload.php';
 
-    Phormium\DB::configure('/path/to/config.json');
+    Phormium\Orm::configure('/path/to/config.json');
 
 Alternatively, if you are not using Composer, Phormium has it's own autoloader:
 
@@ -25,7 +25,7 @@ Alternatively, if you are not using Composer, Phormium has it's own autoloader:
     require '/path/to/phormium/src/Phormium/Autoloader.php';
 
     Phormium\Autoloader::register();
-    Phormium\DB::configure('/path/to/config.json');
+    Phormium\Orm::configure('/path/to/config.json');
 
 Querying individual records
 ---------------------------
@@ -750,7 +750,7 @@ UPDATE or DELETE queries which do not return data.
 
     // Lowercase all names in the person table
     $query = "UPDATE person SET name = LOWER(name);
-    $conn = DB::getConnection('myconn');
+    $conn = Orm::database()->getConnection('myconn');
     $numRows = $conn->execute($query);
 
 Where `myconn` is a connection defined in the config file.
@@ -779,7 +779,7 @@ For more info, see `PDOStatement`_ documentation.
 .. code-block:: php
 
     $query = "SELET * FROM x JOIN y ON x.pk = y.fk";
-    $conn = DB::getConnection('myconn');
+    $conn = Orm::database()->getConnection('myconn');
     $data = $conn->query($query);
 
 preparedQuery()
@@ -805,7 +805,7 @@ The arguments can either be unnamed:
 
     $query = "SELET * FROM x JOIN y ON x.pk = y.fk WHERE col1 > ? AND col2 < ?";
     $arguments = array(10, 20);
-    $conn = DB::getConnection('myconn');
+    $conn = Orm::database()->getConnection('myconn');
     $data = $conn->preparedQuery($query, $arguments);
 
 Or they can be named:
@@ -817,7 +817,7 @@ Or they can be named:
         "val1" => 10,
         "val2" => 20
     );
-    $conn = DB::getConnection('myconn');
+    $conn = Orm::database()->getConnection('myconn');
     $data = $conn->preparedQuery($query, $arguments);
 
 Direct PDO access
@@ -828,7 +828,7 @@ with it as you like.
 
 .. code-block:: php
 
-    $pdo = DB::getConnection('myconn')->getPDO();
+    $pdo = Orm::database()->getConnection('myconn')->getPDO();
     $stmt = $pdo->prepare($query);
     $stmt->execute($args);
     $data = $stmt->fetchAll();

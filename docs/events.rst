@@ -2,15 +2,19 @@
 Events
 ======
 
-Phormium emits a series of events.
+Phormium uses `Événement <https://github.com/igorw/evenement>`_  as an event
+emitter. You can access it emitter by calling ``Orm::emitter()``.
 
-You can subscribe to an event by invoking `Event::on()` with the event name as
-the first parameter, and the callback function as the second. The parameters of
-the callback function depend on the event and are documented below.
+To subscribe to an event, call ``on()`` method on the event emitter with the
+event name as the first parameter, and the callback function as the second. The
+parameters of the callback function depend on the event and are documented
+below.
+
+The ``Event`` class provides a catalogue of all available events.
 
 .. code-block:: php
 
-    Event::on('query.executing' function($query, $arguments, $connection) {
+    Orm::emitter()->on('query.executing' function($query, $arguments, $connection) {
         // Do something
     })
 
@@ -19,27 +23,27 @@ Query events
 
 The following events are emitted when running a database query.
 
-+-------------------+---------------------------------------------+---------------------------------+
-| Event             | Callback arguments                          | Description                     |
-+===================+=============================================+=================================+
-| query.started     | $query, $arguments, $connection             | Before contacting the database. |
-+-------------------+---------------------------------------------+---------------------------------+
-| query.preparing   | $query, $arguments, $connection             | Before preparing the query.     |
-+-------------------+---------------------------------------------+---------------------------------+
-| query.prepared    | $query, $arguments, $connection             | After preparing the query.      |
-+-------------------+---------------------------------------------+---------------------------------+
-| query.executing   | $query, $arguments, $connection             | Before executing the query.     |
-+-------------------+---------------------------------------------+---------------------------------+
-| query.executed    | $query, $arguments, $connection             | After executing the query.      |
-+-------------------+---------------------------------------------+---------------------------------+
-| query.fetching    | $query, $arguments, $connection             | Before fetching resulting data. |
-+-------------------+---------------------------------------------+---------------------------------+
-| query.fetched     | $query, $arguments, $connection, $data      | After fetching resulting data.  |
-+-------------------+---------------------------------------------+---------------------------------+
-| query.completed   | $query, $arguments, $connection, $data      | On successful completion.       |
-+-------------------+---------------------------------------------+---------------------------------+
-| query.error       | $query, $arguments, $connection, $exception | On error.                       |
-+-------------------+---------------------------------------------+---------------------------------+
++--------------------------+---------------------------------------------+---------------------------------+
+| Event                    | Callback arguments                          | Description                     |
++==========================+=============================================+=================================+
+| Event::QUERY_STARTED     | $query, $arguments, $connection             | Before contacting the database. |
++--------------------------+---------------------------------------------+---------------------------------+
+| Event::QUERY_PREPARING   | $query, $arguments, $connection             | Before preparing the query.     |
++--------------------------+---------------------------------------------+---------------------------------+
+| Event::QUERY_PREPARED    | $query, $arguments, $connection             | After preparing the query.      |
++--------------------------+---------------------------------------------+---------------------------------+
+| Event::QUERY_EXECUTING   | $query, $arguments, $connection             | Before executing the query.     |
++--------------------------+---------------------------------------------+---------------------------------+
+| Event::QUERY_EXECUTED    | $query, $arguments, $connection             | After executing the query.      |
++--------------------------+---------------------------------------------+---------------------------------+
+| Event::QUERY_FETCHING    | $query, $arguments, $connection             | Before fetching resulting data. |
++--------------------------+---------------------------------------------+---------------------------------+
+| Event::QUERY_FETCHED     | $query, $arguments, $connection, $data      | After fetching resulting data.  |
++--------------------------+---------------------------------------------+---------------------------------+
+| Event::QUERY_COMPLETED   | $query, $arguments, $connection, $data      | On successful completion.       |
++--------------------------+---------------------------------------------+---------------------------------+
+| Event::QUERY_ERROR       | $query, $arguments, $connection, $exception | On error.                       |
++--------------------------+---------------------------------------------+---------------------------------+
 
 Note that not all events are triggered for each query. Only prepared queries
 will trigger `preparing` and `prepared` events. Only queries which return data
@@ -54,7 +58,7 @@ Event callback functions use the following arguments:
 +---------------+----------------------+--------------------------------------+
 | $arguments    | array                | Query arguments                      |
 +---------------+----------------------+--------------------------------------+
-| $connection   | Phormium\\Connection | Connection on which the query is run |
+| $connection   | Connection           | Connection on which the query is run |
 +---------------+----------------------+--------------------------------------+
 | $data         | array                | The data fetched from the database.  |
 +---------------+----------------------+--------------------------------------+
@@ -67,18 +71,18 @@ Transaction events
 The following events are triggered when starting or ending a database
 transaction.
 
-+----------------------+---------------------------------+
-| Event name           | Description                     |
-+======================+=================================+
-| transaction.begin    | When starting a transaction.    |
-+----------------------+---------------------------------+
-| transaction.commit   | When committing a transaction.  |
-+----------------------+---------------------------------+
-| transaction.rollback | When rolling back a transaction.|
-+----------------------+---------------------------------+
++-----------------------------+---------------------------------+
+| Event name                  | Description                     |
++=============================+=================================+
+| Event::TRANSACTION_BEGIN    | When starting a transaction.    |
++-----------------------------+---------------------------------+
+| Event::TRANSACTION_COMMIT   | When committing a transaction.  |
++-----------------------------+---------------------------------+
+| Event::TRANSACTION_ROLLBACK | When rolling back a transaction.|
++-----------------------------+---------------------------------+
 
-Callbacks for these events have a single argument: the `Phormium\Connection` on
-which the action is executed.
+Callbacks for these events have a single argument: the
+``Phormium\Database\Connection`` on which the action is executed.
 
 Examples
 --------
@@ -92,15 +96,17 @@ A simple logging example using
 .. code-block:: php
 
     use Logger;
-    use Phormium\Events;
+    use Phormium\Database\Connection;
+    use Phormium\Event;
+    use Phormium\Orm;
 
     $log = Logger::getLogger('query');
 
-    Event::on('query.started', function($query, $arguments) use ($log) {
+    Orm::emitter()->on(Event::QUERY_STARTED, function($query, $arguments) use ($log) {
         $log->info("Running query: $query");
     });
 
-    Event::on('query.error', function ($query, $arguments, $connection, $ex) use ($log) {
+    Orm::emitter()->on(Event::QUERY_ERROR, function ($query, $arguments, Connection $connection, $ex) use ($log) {
         $log->error("Query failed: $ex");
     });
 
@@ -113,6 +119,7 @@ Timing query execution for locating slow queries.
 .. code-block:: php
 
     use Phormium\Event;
+    use Phormium\Orm;
 
     class Stats
     {
@@ -123,8 +130,8 @@ Timing query execution for locating slow queries.
         /** Hooks onto relevant events. */
         public function register()
         {
-            Event::on('query.started', array($this, 'started'));
-            Event::on('query.completed', array($this, 'completed'));
+            Orm::emitter()->on(Event::QUERY_STARTED, array($this, 'started'));
+            Orm::emitter()->on(Event::QUERY_COMPLETED, array($this, 'completed'));
         }
 
         /** Called when a query has started. */

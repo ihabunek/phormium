@@ -86,7 +86,7 @@ array with the following values:
     Name of the database table to which the model maps.
 `pk`
     Name of the primary key column (or an array of names for composite primary
-    keys).
+    keys). If not defined, will default to "id", if that column exists.
 
 Try it out
 ----------
@@ -99,7 +99,7 @@ them:
     require 'vendor/autoload.php';
     require 'Person.php';
 
-    Phormium\DB::configure('config.json');
+    Phormium\Orm::configure('config.json');
 
     $persons = Person::objects()->fetch();
 

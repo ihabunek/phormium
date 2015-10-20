@@ -10,9 +10,9 @@ connections without the need to know which model is mapped to which database.
 Callback transactions
 ---------------------
 
-By passing a callable to `DB::transaction()`, the code within the callable will
+By passing a callable to `Orm::transaction()`, the code within the callable will
 be executed within a transaction. If an exception is thrown within the callback,
-the transaction will be rolled back. Otherwise it will be commited once the 
+the transaction will be rolled back. Otherwise it will be commited once the
 callback is executed.
 
 For example, if you wanted to increase the salary for several Persons, you might
@@ -23,7 +23,7 @@ code it this way:
     $ids = array(10, 20, 30);
     $increment = 100;
 
-    DB::transaction(function() use ($ids, $increment) {
+    Orm::transaction(function() use ($ids, $increment) {
         foreach ($ids as $id) {
             $p = Person::get($id);
             $p->income += $increment;
@@ -48,7 +48,7 @@ Equivalent to the callback example would look like:
     $ids = array(10, 20, 30);
     $increment = 100;
 
-    DB::begin();
+    Orm::begin();
 
     try {
         foreach ($ids as $id) {
@@ -57,8 +57,8 @@ Equivalent to the callback example would look like:
             $p->save();
         }
     } catch (\Exception $ex) {
-        DB::rollback();
+        Orm::rollback();
         throw new \Exception("Transaction failed. Rolled back.", 0, $ex);
     }
 
-    DB::commit();
+    Orm::commit();

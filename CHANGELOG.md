@@ -1,11 +1,23 @@
 Phormium Changelog
 ==================
 
-0.8.1 / TBA
+0.9.0 / TBA
 -----------
 
+This release reorganizes the code substantially. The global state which was
+littered all over the project (DB, Conf, Event) is now consolidated in one
+place, the central `Phormium\Orm` class.
+
+This causes several BC breaks:
+
+* `DB` class is deprecated in favour of `Orm::database()`
+* Static methods in `Event` are deprecated in favour of `Orm::emitter()`
+  The class remains used as an event catalogue only.
+* `Conf` is removed, to configure Phormium use `Orm::configure()`
 * Made `Printer` methods non-static
 
+Deprecated methods will emit a deprecation warning when used and will be removed
+in the next release.
 
 0.8.0 / 2015-05-07
 ------------------

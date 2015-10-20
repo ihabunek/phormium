@@ -5,7 +5,7 @@ Configuration
 Phormium uses a configuration array to configure the databases to which to
 connect. JSON and YAML files are also supported. To configure Phormium, pass the
 configuration array, or a path to the configuration file to
-``Phormium\DB::configure()``.
+``Phormium\Orm::configure()``.
 
 The configuration array comprises of the following options:
 
@@ -50,7 +50,7 @@ PHP example
 
 .. code-block:: php
 
-    Phormium\DB::configure([
+    Phormium\Orm::configure([
         "databases" => [
             "db1" => [
                 "dsn" => "mysql:host=localhost;dbname=db1",
@@ -95,7 +95,7 @@ This is the equivalent configuration in JSON.
 
 .. code-block:: php
 
-    Phormium\DB::configure('/path/to/config.json');
+    Phormium\Orm::configure('/path/to/config.json');
 
 YAML example
 ~~~~~~~~~~~~
@@ -117,5 +117,5 @@ This is the equivalent configuration in YAML.
 
 .. code-block:: php
 
-    Phormium\DB::configure('/path/to/config.yaml');
+    Phormium\Orm::configure('/path/to/config.yaml');
 
