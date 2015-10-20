@@ -4,11 +4,11 @@ namespace Phormium\Tests\Models;
 
 class Person extends \Phormium\Model
 {
-    protected static $_meta = array(
+    protected static $_meta = [
         'database' => 'testdb',
         'table' => 'person',
         'pk' => 'id'
-    );
+    ];
 
     public $id;
     public $name;

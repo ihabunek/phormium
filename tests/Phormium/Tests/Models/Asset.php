@@ -9,11 +9,11 @@ use Phormium\Model;
  */
 class Asset extends Model
 {
-    protected static $_meta = array(
+    protected static $_meta = [
         'database' => 'testdb',
         'table' => 'asset',
         'pk' => 'id'
-    );
+    ];
 
     public $id;
     public $owner_id;

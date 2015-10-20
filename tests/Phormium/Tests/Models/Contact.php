@@ -6,11 +6,11 @@ use Phormium\Model;
 
 class Contact extends Model
 {
-    protected static $_meta = array(
+    protected static $_meta = [
         'database' => 'testdb',
         'table' => 'contact',
         'pk' => 'id'
-    );
+    ];
 
     public $id;
     public $person_id;

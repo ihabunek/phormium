@@ -28,8 +28,8 @@ class AggregateTest extends \PHPUnit_Framework_TestCase
         $qs->delete();
 
         // Create trades with random prices and quantitities
-        $prices = array();
-        $quantities = array();
+        $prices = [];
+        $quantities = [];
 
         foreach(range(1, $count) as $tradeno) {
             $price = rand(100, 100000) / 100;;

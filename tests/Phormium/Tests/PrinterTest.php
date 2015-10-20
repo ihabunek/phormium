@@ -23,9 +23,9 @@ class PrinterTest extends \PHPUnit_Framework_TestCase
 
         Person::objects()->filter("name", "=", $name)->delete();
 
-        $person1 = Person::fromArray(array("name" => $name, "income" => 100));
-        $person2 = Person::fromArray(array("name" => $name, "income" => 200));
-        $person3 = Person::fromArray(array("name" => $name, "income" => 300));
+        $person1 = Person::fromArray(["name" => $name, "income" => 100]);
+        $person2 = Person::fromArray(["name" => $name, "income" => 200]);
+        $person3 = Person::fromArray(["name" => $name, "income" => 300]);
 
         $person1->save(); $id1 = $person1->id;
         $person2->save(); $id2 = $person2->id;
@@ -45,11 +45,11 @@ class PrinterTest extends \PHPUnit_Framework_TestCase
     {
         $name = "Freddy Mercury";
 
-        $data = array(
-            array("id" => 1, "name" => $name, "email" => "freddy@queen.org", "income" => 100),
-            array("id" => 2, "name" => $name, "email" => "freddy@queen.org", "income" => 200),
-            array("id" => 3, "name" => $name, "email" => "freddy@queen.org", "income" => 300),
-        );
+        $data = [
+            ["id" => 1, "name" => $name, "email" => "freddy@queen.org", "income" => 100],
+            ["id" => 2, "name" => $name, "email" => "freddy@queen.org", "income" => 200],
+            ["id" => 3, "name" => $name, "email" => "freddy@queen.org", "income" => 300],
+        ];
 
         $printer = new Printer();
         $actual = $printer->dump($data, true);
@@ -68,9 +68,9 @@ class PrinterTest extends \PHPUnit_Framework_TestCase
 
         Person::objects()->filter("name", "=", $name)->delete();
 
-        $person1 = Person::fromArray(array("name" => $name, "income" => 100));
-        $person2 = Person::fromArray(array("name" => $name, "income" => 200));
-        $person3 = Person::fromArray(array("name" => $name, "income" => 300));
+        $person1 = Person::fromArray(["name" => $name, "income" => 100]);
+        $person2 = Person::fromArray(["name" => $name, "income" => 200]);
+        $person3 = Person::fromArray(["name" => $name, "income" => 300]);
 
         $person1->save(); $id1 = $person1->id;
         $person2->save(); $id2 = $person2->id;
@@ -106,7 +106,7 @@ class PrinterTest extends \PHPUnit_Framework_TestCase
     {
         ob_start();
         $printer = new Printer();
-        $printer->dump(array());
+        $printer->dump([]);
         $actual = ob_get_clean();
 
         $this->assertSame("", $actual);

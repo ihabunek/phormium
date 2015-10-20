@@ -37,7 +37,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($p, $p2);
 
         // Alternative get
-        $p3 = Person::get(array($id));
+        $p3 = Person::get([$id]);
         $this->assertInstanceOf("Phormium\\Tests\\Models\\Person", $p3);
         $this->assertEquals($p, $p3);
     }
@@ -72,7 +72,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($t, $t2);
 
         // Alternative get
-        $t3 = Trade::get(array($date, $no));
+        $t3 = Trade::get([$date, $no]);
         $this->assertInstanceOf("Phormium\\Tests\\Models\\Trade", $t3);
         $this->assertEquals($t, $t3);
     }
@@ -111,10 +111,10 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     public function testNewPersonFromArray()
     {
         $p = Person::fromArray(
-            array(
+            [
                 'name' => 'Peter Peterson',
                 'email' => 'peter@peterson.com'
-            )
+            ]
         );
 
         // Perform INSERT
@@ -157,14 +157,14 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testFromYAML()
     {
-        $yaml = implode("\n", array(
+        $yaml = implode("\n", [
             'id: 101',
             'name: "Jack Jackson"',
             'email: "jack@jackson.org"',
             'birthday: "1980-03-14"',
             'created: "2000-03-07 10:45:13"',
             'income: 12345.67',
-        ));
+        ]);
 
         $actual = Person::fromYAML($yaml);
 
@@ -203,13 +203,10 @@ class ModelTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidProperty()
     {
-        $p = Person::fromArray(
-            array(
-                'name' => 'Peter Peterson',
-                'xxx' => 'peter@peterson.com' // doesn't exist
-            ),
-            true
-        );
+        $p = Person::fromArray([
+            'name' => 'Peter Peterson',
+            'xxx' => 'peter@peterson.com' // doesn't exist
+        ], true);
     }
 
     public function testUpdate()
@@ -411,7 +408,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(0, $qs->count());
         $this->assertFalse($qs->exists());
 
-        $data = array('name' => 'Hrvoje');
+        $data = ['name' => 'Hrvoje'];
         Person::fromArray($data)->save();
         Person::fromArray($data)->save();
         Person::fromArray($data)->save();
@@ -427,7 +424,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
      */
     public function testFromObject()
     {
-        $array = array('name' => 'Kiki', 'income' => 123.45);
+        $array = ['name' => 'Kiki', 'income' => 123.45];
         $object = (object) $array;
 
         $p1 = Person::fromArray($array);
@@ -462,7 +459,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetErrorPKNotScalar()
     {
-        Person::get(array(array()));
+        Person::get([[]]);
     }
 
     /**
@@ -515,28 +512,28 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     {
         $name = uniqid();
 
-        Person::fromArray(array('name' => $name, 'income' => 100))->insert();
-        Person::fromArray(array('name' => $name, 'income' => 100))->insert();
-        Person::fromArray(array('name' => $name, 'income' => 100))->insert();
-        Person::fromArray(array('name' => $name, 'income' => 200))->insert();
-        Person::fromArray(array('name' => $name, 'income' => 200))->insert();
-        Person::fromArray(array('name' => $name, 'income' => 200))->insert();
+        Person::fromArray(['name' => $name, 'income' => 100])->insert();
+        Person::fromArray(['name' => $name, 'income' => 100])->insert();
+        Person::fromArray(['name' => $name, 'income' => 100])->insert();
+        Person::fromArray(['name' => $name, 'income' => 200])->insert();
+        Person::fromArray(['name' => $name, 'income' => 200])->insert();
+        Person::fromArray(['name' => $name, 'income' => 200])->insert();
 
         $actual = Person::objects()
             ->filter('name', '=', $name)
             ->orderBy('income', 'asc')
             ->distinct('name', 'income');
 
-        $expected = array(
-            array(
+        $expected = [
+            [
                 'name' => $name,
                 'income' => 100,
-            ),
-            array (
+            ],
+            [
                 'name' => $name,
                 'income' => 200,
-            ),
-        );
+            ],
+        ];
         $this->assertEquals($expected, $actual);
 
         $actual = Person::objects()
@@ -544,7 +541,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             ->orderBy('income', 'asc')
             ->distinct('income');
 
-        $expected = array(100, 200);
+        $expected = [100, 200];
         $this->assertEquals($expected, $actual);
     }
 
@@ -561,20 +558,20 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     {
         $name = uniqid();
 
-        Person::fromArray(array('name' => "$name-1", 'income' => 100))->insert();
-        Person::fromArray(array('name' => "$name-2", 'income' => 200))->insert();
-        Person::fromArray(array('name' => "$name-3", 'income' => 300))->insert();
+        Person::fromArray(['name' => "$name-1", 'income' => 100])->insert();
+        Person::fromArray(['name' => "$name-2", 'income' => 200])->insert();
+        Person::fromArray(['name' => "$name-3", 'income' => 300])->insert();
 
         $actual = Person::objects()
             ->filter('name', 'LIKE', "$name%")
             ->orderBy('name', 'asc')
             ->values('name', 'income');
 
-        $expected = array(
-            array('name' => "$name-1", 'income' => 100),
-            array('name' => "$name-2", 'income' => 200),
-            array('name' => "$name-3", 'income' => 300),
-        );
+        $expected = [
+            ['name' => "$name-1", 'income' => 100],
+            ['name' => "$name-2", 'income' => 200],
+            ['name' => "$name-3", 'income' => 300],
+        ];
 
         $this->assertEquals($expected, $actual);
 
@@ -583,11 +580,11 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             ->orderBy('name', 'asc')
             ->valuesList('name', 'income');
 
-        $expected = array(
-            array("$name-1", 100),
-            array("$name-2", 200),
-            array("$name-3", 300),
-        );
+        $expected = [
+            ["$name-1", 100],
+            ["$name-2", 200],
+            ["$name-3", 300],
+        ];
 
         $this->assertEquals($expected, $actual);
 
@@ -596,42 +593,42 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             ->orderBy('name', 'asc')
             ->valuesFlat('name');
 
-         $expected = array(
+         $expected = [
             "$name-1",
             "$name-2",
             "$name-3",
-        );
+        ];
 
         $this->assertEquals($expected, $actual);
     }
 
     public function testToArray()
     {
-        $person = Person::fromArray(array(
+        $person = Person::fromArray([
             'name' => "Michael Kiske",
             'email' => "miki@example.com",
             'income' => 100000,
-        ));
+        ]);
 
-        $expected = array(
+        $expected = [
             'id' => null,
             'name' => 'Michael Kiske',
             'email' => 'miki@example.com',
             'birthday' => null,
             'created' => null,
             'income' => 100000
-        );
+        ];
 
         $this->assertSame($expected, $person->toArray());
     }
 
     public function testToJson()
     {
-        $person = Person::fromArray(array(
+        $person = Person::fromArray([
             'name' => "Michael Kiske",
             'email' => "miki@example.com",
             'income' => 100000,
-        ));
+        ]);
 
         $expected = '{"id":null,"name":"Michael Kiske","email":"miki@example.com","birthday":null,"created":null,"income":100000}';
 
@@ -640,20 +637,20 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testToYaml()
     {
-        $person = Person::fromArray(array(
+        $person = Person::fromArray([
             'name' => "Michael Kiske",
             'email' => "miki@example.com",
             'income' => 100000,
-        ));
+        ]);
 
-        $expected = implode("\n", array(
+        $expected = implode("\n", [
             'id: null',
             "name: 'Michael Kiske'",
             'email: miki@example.com',
             'birthday: null',
             'created: null',
             'income: 100000',
-        )) . "\n";
+        ]) . "\n";
 
         $this->assertSame($expected, $person->toYAML());
     }
@@ -678,9 +675,9 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType('array', $actual);
         $this->assertEmpty($actual);
 
-        Person::fromArray(array('name' => "Freddy Mercury"))->insert();
-        Person::fromArray(array('name' => "Brian May"))->insert();
-        Person::fromArray(array('name' => "Roger Taylor"))->insert();
+        Person::fromArray(['name' => "Freddy Mercury"])->insert();
+        Person::fromArray(['name' => "Brian May"])->insert();
+        Person::fromArray(['name' => "Roger Taylor"])->insert();
 
         $actual = Person::all();
         $this->assertInternalType('array', $actual);
@@ -689,19 +686,19 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testDump()
     {
-        $p = Person::fromArray(array(
+        $p = Person::fromArray([
             'id' => 10,
             'name' => "Tom Lehrer",
             'email' => "tom@lehrer.net",
             'birthday' => "1928-04-09",
             'income' => 1000
-        ));
+        ]);
 
         ob_start();
         $p->dump();
         $actual = ob_get_clean();
 
-        $expected = implode("\n", array(
+        $expected = implode("\n", [
             'Phormium\Tests\Models\Person (testdb.person)',
             '============================================',
             'id: 10 (PK)',
@@ -710,7 +707,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             'birthday: "1928-04-09"',
             'created: NULL',
             'income: 1000',
-        ));
+        ]);
         $expected .= "\n\n";
 
         $this->assertSame($expected, $actual);

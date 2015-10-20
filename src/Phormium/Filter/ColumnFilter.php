@@ -108,7 +108,7 @@ class ColumnFilter extends Filter
         $this->checkIsScalar($value, $operation);
 
         $where = "{$column} {$operation} ?";
-        return array($where, array($value));
+        return [$where, [$value]];
     }
 
     private function renderBetween($column, $operation, $values)
@@ -117,7 +117,7 @@ class ColumnFilter extends Filter
         $this->checkArrayCount($values, 2, $operation);
 
         $where = "{$column} BETWEEN ? AND ?";
-        return array($where, $values);
+        return [$where, $values];
     }
 
     private function renderIn($column, $operation, $values)
@@ -127,7 +127,7 @@ class ColumnFilter extends Filter
 
         $qs = array_fill(0, count($values), '?');
         $where = "$column IN (" . implode(', ', $qs) . ")";
-        return array($where, $values);
+        return [$where, $values];
     }
 
     private function renderLikeCaseInsensitive($column, $operation, $value)
@@ -135,7 +135,7 @@ class ColumnFilter extends Filter
         $this->checkIsScalar($value, $operation);
 
         $where = "lower($column) LIKE lower(?)";
-        return array($where, array($value));
+        return [$where, [$value]];
     }
 
     private function renderNotIn($column, $operation, $values)
@@ -145,19 +145,19 @@ class ColumnFilter extends Filter
 
         $qs = array_fill(0, count($values), '?');
         $where = "$column NOT IN (" . implode(', ', $qs) . ")";
-        return array($where, $values);
+        return [    $where, $values];
     }
 
     private function renderIsNull($column)
     {
         $where = "$column IS NULL";
-        return array($where, array());
+        return [$where, []];
     }
 
     private function renderNotNull($column)
     {
         $where = "$column IS NOT NULL";
-        return array($where, array());
+        return [$where, []];
     }
 
     // ******************************************

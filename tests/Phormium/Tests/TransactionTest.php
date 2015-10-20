@@ -181,13 +181,13 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $conn = Orm::database()->getConnection('testdb');
 
         Orm::begin();
-        $conn->preparedExecute("UPDATE person SET income = ?", array(200));
+        $conn->preparedExecute("UPDATE person SET income = ?", [200]);
         Orm::rollback();
 
         $this->assertEquals(100, Person::get($id)->income);
 
         Orm::begin();
-        $conn->preparedExecute("UPDATE person SET income = ?", array(200));
+        $conn->preparedExecute("UPDATE person SET income = ?", [200]);
         Orm::commit();
 
         $this->assertEquals(200, Person::get($id)->income);

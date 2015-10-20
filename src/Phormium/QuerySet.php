@@ -28,8 +28,10 @@ class QuerySet
      */
     private $query;
 
-    /** Order by clauses. */
-    private $order = array();
+    /**
+     * Order by clauses.
+     */
+    private $order = [];
 
     /**
      * The root filter.
@@ -309,7 +311,7 @@ class QuerySet
         $data = $this->query->select(
             $this->filter,
             $this->order,
-            array($column),
+            [$column],
             $this->limit,
             $this->offset,
             PDO::FETCH_NUM

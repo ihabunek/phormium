@@ -70,7 +70,7 @@ class Printer
     private function dumpData($data, $columns, $return = false)
     {
         // Record column names lengths
-        $lengths = array();
+        $lengths = [];
         foreach ($columns as $name) {
             $lengths[$name] = mb_strlen($name);
         }

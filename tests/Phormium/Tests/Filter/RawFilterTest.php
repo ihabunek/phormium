@@ -15,27 +15,27 @@ class RawFilterTest extends \PHPUnit_Framework_TestCase
     function testConstruction()
     {
         $condition = "lower(name) = ?";
-        $arguments = array('foo');
+        $arguments = ['foo'];
 
         $filter = new RawFilter($condition, $arguments);
         $actual = $filter->render();
-        $expected = array($condition, $arguments);
+        $expected = [$condition, $arguments];
     }
 
     function testFactory()
     {
         $condition = "lower(name) = ?";
-        $arguments = array('foo');
+        $arguments = ['foo'];
 
         $filter = Filter::raw($condition, $arguments);
         $actual = $filter->render();
-        $expected = array($condition, $arguments);
+        $expected = [$condition, $arguments];
     }
 
     function testQuerySet()
     {
         $condition = "lower(name) = ?";
-        $arguments = array('foo');
+        $arguments = ['foo'];
 
         $qs = Person::objects()->filter($condition, $arguments);
 

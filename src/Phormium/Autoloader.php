@@ -28,10 +28,10 @@ class Autoloader
         $namespace = __NAMESPACE__ . '\\';
 
         if (strpos($class, $namespace) == 0) {
-            $replacements = array(
+            $replacements = [
                 '\\' => DIRECTORY_SEPARATOR,
                 '_' => DIRECTORY_SEPARATOR
-            );
+            ];
 
             $subpath = substr($class, strlen($namespace));
             $subpath = strtr($subpath, $replacements);

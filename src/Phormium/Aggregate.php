@@ -15,13 +15,13 @@ class Aggregate
     const SUM = 'sum';
 
     /** Available aggregates. */
-    private $types = array(
+    private $types = [
         self::AVERAGE,
         self::COUNT,
         self::MAX,
         self::MIN,
         self::SUM,
-    );
+    ];
 
     /** Aggregate type. One of $types constants. */
     public $type;

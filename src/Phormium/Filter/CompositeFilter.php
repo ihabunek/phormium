@@ -11,18 +11,18 @@ class CompositeFilter extends Filter
     const OP_AND = "AND";
     const OP_OR = "OR";
 
-    private $operations = array(
+    private $operations = [
         self::OP_AND,
         self::OP_OR,
-    );
+    ];
 
     /** Array of Filter objects. */
-    private $filters = array();
+    private $filters = [];
 
     /** The operation to use to join $filters. */
     private $operation;
 
-    public function __construct($operation, array $filters = array())
+    public function __construct($operation, array $filters = [])
     {
         if (!in_array($operation, $this->operations)) {
             $operations = implode(', ', $this->operations);
@@ -51,8 +51,8 @@ class CompositeFilter extends Filter
             throw new \Exception("Canot render composite filter. No filters defined.");
         }
 
-        $where = array();
-        $args = array();
+        $where = [];
+        $args = [];
 
         foreach ($this->filters as $filter) {
             list($w, $a) = $filter->render();
@@ -62,7 +62,7 @@ class CompositeFilter extends Filter
 
         $separator = " " . $this->operation . " ";
         $where = "(" . implode($separator, $where) . ")";
-        return array($where, $args);
+        return [$where, $args];
     }
 
     public function getFilters()

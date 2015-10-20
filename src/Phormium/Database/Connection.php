@@ -60,15 +60,15 @@ class Connection
      * @param string $class When using PDO::FETCH_CLASS, class to fetch into.
      * @return array The resulting data.
      */
-    public function preparedQuery($query, array $arguments = array(), $fetchStyle = PDO::FETCH_ASSOC, $class = null)
+    public function preparedQuery($query, array $arguments = [], $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
-        $this->emitter->emit(Event::QUERY_STARTED, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_STARTED, [$query, $arguments, $this]);
 
         $stmt = $this->pdoPrepare($query, $arguments);
         $this->pdoExecute($query, $arguments, $stmt);
         $data = $this->pdoFetch($query, $arguments, $stmt, $fetchStyle, $class);
 
-        $this->emitter->emit(Event::QUERY_COMPLETED, array($query, $arguments, $this, $data));
+        $this->emitter->emit(Event::QUERY_COMPLETED, [$query, $arguments, $this, $data]);
 
         return $data;
     }
@@ -86,14 +86,14 @@ class Connection
      */
     public function query($query, $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
-        $arguments = array();
+        $arguments = [];
 
-        $this->emitter->emit(Event::QUERY_STARTED, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_STARTED, [$query, $arguments, $this]);
 
         $stmt = $this->pdoQuery($query, $arguments);
         $data = $this->pdoFetch($query, $arguments, $stmt, $fetchStyle, $class);
 
-        $this->emitter->emit(Event::QUERY_COMPLETED, array($query, $arguments, $this, $data));
+        $this->emitter->emit(Event::QUERY_COMPLETED, [$query, $arguments, $this, $data]);
 
         return $data;
     }
@@ -108,13 +108,13 @@ class Connection
      */
     public function execute($query)
     {
-        $arguments = array();
+        $arguments = [];
 
-        $this->emitter->emit(Event::QUERY_STARTED, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_STARTED, [$query, $arguments, $this]);
 
         $numRows = $this->pdoExec($query);
 
-        $this->emitter->emit(Event::QUERY_COMPLETED, array($query, $arguments, $this, null));
+        $this->emitter->emit(Event::QUERY_COMPLETED, [$query, $arguments, $this, null]);
 
         return $numRows;
     }
@@ -130,14 +130,14 @@ class Connection
      * @param array $arguments The arguments used to substitute params.
      * @return integer Number of rows affected by the query.
      */
-    public function preparedExecute($query, $arguments = array())
+    public function preparedExecute($query, $arguments = [])
     {
-        $this->emitter->emit(Event::QUERY_STARTED, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_STARTED, [$query, $arguments, $this]);
 
         $stmt = $this->pdoPrepare($query, $arguments);
         $this->pdoExecute($query, $arguments, $stmt);
 
-        $this->emitter->emit(Event::QUERY_COMPLETED, array($query, $arguments, $this, null));
+        $this->emitter->emit(Event::QUERY_COMPLETED, [$query, $arguments, $this, null]);
 
         return $stmt->rowCount();
     }
@@ -161,7 +161,7 @@ class Connection
     /** Calls BEGIN on the underlying PDO connection */
     public function beginTransaction()
     {
-        $this->emitter->emit(Event::TRANSACTION_BEGIN, array($this));
+        $this->emitter->emit(Event::TRANSACTION_BEGIN, [$this]);
         $this->pdo->beginTransaction();
 
         $this->inTransaction = true;
@@ -170,7 +170,7 @@ class Connection
     /** Calls COMMIT on the underlying PDO connection */
     public function commit()
     {
-        $this->emitter->emit(Event::TRANSACTION_COMMIT, array($this));
+        $this->emitter->emit(Event::TRANSACTION_COMMIT, [$this]);
         $this->pdo->commit();
 
         $this->inTransaction = false;
@@ -179,7 +179,7 @@ class Connection
     /** Calls ROLLBACK on the underlying PDO connection */
     public function rollback()
     {
-        $this->emitter->emit(Event::TRANSACTION_ROLLBACK, array($this));
+        $this->emitter->emit(Event::TRANSACTION_ROLLBACK, [$this]);
         $this->pdo->rollback();
 
         $this->inTransaction = false;
@@ -193,62 +193,62 @@ class Connection
 
     private function pdoPrepare($query, $arguments)
     {
-        $this->emitter->emit(Event::QUERY_PREPARING, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_PREPARING, [$query, $arguments, $this]);
 
         try {
             $stmt = $this->pdo->prepare($query);
         } catch (\Exception $ex) {
-            $this->emitter->emit(Event::QUERY_ERROR, array($query, $arguments, $this, $ex));
+            $this->emitter->emit(Event::QUERY_ERROR, [$query, $arguments, $this, $ex]);
             throw $ex;
         }
 
-        $this->emitter->emit(Event::QUERY_PREPARED, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_PREPARED, [$query, $arguments, $this]);
 
         return $stmt;
     }
 
     private function pdoExec($query)
     {
-        $arguments = array();
+        $arguments = [];
 
-        $this->emitter->emit(Event::QUERY_EXECUTING, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_EXECUTING, [$query, $arguments, $this]);
 
         try {
             $this->pdo->exec($query);
         } catch (\Exception $ex) {
-            $this->emitter->emit(Event::QUERY_ERROR, array($query, $arguments, $this, $ex));
+            $this->emitter->emit(Event::QUERY_ERROR, [$query, $arguments, $this, $ex]);
             throw $ex;
         }
 
-        $this->emitter->emit(Event::QUERY_EXECUTED, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_EXECUTED, [$query, $arguments, $this]);
     }
 
     private function pdoExecute($query, $arguments, PDOStatement $stmt)
     {
-        $this->emitter->emit(Event::QUERY_EXECUTING, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_EXECUTING, [$query, $arguments, $this]);
 
         try {
             $stmt->execute($arguments);
         } catch (\Exception $ex) {
-            $this->emitter->emit(Event::QUERY_ERROR, array($query, $arguments, $this, $ex));
+            $this->emitter->emit(Event::QUERY_ERROR, [$query, $arguments, $this, $ex]);
             throw $ex;
         }
 
-        $this->emitter->emit(Event::QUERY_EXECUTED, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_EXECUTED, [$query, $arguments, $this]);
     }
 
     private function pdoQuery($query, $arguments)
     {
-        $this->emitter->emit(Event::QUERY_EXECUTING, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_EXECUTING, [$query, $arguments, $this]);
 
         try {
             $stmt = $this->pdo->query($query);
         } catch (\Exception $ex) {
-            $this->emitter->emit(Event::QUERY_ERROR, array($query, $arguments, $this, $ex));
+            $this->emitter->emit(Event::QUERY_ERROR, [$query, $arguments, $this, $ex]);
             throw $ex;
         }
 
-        $this->emitter->emit(Event::QUERY_EXECUTED, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_EXECUTED, [$query, $arguments, $this]);
 
         return $stmt;
     }
@@ -256,7 +256,7 @@ class Connection
     /** Fetches all resulting records from a PDO statement. */
     private function pdoFetch($query, $arguments, PDOStatement $stmt, $fetchStyle, $class)
     {
-        $this->emitter->emit(Event::QUERY_FETCHING, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_FETCHING, [$query, $arguments, $this]);
 
         $fetchIntoClass = $fetchStyle === PDO::FETCH_CLASS && isset($class);
 
@@ -267,7 +267,7 @@ class Connection
             // record, without raising an error. Fetch, on the other hand will
             // produce an error.
             if ($this->getDriver() == 'informix') {
-                $data = array();
+                $data = [];
                 if ($fetchIntoClass) {
                     $stmt->setFetchMode(PDO::FETCH_CLASS, $class);
                 }
@@ -282,11 +282,11 @@ class Connection
                 }
             }
         } catch (\Exception $ex) {
-            $this->emitter->emit(Event::QUERY_ERROR, array($query, $arguments, $this, $ex));
+            $this->emitter->emit(Event::QUERY_ERROR, [$query, $arguments, $this, $ex]);
             throw $ex;
         }
 
-        $this->emitter->emit(Event::QUERY_FETCHED, array($query, $arguments, $this));
+        $this->emitter->emit(Event::QUERY_FETCHED, [$query, $arguments, $this]);
 
         return $data;
     }

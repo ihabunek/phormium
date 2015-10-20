@@ -178,7 +178,7 @@ class Query
         }
 
         // Collect query arguments
-        $args = array();
+        $args = [];
         foreach ($columns as $column) {
             $args[] = $model->{$column};
         }
@@ -240,15 +240,15 @@ class Query
         }
 
         // Collect query arguments (primary key goes last, skip it here)
-        $args = array();
-        $updates = array();
+        $args = [];
+        $updates = [];
         foreach ($nonPkColumns as $column) {
             $updates[] = "$column = ?";
             $args[] = $model->{$column};
         }
 
         // Add primary key to where and arguments
-        $where = array();
+        $where = [];
         foreach ($pkColumns as $column) {
             $where[] = "{$column} = ?";
             $args[] = $model->$column;
@@ -275,8 +275,8 @@ class Query
         $table = $model->getMeta()->getTable();
 
         // Construct where clause based on primary key
-        $args = array();
-        $where = array();
+        $args = [];
+        $where = [];
         foreach ($pk as $column => $value) {
             // All PK fields must be set
             if (!isset($value)) {
@@ -305,7 +305,7 @@ class Query
         $table = $this->meta->getTable();
 
         // Check columns exist
-        $updateBits = array();
+        $updateBits = [];
         foreach ($updates as $column => $value) {
             if (!in_array($column, $columns)) {
                 throw new \Exception("Column [$column] does not exist in table [$table].");
@@ -376,7 +376,7 @@ class Query
         $stmt = $pdo->prepare($query);
         $stmt->execute($args);
 
-        $data = array();
+        $data = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $data[] = $row[$column];
         }
@@ -388,17 +388,17 @@ class Query
     private function constructWhere(Filter $filter = null)
     {
         if ($filter === null) {
-            return array("", array());
+            return ["", []];
         }
 
         list($where, $args) = $filter->render();
 
         if (empty($where)) {
-            return array("", array());
+            return ["", []];
         }
 
         $where = " WHERE $where";
-        return array($where, $args);
+        return [$where, $args];
     }
 
     /** Constructs an ORDER BY clause. */
@@ -452,6 +452,6 @@ class Query
                 break;
         }
 
-        return array($limit1, $limit2);
+        return [$limit1, $limit2];
     }
 }

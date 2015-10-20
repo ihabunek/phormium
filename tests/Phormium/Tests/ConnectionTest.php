@@ -17,10 +17,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     private $connection;
     private $driver;
 
-    public $triggeredEvents = array();
-    public $triggeredArguments = array();
+    public $triggeredEvents = [];
+    public $triggeredArguments = [];
 
-    private $queryEvents = array(
+    private $queryEvents = [
         'query.started',
         'query.preparing',
         'query.prepared',
@@ -30,7 +30,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         'query.fetched',
         'query.completed',
         'query.error',
-    );
+    ];
 
     public static function setUpBeforeClass()
     {
@@ -43,8 +43,8 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $this->driver = $this->connection->getDriver();
 
         // Clean up events before every test
-        $this->triggeredEvents = array();
-        $this->triggeredArguments = array();
+        $this->triggeredEvents = [];
+        $this->triggeredArguments = [];
 
         $that = $this;
         foreach ($this->queryEvents as $event) {
@@ -103,18 +103,18 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $p = Person::fromArray(compact('name'));
         $p->insert();
 
-        $actual = $this->connection->preparedQuery("SELECT * FROM person WHERE name like ?", array($name));
+        $actual = $this->connection->preparedQuery("SELECT * FROM person WHERE name like ?", [$name]);
 
-        $expected = array(
-            array (
+        $expected = [
+            [
                 'id' => $p->id,
                 'name' => $name,
                 'email' => NULL,
                 'birthday' => NULL,
                 'created' => NULL,
                 'income' => NULL,
-            )
-        );
+            ]
+        ];
 
         $this->assertSame($expected, $actual);
     }
@@ -125,7 +125,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
      */
     public function testPreparedQueryFailure()
     {
-        $this->connection->preparedQuery("that human affairs were being watched", array());
+        $this->connection->preparedQuery("that human affairs were being watched", []);
     }
 
     // ******************************************
@@ -135,18 +135,18 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testQueryEvents()
     {
         $query = "SELECT * FROM person";
-        $arguments = array();
+        $arguments = [];
 
         $this->connection->query($query);
 
-        $expected = array(
+        $expected = [
             'query.started',
             'query.executing',
             'query.executed',
             'query.fetching',
             'query.fetched',
             'query.completed',
-        );
+        ];
 
         $this->assertEquals($expected, $this->triggeredEvents);
         $this->checkTriggeredEvents($query, $arguments);
@@ -155,18 +155,18 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testQueryEventsFailure()
     {
         $query = "from the timeless worlds of space.";
-        $arguments = array();
+        $arguments = [];
 
         try {
             $this->connection->query($query);
         } catch (PDOException $ex) {
 
         }
-        $expected = array(
+        $expected = [
             'query.started',
             'query.executing',
             'query.error',
-        );
+        ];
 
         $this->assertEquals($expected, $this->triggeredEvents);
         $this->checkTriggeredEvents($query, $arguments);
@@ -175,10 +175,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testPreparedQueryEvents()
     {
         $query = "SELECT * FROM person WHERE name like ?";
-        $arguments = array('xxx');
+        $arguments = ['xxx'];
 
         $this->connection->preparedQuery($query, $arguments);
-        $expected = array(
+        $expected = [
             'query.started',
             'query.preparing',
             'query.prepared',
@@ -187,7 +187,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             'query.fetching',
             'query.fetched',
             'query.completed',
-        );
+        ];
 
         $this->assertEquals($expected, $this->triggeredEvents);
         $this->checkTriggeredEvents($query, $arguments);
@@ -196,7 +196,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testPreparedQueryEventsFailure()
     {
         $query = "No one could have dreamed";
-        $arguments = array();
+        $arguments = [];
 
         $errored = false;
         try {
@@ -207,20 +207,20 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($errored);
 
         // sqlite and informix fail on prepare, others on execute
-        if (in_array($this->driver, array('sqlite', 'informix'))) {
-            $expected = array(
+        if (in_array($this->driver, ['sqlite', 'informix'])) {
+            $expected = [
                 'query.started',
                 'query.preparing',
                 'query.error',
-            );
+            ];
         } else {
-            $expected = array(
+            $expected = [
                 'query.started',
                 'query.preparing',
                 'query.prepared',
                 'query.executing',
                 'query.error',
-            );
+            ];
         }
 
         $this->assertEquals($expected, $this->triggeredEvents);
@@ -230,15 +230,15 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testExecuteEvents()
     {
         $query = "UPDATE person SET income = income + 1";
-        $arguments = array();
+        $arguments = [];
 
         $this->connection->execute($query);
-        $expected = array(
+        $expected = [
             'query.started',
             'query.executing',
             'query.executed',
             'query.completed',
-        );
+        ];
 
         $this->assertEquals($expected, $this->triggeredEvents);
         $this->checkTriggeredEvents($query, $arguments);
@@ -247,7 +247,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testExecuteEventsFailure()
     {
         $query = "we were being scrutinized";
-        $arguments = array();
+        $arguments = [];
 
         $errored = false;
         try {
@@ -257,11 +257,11 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         }
         $this->assertTrue($errored);
 
-        $expected = array(
+        $expected = [
             'query.started',
             'query.executing',
             'query.error',
-        );
+        ];
 
         $this->assertEquals($expected, $this->triggeredEvents);
         $this->checkTriggeredEvents($query, $arguments);
@@ -270,17 +270,17 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testPreparedExecuteEvents()
     {
         $query = "UPDATE person SET income = income + 1 WHERE id = ?";
-        $arguments = array(1);
+        $arguments = [1];
 
         $this->connection->preparedExecute($query, $arguments);
-        $expected = array(
+        $expected = [
             'query.started',
             'query.preparing',
             'query.prepared',
             'query.executing',
             'query.executed',
             'query.completed',
-        );
+        ];
 
         $this->assertEquals($expected, $this->triggeredEvents);
         $this->checkTriggeredEvents($query, $arguments);
@@ -290,7 +290,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     {
         $query = "as someone with a microscope studies creatures" .
             "that swarm and multiply in a drop of water";
-        $arguments = array();
+        $arguments = [];
 
         $errored = false;
         try {
@@ -301,20 +301,20 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($errored);
 
         // sqlite and informix fail on prepare, others on execute
-        if (in_array($this->driver, array('sqlite', 'informix'))) {
-            $expected = array(
+        if (in_array($this->driver, ['sqlite', 'informix'])) {
+            $expected = [
                 'query.started',
                 'query.preparing',
                 'query.error',
-            );
+            ];
         } else {
-            $expected = array(
+            $expected = [
                 'query.started',
                 'query.preparing',
                 'query.prepared',
                 'query.executing',
                 'query.error',
-            );
+            ];
         }
 
         $this->assertEquals($expected, $this->triggeredEvents);

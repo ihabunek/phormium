@@ -25,10 +25,10 @@ class FilterTest extends \PHPUnit_Framework_TestCase
         $qs->delete();
         $this->assertFalse($qs->exists());
 
-        Person::fromArray(array('name' => "PERO"))->insert();
-        Person::fromArray(array('name' => "pero"))->insert();
-        Person::fromArray(array('name' => "Pero"))->insert();
-        Person::fromArray(array('name' => "pERO"))->insert();
+        Person::fromArray(['name' => "PERO"])->insert();
+        Person::fromArray(['name' => "pero"])->insert();
+        Person::fromArray(['name' => "Pero"])->insert();
+        Person::fromArray(['name' => "pERO"])->insert();
 
         $this->assertSame(4, $qs->count());
         $this->assertCount(4, $qs->fetch());

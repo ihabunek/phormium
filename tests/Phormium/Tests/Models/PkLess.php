@@ -7,10 +7,10 @@ namespace Phormium\Tests\Models;
  */
 class PkLess extends \Phormium\Model
 {
-    protected static $_meta = array(
+    protected static $_meta = [
         'database' => 'testdb',
         'table' => 'pkless',
-    );
+    ];
 
     public $foo;
     public $bar;

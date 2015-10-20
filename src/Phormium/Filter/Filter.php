@@ -66,7 +66,7 @@ abstract class Filter
      *
      * @return RawFilter
      */
-    public static function raw($condition, $arguments = array())
+    public static function raw($condition, $arguments = [])
     {
         return new RawFilter($condition, $arguments);
     }

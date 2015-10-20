@@ -8,11 +8,11 @@ namespace Phormium\Tests\Models;
  */
 class Trade extends \Phormium\Model
 {
-    protected static $_meta = array(
+    protected static $_meta = [
         'database' => 'testdb',
         'table' => 'trade',
-        'pk' => array('tradedate', 'tradeno')
-    );
+        'pk' => ['tradedate', 'tradeno']
+    ];
 
     public $tradedate;
     public $tradeno;

@@ -308,10 +308,10 @@ abstract class Model
         $pkColumns = self::getMeta()->getPkColumns();
 
         if ($pkColumns === null) {
-            return array();
+            return [];
         }
 
-        $pk = array();
+        $pk = [];
         foreach ($pkColumns as $column) {
             $pk[$column] = $this->{$column};
         }

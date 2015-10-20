@@ -27,15 +27,15 @@ class CompositeFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new CompositeFilter(
             CompositeFilter::OP_OR,
-            array(
-                ColumnFilter::fromArray(array('id', '=', 1)),
-                ColumnFilter::fromArray(array('id', '=', 2)),
-                ColumnFilter::fromArray(array('id', '=', 3)),
-            )
+            [
+                ColumnFilter::fromArray(['id', '=', 1]),
+                ColumnFilter::fromArray(['id', '=', 2]),
+                ColumnFilter::fromArray(['id', '=', 3]),
+            ]
         );
 
         $actual = $filter->render();
-        $expected = array("(id = ? OR id = ? OR id = ?)", array(1, 2, 3));
+        $expected = ["(id = ? OR id = ? OR id = ?)", [1, 2, 3]];
         $this->assertSame($expected, $actual);
     }
 
@@ -43,15 +43,15 @@ class CompositeFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new CompositeFilter(
             CompositeFilter::OP_OR,
-            array(
-                array('id', '=', 1),
-                array('id', '=', 2),
-                array('id', '=', 3),
-            )
+            [
+                ['id', '=', 1],
+                ['id', '=', 2],
+                ['id', '=', 3],
+            ]
         );
 
         $actual = $filter->render();
-        $expected = array("(id = ? OR id = ? OR id = ?)", array(1, 2, 3));
+        $expected = ["(id = ? OR id = ? OR id = ?)", [1, 2, 3]];
         $this->assertSame($expected, $actual);
     }
 

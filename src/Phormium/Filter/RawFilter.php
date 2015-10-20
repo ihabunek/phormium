@@ -12,7 +12,7 @@ class RawFilter extends Filter
 
     public $arguments;
 
-    public function __construct($condition, array $arguments = array())
+    public function __construct($condition, array $arguments = [])
     {
         $this->condition = $condition;
         $this->arguments = $arguments;
@@ -20,9 +20,9 @@ class RawFilter extends Filter
 
     public function render()
     {
-        return array(
+        return [
             $this->condition,
             $this->arguments
-        );
+        ];
     }
 }

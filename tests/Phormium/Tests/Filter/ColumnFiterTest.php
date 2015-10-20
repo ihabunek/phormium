@@ -15,7 +15,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = Filter::col('test', '=', 1);
         $actual = $filter->render();
-        $expected = array("test = ?", array(1));
+        $expected = ["test = ?", [1]];
         $this->assertSame($expected, $actual);
     }
 
@@ -23,7 +23,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new ColumnFilter('test', '=', 1);
         $actual = $filter->render();
-        $expected = array("test = ?", array(1));
+        $expected = ["test = ?", [1]];
         $this->assertSame($expected, $actual);
     }
 
@@ -31,7 +31,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new ColumnFilter('test', '=', null);
         $actual = $filter->render();
-        $expected = array("test IS NULL", array());
+        $expected = ["test IS NULL", []];
         $this->assertSame($expected, $actual);
     }
 
@@ -41,7 +41,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function testEqWrongParam()
     {
-        $filter = new ColumnFilter('test', '=', array());
+        $filter = new ColumnFilter('test', '=', []);
         $filter->render();
     }
 
@@ -49,7 +49,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new ColumnFilter('test', '!=', 1);
         $actual = $filter->render();
-        $expected = array("test != ?", array(1));
+        $expected = ["test != ?", [1]];
         $this->assertSame($expected, $actual);
     }
 
@@ -57,7 +57,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new ColumnFilter('test', '<>', 1);
         $actual = $filter->render();
-        $expected = array("test <> ?", array(1));
+        $expected = ["test <> ?", [1]];
         $this->assertSame($expected, $actual);
     }
 
@@ -65,7 +65,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new ColumnFilter('test', '<>', null);
         $actual = $filter->render();
-        $expected = array("test IS NOT NULL", array());
+        $expected = ["test IS NOT NULL", []];
         $this->assertSame($expected, $actual);
     }
 
@@ -73,7 +73,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new ColumnFilter('test', '!=', null);
         $actual = $filter->render();
-        $expected = array("test IS NOT NULL", array());
+        $expected = ["test IS NOT NULL", []];
         $this->assertSame($expected, $actual);
     }
 
@@ -83,7 +83,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function testNeqWrongParam()
     {
-        $filter = new ColumnFilter('test', '!=', array());
+        $filter = new ColumnFilter('test', '!=', []);
         $filter->render();
     }
 
@@ -91,7 +91,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new ColumnFilter('test', '>', 1);
         $actual = $filter->render();
-        $expected = array("test > ?", array(1));
+        $expected = ["test > ?", [1]];
         $this->assertSame($expected, $actual);
     }
 
@@ -99,7 +99,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new ColumnFilter('test', '>=', 1);
         $actual = $filter->render();
-        $expected = array("test >= ?", array(1));
+        $expected = ["test >= ?", [1]];
         $this->assertSame($expected, $actual);
     }
 
@@ -107,7 +107,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new ColumnFilter('test', '<', 1);
         $actual = $filter->render();
-        $expected = array("test < ?", array(1));
+        $expected = ["test < ?", [1]];
         $this->assertSame($expected, $actual);
     }
 
@@ -115,15 +115,15 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new ColumnFilter('test', '<=', 1);
         $actual = $filter->render();
-        $expected = array("test <= ?", array(1));
+        $expected = ["test <= ?", [1]];
         $this->assertSame($expected, $actual);
     }
 
     public function testIn()
     {
-        $filter = new ColumnFilter('test', 'in', array(1, 2, 3));
+        $filter = new ColumnFilter('test', 'in', [1, 2, 3]);
         $actual = $filter->render();
-        $expected = array("test IN (?, ?, ?)", array(1, 2, 3));
+        $expected = ["test IN (?, ?, ?)", [1, 2, 3]];
         $this->assertSame($expected, $actual);
     }
 
@@ -162,15 +162,15 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function testInWrongParam4()
     {
-        $filter = new ColumnFilter('test', 'in', array());
+        $filter = new ColumnFilter('test', 'in', []);
         $filter->render();
     }
 
     public function testNotIn()
     {
-        $filter = new ColumnFilter('test', 'not in', array(1, 2, 3));
+        $filter = new ColumnFilter('test', 'not in', [1, 2, 3]);
         $actual = $filter->render();
-        $expected = array("test NOT IN (?, ?, ?)", array(1, 2, 3));
+        $expected = ["test NOT IN (?, ?, ?)", [1, 2, 3]];
         $this->assertSame($expected, $actual);
     }
 
@@ -209,7 +209,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotInWrongParam4()
     {
-        $filter = new ColumnFilter('test', 'not in', array());
+        $filter = new ColumnFilter('test', 'not in', []);
         $filter->render();
     }
 
@@ -217,7 +217,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new ColumnFilter('test', 'is null');
         $actual = $filter->render();
-        $expected = array("test IS NULL", array());
+        $expected = ["test IS NULL", []];
         $this->assertSame($expected, $actual);
     }
 
@@ -225,7 +225,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new ColumnFilter('test', 'not null');
         $actual = $filter->render();
-        $expected = array("test IS NOT NULL", array());
+        $expected = ["test IS NOT NULL", []];
         $this->assertSame($expected, $actual);
     }
 
@@ -233,7 +233,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new ColumnFilter('test', 'is not null');
         $actual = $filter->render();
-        $expected = array("test IS NOT NULL", array());
+        $expected = ["test IS NOT NULL", []];
         $this->assertSame($expected, $actual);
     }
 
@@ -241,7 +241,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new ColumnFilter('test', 'like', '%foo%');
         $actual = $filter->render();
-        $expected = array("test LIKE ?", array('%foo%'));
+        $expected = ["test LIKE ?", ['%foo%']];
         $this->assertSame($expected, $actual);
     }
 
@@ -249,7 +249,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new ColumnFilter('test', 'ilike', '%foo%');
         $actual = $filter->render();
-        $expected = array("lower(test) LIKE lower(?)", array('%foo%'));
+        $expected = ["lower(test) LIKE lower(?)", ['%foo%']];
         $this->assertSame($expected, $actual);
     }
 
@@ -257,15 +257,15 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = new ColumnFilter('test', 'not like', '%bar%');
         $actual = $filter->render();
-        $expected = array("test NOT LIKE ?", array('%bar%'));
+        $expected = ["test NOT LIKE ?", ['%bar%']];
         $this->assertSame($expected, $actual);
     }
 
     public function testBetween()
     {
-        $filter = new ColumnFilter('test', 'between', array(10, 20));
+        $filter = new ColumnFilter('test', 'between', [10, 20]);
         $actual = $filter->render();
-        $expected = array("test BETWEEN ? AND ?", array(10, 20));
+        $expected = ["test BETWEEN ? AND ?", [10, 20]];
         $this->assertSame($expected, $actual);
     }
 
@@ -295,7 +295,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function testBetweenWrongParam3()
     {
-        $filter = new ColumnFilter('test', 'between', array(1));
+        $filter = new ColumnFilter('test', 'between', [1]);
         $filter->render();
     }
 
@@ -311,14 +311,14 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
 
     public function testFilterFromArray()
     {
-        $actual = ColumnFilter::fromArray(array('id', '=', 123));
+        $actual = ColumnFilter::fromArray(['id', '=', 123]);
 
         $this->assertInstanceOf('\\Phormium\\Filter\\ColumnFilter', $actual);
         $this->assertSame('id', $actual->column);
         $this->assertSame('=', $actual->operation);
         $this->assertSame(123, $actual->value);
 
-        $actual = ColumnFilter::fromArray(array('email', 'null'));
+        $actual = ColumnFilter::fromArray(['email', 'null']);
 
         $this->assertInstanceOf('\\Phormium\\Filter\\ColumnFilter', $actual);
         $this->assertSame('email', $actual->column);
@@ -332,7 +332,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function testFilterFromArrayExceptionTooMany()
     {
-        $actual = ColumnFilter::fromArray(array(1, 2, 3, 4, 5));
+        $actual = ColumnFilter::fromArray([1, 2, 3, 4, 5]);
     }
 
     /**
@@ -341,6 +341,6 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function testFilterFromArrayExceptionTooFew()
     {
-        $actual = ColumnFilter::fromArray(array(1));
+        $actual = ColumnFilter::fromArray([1]);
     }
 }

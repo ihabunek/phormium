@@ -97,12 +97,12 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEmpty($qs1->getOrder());
 
-        $expected = array('name desc');
+        $expected = ['name desc'];
         $actual = $qs2->getOrder();
         $this->assertSame($expected, $actual);
 
         $qs3 = $qs2->orderBy('id');
-        $expected = array('name desc', 'id asc');
+        $expected = ['name desc', 'id asc'];
         $actual = $qs3->getOrder();
         $this->assertSame($expected, $actual);
     }
@@ -130,20 +130,20 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         // Create some sample data
         $uniq = uniqid('batch');
 
-        $p1 = array(
+        $p1 = [
             'name' => "{$uniq}_1",
             'income' => 10000
-        );
+        ];
 
-        $p2 = array(
+        $p2 = [
             'name' => "{$uniq}_2",
             'income' => 20000
-        );
+        ];
 
-        $p3 = array(
+        $p3 = [
             'name' => "{$uniq}_3",
             'income' => 30000
-        );
+        ];
 
         $qs = Person::objects()->filter('name', 'like', "{$uniq}%");
 
@@ -159,9 +159,9 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
 
         // Give everybody a raise!
         $count = $qs->update(
-            array(
+            [
                 'income' => 5000
-            )
+            ]
         );
 
         $this->assertSame(3, $count);
@@ -189,13 +189,13 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         // Create some sample data
         $uniq = uniqid('limit');
 
-        $persons = array(
-            Person::fromArray(array('name' => "{$uniq}_1")),
-            Person::fromArray(array('name' => "{$uniq}_2")),
-            Person::fromArray(array('name' => "{$uniq}_3")),
-            Person::fromArray(array('name' => "{$uniq}_4")),
-            Person::fromArray(array('name' => "{$uniq}_5")),
-        );
+        $persons = [
+            Person::fromArray(['name' => "{$uniq}_1"]),
+            Person::fromArray(['name' => "{$uniq}_2"]),
+            Person::fromArray(['name' => "{$uniq}_3"]),
+            Person::fromArray(['name' => "{$uniq}_4"]),
+            Person::fromArray(['name' => "{$uniq}_5"]),
+        ];
 
         foreach ($persons as $person) {
             $person->save();

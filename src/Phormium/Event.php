@@ -46,7 +46,7 @@ class Event
     /**
      * @deprecated 0.9.0 Use Orm::emitter()->emit(). Will be removed in 1.0.0.
      */
-    public static function emit($event, array $arguments = array())
+    public static function emit($event, array $arguments = [])
     {
         self::deprecationNotice(__METHOD__, "Orm::emitter()->emit()");
         return Orm::emitter()->emit($event, $arguments);

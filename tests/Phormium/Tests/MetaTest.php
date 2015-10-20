@@ -13,20 +13,20 @@ use Phormium\Tests\Models\PkLess;
  */
 class MetaTest extends \PHPUnit_Framework_TestCase
 {
-    private $testMeta = array(
+    private $testMeta = [
         'table' => 'person',
         'database' => 'testdb',
         'pk' => 'id'
-    );
+    ];
 
     public function testPersonMeta()
     {
         $table = 'person';
         $class = 'Phormium\\Tests\\Models\\Person';
         $database = 'testdb';
-        $columns = array('id', 'name', 'email', 'birthday', 'created', 'income');
-        $pk = array('id');
-        $nonPK = array('name', 'email', 'birthday', 'created', 'income');
+        $columns = ['id', 'name', 'email', 'birthday', 'created', 'income'];
+        $pk = ['id'];
+        $nonPK = ['name', 'email', 'birthday', 'created', 'income'];
 
         $expected = new Meta($table, $database, $class, $columns, $pk, $nonPK);
         $actual = Person::getMeta();
@@ -38,9 +38,9 @@ class MetaTest extends \PHPUnit_Framework_TestCase
         $table = 'trade';
         $class = 'Phormium\\Tests\\Models\\Trade';
         $database = 'testdb';
-        $columns = array('tradedate', 'tradeno', 'price', 'quantity');
-        $pk = array('tradedate', 'tradeno');
-        $nonPK = array('price', 'quantity');
+        $columns = ['tradedate', 'tradeno', 'price', 'quantity'];
+        $pk = ['tradedate', 'tradeno'];
+        $nonPK = ['price', 'quantity'];
 
         $expected = new Meta($table, $database, $class, $columns, $pk, $nonPK);
         $actual = Trade::getMeta();
@@ -52,9 +52,9 @@ class MetaTest extends \PHPUnit_Framework_TestCase
         $table = 'pkless';
         $class = 'Phormium\\Tests\\Models\\PkLess';
         $database = 'testdb';
-        $columns = array('foo', 'bar', 'baz');
+        $columns = ['foo', 'bar', 'baz'];
         $pk = null;
-        $nonPK = array('foo', 'bar', 'baz');
+        $nonPK = ['foo', 'bar', 'baz'];
 
         $expected = new Meta($table, $database, $class, $columns, $pk, $nonPK);
         $actual = PkLess::getMeta();
