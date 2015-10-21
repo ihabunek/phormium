@@ -2,6 +2,8 @@
 
 namespace Phormium;
 
+use Phormium\Exception\InvalidModelException;
+
 use ReflectionClass;
 use ReflectionProperty;
 
@@ -30,7 +32,7 @@ class MetaBuilder
         // Fetch user-defined model meta-data
         $_meta = call_user_func([$class, 'getRawMeta']);
         if (!is_array($_meta)) {
-            throw new \Exception("Invalid $class::\$_meta. Not an array.");
+            throw new InvalidModelException("Invalid $class::\$_meta. Not an array.");
         }
 
         // Construct the Meta
@@ -66,7 +68,7 @@ class MetaBuilder
         }, $props);
 
         if (empty($columns)) {
-            throw new \Exception("Model $class has no defined columns (public properties).");
+            throw new InvalidModelException("Model $class has no defined columns (public properties).");
         }
 
         return $columns;
@@ -113,14 +115,14 @@ class MetaBuilder
         } elseif (is_array($meta['pk'])) {
             $pk = $meta['pk'];
         } else {
-            throw new \Exception("Invalid primary key given in $class::\$_meta. Not a string or array.");
+            throw new InvalidModelException("Invalid primary key given in $class::\$_meta. Not a string or array.");
         }
 
         // Check all PK columns exist
         $missing = array_diff($pk, $columns);
         if (!empty($missing)) {
             $missing = implode(",", $missing);
-            throw new \Exception("Invalid $class::\$_meta. Specified primary key column(s) do not exist: $missing");
+            throw new InvalidModelException("Invalid $class::\$_meta. Specified primary key column(s) do not exist: $missing");
         }
 
         return $pk;
@@ -144,7 +146,7 @@ class MetaBuilder
     private function getDatabase($class, $meta)
     {
         if (empty($meta['database'])) {
-            throw new \Exception("Invalid $class::\$_meta. Missing \"database\".");
+            throw new InvalidModelException("Invalid $class::\$_meta. Missing \"database\".");
         }
 
         return $meta['database'];
@@ -154,7 +156,7 @@ class MetaBuilder
     private function getTable($class, $meta)
     {
         if (empty($meta['table'])) {
-            throw new \Exception("Invalid $class::\$_meta. Missing \"table\".");
+            throw new InvalidModelException("Invalid $class::\$_meta. Missing \"table\".");
         }
 
         return $meta['table'];

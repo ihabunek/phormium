@@ -33,7 +33,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Invalid model given
      */
     public function testInvalidClass1()
@@ -43,7 +43,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Class "Some\Class" does not exist.
      */
     public function testInvalidClass2()
@@ -53,7 +53,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Class "Phormium\Tests\Models\NotModel" is not a subclass of Phormium\Model.
      */
     public function testInvalidClass3()
@@ -63,7 +63,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Phormium\Exception\InvalidModelException
      * @expectedExceptionMessage Invalid Phormium\Tests\Models\InvalidModel1::$_meta. Not an array.
      */
     public function testParseErrorNotArray()
@@ -73,7 +73,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Phormium\Exception\InvalidModelException
      * @expectedExceptionMessage Model Phormium\Tests\Models\InvalidModel2 has no defined columns (public properties).
      */
     public function testParseNoColumns()
@@ -83,7 +83,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Phormium\Exception\InvalidModelException
      * @expectedExceptionMessage Invalid Some\Class::$_meta. Missing "database".
      */
     public function testParseErrorMissingDatabase()
@@ -98,7 +98,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Phormium\Exception\InvalidModelException
      * @expectedExceptionMessage Invalid Some\Class::$_meta. Missing "table".
      */
     public function testParseErrorMissingTable()
@@ -143,7 +143,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Phormium\Exception\InvalidModelException
      * @expectedExceptionMessage Invalid Some\Class::$_meta. Specified primary key column(s) do not exist: bar
      */
     public function testGetPKMissingColumn()
@@ -160,7 +160,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Phormium\Exception\InvalidModelException
      * @expectedExceptionMessage Invalid primary key given in Some\Class::$_meta. Not a string or array.
      */
     public function testGetPKInvalidPK()
@@ -178,7 +178,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Phormium\Exception\InvalidModelException
      * @expectedExceptionMessage Invalid primary key given in Some\Class::$_meta. Not a string or array.
      */
     public function testGetColumnsNoColumns()
