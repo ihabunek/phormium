@@ -216,11 +216,6 @@ abstract class Model
         $qs = self::objects();
         foreach ($pkColumns as $name) {
             $value = array_shift($argv);
-
-            if (!is_scalar($value)) {
-                throw new \Exception("Nonscalar value given for primary key value.");
-            }
-
             $qs = $qs->filter($name, '=', $value);
         }
 
