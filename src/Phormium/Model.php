@@ -2,6 +2,7 @@
 
 namespace Phormium;
 
+use Phormium\Exception\ModelNotFoundException;
 use Phormium\Helper\Json;
 
 use Symfony\Component\Yaml\Yaml;
@@ -91,7 +92,7 @@ abstract class Model
         if ($model === null) {
             $class = get_called_class();
             $pk = implode(',', $argv);
-            throw new \Exception("[$class] record with primary key [$pk] does not exist.");
+            throw new ModelNotFoundException("[$class] record with primary key [$pk] does not exist.");
         }
 
         return $model;
@@ -188,7 +189,7 @@ abstract class Model
 
 
     /** Inner method used by get(), search() and exists(). */
-    private static function getQuerySetForPK($argv, $argc)
+    private static function getQuerySetForPK(array $argv, $argc)
     {
         // Allow passing the PK as an array
         if ($argc == 1 && is_array($argv[0])) {

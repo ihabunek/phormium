@@ -454,7 +454,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Phormium\Exception\ModelNotFoundException
      * @expectedExceptionMessage [Phormium\Tests\Models\Person] record with primary key [12345678] does not exist.
      */
     public function testGetErrorModelDoesNotExist()
