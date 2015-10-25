@@ -2,6 +2,8 @@
 
 namespace Phormium;
 
+use Phormium\Exception\InvalidRelationException;
+
 /**
  * Implements relation forming functions for Models.
  */
@@ -103,7 +105,7 @@ trait ModelRelationsTrait
         }
 
         if (count($parentKey) !== count($childKey)) {
-            throw new \Exception("Primary and foreign key must have the same number of columns.");
+            throw new InvalidRelationException("Primary and foreign key must have the same number of columns.");
         }
 
         $this->checkClassHasProperties($child, $childKey);
@@ -118,11 +120,11 @@ trait ModelRelationsTrait
     private function checkClassIsModel($class)
     {
         if (!class_exists($class)) {
-            throw new \Exception("Model class \"$class\" does not exist.");
+            throw new InvalidRelationException("Model class \"$class\" does not exist.");
         }
 
         if (!is_subclass_of($class, "Phormium\\Model")) {
-            throw new \Exception("Given class \"$class\" is not a subclass of Phormium\\Model");
+            throw new InvalidRelationException("Given class \"$class\" is not a subclass of Phormium\\Model");
         }
     }
 
@@ -133,7 +135,7 @@ trait ModelRelationsTrait
     {
         foreach ($properties as $property) {
             if (!property_exists($class, $property)) {
-                throw new \Exception("Property \"$property\" does not exist in class \"$class\".");
+                throw new InvalidRelationException("Property \"$property\" does not exist in class \"$class\".");
             }
         }
     }
@@ -168,7 +170,7 @@ trait ModelRelationsTrait
     private function processKey($key)
     {
         if (empty($key)) {
-            throw new \Exception("Empty key given.");
+            throw new InvalidRelationException("Empty key given.");
         }
 
         if (is_string($key)) {
@@ -180,6 +182,6 @@ trait ModelRelationsTrait
         }
 
         $type = gettype($key);
-        throw new \Exception("Invalid key type: \"$type\". Expected string or array.");
+        throw new InvalidRelationException("Invalid key type: \"$type\". Expected string or array.");
     }
 }

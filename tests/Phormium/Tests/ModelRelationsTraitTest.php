@@ -83,7 +83,7 @@ class ModelRelationsTraitTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException Phormium\Exception\InvalidRelationException
      * @expectedExceptionMessage Model class "foo" does not exist
      */
     public function testInvalidModel1()
@@ -93,7 +93,7 @@ class ModelRelationsTraitTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException Phormium\Exception\InvalidRelationException
      * @expectedExceptionMessage Given class "DateTime" is not a subclass of Phormium\Model
      */
     public function testInvalidModel2()
@@ -103,7 +103,7 @@ class ModelRelationsTraitTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException Phormium\Exception\InvalidRelationException
      * @expectedExceptionMessage Empty key given
      */
     public function testInvalidKey1()
@@ -113,7 +113,7 @@ class ModelRelationsTraitTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException Phormium\Exception\InvalidRelationException
      * @expectedExceptionMessage Invalid key type: "object". Expected string or array.
      */
     public function testInvalidKey2()
@@ -123,7 +123,7 @@ class ModelRelationsTraitTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException Phormium\Exception\InvalidRelationException
      * @expectedExceptionMessage Property "foo" does not exist
      */
     public function testInvalidKey3()
