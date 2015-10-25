@@ -48,8 +48,7 @@ class ColumnFilter extends Filter
      */
     public function render()
     {
-        switch($this->operation)
-        {
+        switch ($this->operation) {
             case self::OP_EQUALS:
                 // Replace "= null" with "IS NULL"
                 if (is_null($this->value)) {
@@ -212,8 +211,7 @@ class ColumnFilter extends Filter
     {
         $count = count($array);
 
-        switch($count)
-        {
+        switch ($count) {
             case 2:
                 return new ColumnFilter($array[0], $array[1]);
             case 3:

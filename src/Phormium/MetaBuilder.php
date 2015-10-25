@@ -136,7 +136,7 @@ class MetaBuilder
         }
 
         return array_values(
-            array_filter($columns, function($column) use ($pk) {
+            array_filter($columns, function ($column) use ($pk) {
                 return !in_array($column, $pk);
             })
         );

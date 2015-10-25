@@ -23,7 +23,7 @@ class Container extends \Pimple\Container
         // One or more configurations can be given as constructor arguments
         $this['config.input'] = func_get_args();
 
-        $this['config.loader'] = function() {
+        $this['config.loader'] = function () {
             return new DelegatingLoader(new LoaderResolver([
                 new ArrayLoader(),
                 new JsonLoader(),
@@ -45,7 +45,7 @@ class Container extends \Pimple\Container
             return new PostProcessor();
         };
 
-        $this['config'] = function() {
+        $this['config'] = function () {
             // Load all given configurations
             $configs = [];
             foreach ($this['config.input'] as $raw) {
@@ -78,7 +78,7 @@ class Container extends \Pimple\Container
         };
 
         // Database connection factory
-        $this['database.factory'] = function() {
+        $this['database.factory'] = function () {
             return new Factory(
                 $this['config']['databases'],
                 $this['emitter']
@@ -86,7 +86,7 @@ class Container extends \Pimple\Container
         };
 
         // Database connection manager
-        $this['database'] = function() {
+        $this['database'] = function () {
             return new Database(
                 $this['database.factory'],
                 $this['emitter']

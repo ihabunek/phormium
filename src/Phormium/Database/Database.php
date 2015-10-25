@@ -38,7 +38,7 @@ class Database
         // Handle database transactions
         // If a global transaction is triggered, start the database transaction
         // before executing a query on the connection.
-        $emitter->on(Event::QUERY_STARTED, function($query, $args, Connection $conn) {
+        $emitter->on(Event::QUERY_STARTED, function ($query, $args, Connection $conn) {
             if ($this->beginTriggered() && !$conn->inTransaction()) {
                 $conn->beginTransaction();
             }
@@ -89,7 +89,8 @@ class Database
     public function setConnection($name, Connection $connection)
     {
         if (isset($this->connections[$name])) {
-            throw new \Exception("Connection \"$name\" is already connected. Please disconnect it before calling setConnection().");
+            throw new \Exception("Connection \"$name\" is already connected. " .
+                "Please disconnect it before calling setConnection().");
         }
 
         $this->connections[$name] = $connection;

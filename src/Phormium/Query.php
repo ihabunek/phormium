@@ -430,8 +430,7 @@ class Query
         $limit2 = ""; // Inserted at end of query (for others)
 
         // Construct the query part (database dependant)
-        switch($driver)
-        {
+        switch ($driver) {
             case "informix":
                 if (isset($offset)) {
                     $limit1 .= " SKIP $offset";
