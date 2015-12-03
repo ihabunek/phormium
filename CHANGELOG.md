@@ -21,7 +21,8 @@ in the next release.
 
 Other changes:
 
-* Fixed limited distinct queries (#18)
+* Fix: Apply limit and offset to distinct queries (#18)
+* Fix: `Connection->execute()` should return the number of affected rows (#12)
 
 0.8.0 / 2015-05-07
 ------------------

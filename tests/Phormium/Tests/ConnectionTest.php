@@ -61,13 +61,25 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $name = uniqid();
         $income = 100;
 
-        $p = Person::fromArray(compact('name', 'income'));
-        $p->insert();
+        $p1 = Person::fromArray(compact('name', 'income'));
+        $p2 = Person::fromArray(compact('name', 'income'));
+        $p3 = Person::fromArray(compact('name', 'income'));
 
-        $this->connection->execute("UPDATE person SET income = income + 1");
+        $p1->insert();
+        $p2->insert();
+        $p3->insert();
 
-        $p2 = Person::get($p->id);
-        $this->assertEquals(101, $p2->income);
+        $numRows = $this->connection->execute("UPDATE person SET income = income + 1 WHERE name = '$name'");
+
+        $p1a = Person::get($p1->id);
+        $p2a = Person::get($p2->id);
+        $p3a = Person::get($p3->id);
+
+        $this->assertEquals(101, $p1a->income);
+        $this->assertEquals(101, $p2a->income);
+        $this->assertEquals(101, $p3a->income);
+
+        $this->assertSame(3, $numRows);
     }
 
     /**

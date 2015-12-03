@@ -214,13 +214,15 @@ class Connection
         $this->emitter->emit(Event::QUERY_EXECUTING, [$query, $arguments, $this]);
 
         try {
-            $this->pdo->exec($query);
+            $numRows = $this->pdo->exec($query);
         } catch (\Exception $ex) {
             $this->emitter->emit(Event::QUERY_ERROR, [$query, $arguments, $this, $ex]);
             throw $ex;
         }
 
         $this->emitter->emit(Event::QUERY_EXECUTED, [$query, $arguments, $this]);
+
+        return $numRows;
     }
 
     private function pdoExecute($query, $arguments, PDOStatement $stmt)
