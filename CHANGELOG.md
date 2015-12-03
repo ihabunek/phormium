@@ -19,6 +19,10 @@ This causes several BC breaks:
 Deprecated methods will emit a deprecation warning when used and will be removed
 in the next release.
 
+Other changes:
+
+* Fixed limited distinct queries (#18)
+
 0.8.0 / 2015-05-07
 ------------------
 

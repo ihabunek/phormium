@@ -331,7 +331,14 @@ class QuerySet
     public function distinct()
     {
         $columns = func_get_args();
-        return $this->query->selectDistinct($this->filter, $this->order, $columns);
+
+        return $this->query->selectDistinct(
+            $this->filter,
+            $this->order,
+            $columns,
+            $this->limit,
+            $this->offset
+        );
     }
 
     /**

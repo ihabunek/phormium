@@ -253,4 +253,32 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
     {
         Person::objects()->limit(1, "a");
     }
+
+    public function testLimitOffsetDistinctQuery()
+    {
+        $p1 = Person::fromArray(['name' => 'Foo Bar']);
+        $p2 = Person::fromArray(['name' => 'Foo Bar']);
+        $p3 = Person::fromArray(['name' => 'Foo Bar']);
+        $p4 = Person::fromArray(['name' => 'Foo Bar']);
+        $p5 = Person::fromArray(['name' => 'Foo Bar']);
+
+        $p1->save();
+        $p2->save();
+        $p3->save();
+        $p4->save();
+        $p5->save();
+
+        $ids = [$p1->id, $p2->id, $p3->id, $p4->id, $p5->id];
+
+        $res = Person::objects()
+            ->filter('id', 'in', $ids)
+            ->orderBy('id', 'desc')
+            ->limit(3, 1)
+            ->distinct('id');
+
+        $this->assertCount(3, $res);
+        $this->assertSame($p4->id, $res[0]);
+        $this->assertSame($p3->id, $res[1]);
+        $this->assertSame($p2->id, $res[2]);
+    }
 }

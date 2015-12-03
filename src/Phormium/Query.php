@@ -74,16 +74,20 @@ class Query
      *
      * @param Filter $filter A filter instance used to form the WHERE clause.
      * @param array $order Array of strings used to form the ORDER BY clause.
+     * @param integer $limit The max. number of rows to fetch.
+     * @param integer $offset The number of rows to skip from beginning.
      *
      * @return array An array distinct values. If multiple columns are given,
      *      will return an array of arrays, and each of these will have
      *      the distinct values indexed by column name. If a single column is
      *      given will return an array of distinct values for that column.
      */
-    public function selectDistinct($filter, $order, array $columns)
+    public function selectDistinct($filter, $order, array $columns, $limit, $offset)
     {
         $table = $this->meta->getTable();
         $database = $this->meta->getDatabase();
+        $conn = Orm::database()->getConnection($database);
+        $driver = $conn->getDriver();
 
         if (empty($columns)) {
             throw new \Exception("No columns given");
@@ -93,14 +97,14 @@ class Query
 
         $sqlColumns = implode(', ', $columns);
 
+        list($limit1, $limit2) = $this->constructLimitOffset($driver, $limit, $offset);
         list($where, $args) = $this->constructWhere($filter);
         $order = $this->constructOrder($order);
 
-        $query = "SELECT DISTINCT {$sqlColumns} FROM {$table}{$where}{$order};";
+        $query = "SELECT{$limit1} DISTINCT {$sqlColumns} FROM {$table}{$where}{$order}{$limit2};";
 
         if (count($columns) > 1) {
             // If multiple columns, return array of arrays
-            $conn = Orm::database()->getConnection($database);
             return $conn->preparedQuery($query, $args);
         } else {
             // If single column, return array of strings
