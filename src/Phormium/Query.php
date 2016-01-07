@@ -57,6 +57,10 @@ class Query
             $columns = $this->meta->columns;
         }
 
+        foreach($columns as $key => $col) {
+            $columns[$key] = '`'.$col.'`';
+        }
+
         $columns = implode(", ", $columns);
         $table = $this->meta->table;
         $class = $this->meta->class;
@@ -68,7 +72,15 @@ class Query
         $query = "SELECT{$limit1} {$columns} FROM {$table}{$where}{$order}{$limit2};";
 
         $conn = DB::getConnection($this->meta->database);
-        return $conn->preparedQuery($query, $args, $fetchType, $class);
+
+        try {
+            $result = $conn->preparedQuery($query, $args, $fetchType, $class);
+            return $result;
+        }
+        catch(\PDOException $e)
+        {
+            throw(new \PDOException($e->getMessage(), $e->getCode()));
+        }
     }
 
     /**

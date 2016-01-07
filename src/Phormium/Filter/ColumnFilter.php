@@ -107,7 +107,7 @@ class ColumnFilter extends Filter
     {
         $this->checkIsScalar($value, $operation);
 
-        $where = "{$column} {$operation} ?";
+        $where = "`{$column}` {$operation} ?";
         return array($where, array($value));
     }
 
@@ -116,7 +116,7 @@ class ColumnFilter extends Filter
         $this->checkIsArray($values, $operation);
         $this->checkArrayCount($values, 2, $operation);
 
-        $where = "{$column} BETWEEN ? AND ?";
+        $where = "`{$column}` BETWEEN ? AND ?";
         return array($where, $values);
     }
 
@@ -126,7 +126,7 @@ class ColumnFilter extends Filter
         $this->checkArrayNotEmpty($values, $operation);
 
         $qs = array_fill(0, count($values), '?');
-        $where = "$column IN (" . implode(', ', $qs) . ")";
+        $where = "`$column` IN (" . implode(', ', $qs) . ")";
         return array($where, $values);
     }
 
@@ -134,7 +134,7 @@ class ColumnFilter extends Filter
     {
         $this->checkIsScalar($value, $operation);
 
-        $where = "lower($column) LIKE lower(?)";
+        $where = "lower(`$column`) LIKE lower(?)";
         return array($where, array($value));
     }
 
@@ -144,19 +144,19 @@ class ColumnFilter extends Filter
         $this->checkArrayNotEmpty($values, $operation);
 
         $qs = array_fill(0, count($values), '?');
-        $where = "$column NOT IN (" . implode(', ', $qs) . ")";
+        $where = "`$column` NOT IN (" . implode(', ', $qs) . ")";
         return array($where, $values);
     }
 
     private function renderIsNull($column)
     {
-        $where = "$column IS NULL";
+        $where = "`$column` IS NULL";
         return array($where, array());
     }
 
     private function renderNotNull($column)
     {
-        $where = "$column IS NOT NULL";
+        $where = "`$column` IS NOT NULL";
         return array($where, array());
     }
 
