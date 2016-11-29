@@ -15,6 +15,11 @@ class QuerySegmentTest extends \PHPUnit_Framework_TestCase
         $qs = new QuerySegment($query, $args);
         $this->assertSame($query, $qs->query());
         $this->assertSame($args, $qs->args());
+
+        // Default args
+        $qs = new QuerySegment();
+        $this->assertSame("", $qs->query());
+        $this->assertSame([], $qs->args());
     }
 
     public function testCombine()
@@ -22,7 +27,7 @@ class QuerySegmentTest extends \PHPUnit_Framework_TestCase
         $qs1 = new QuerySegment("WHERE a = ?", ["foo"]);
         $qs2 = new QuerySegment("AND b = ?", ["bar"]);
 
-        $qsc = QuerySegment::combine($qs1, $qs2);
+        $qsc = $qs1->combine($qs2);
         $this->assertSame("WHERE a = ? AND b = ?", $qsc->query());
         $this->assertSame(["foo", "bar"], $qsc->args());
     }
@@ -40,7 +45,37 @@ class QuerySegmentTest extends \PHPUnit_Framework_TestCase
         $expectedQuery = "SELECT * FROM table WHERE a = ? AND b BETWEEN ? AND ? AND c > ?";
         $expectedArgs = ["foo", "bar", "baz", "qux"];
 
+        $this->assertInstanceOf("Phormium\Query\QuerySegment", $reduced);
         $this->assertSame($expectedQuery, $reduced->query());
         $this->assertSame($expectedArgs, $reduced->args());
+    }
+
+    public function testImplode()
+    {
+        $qs1 = new QuerySegment("foo", [1]);
+        $qs2 = new QuerySegment("bar", []);
+        $qs3 = new QuerySegment("baz", [3, 4]);
+        $separator = new QuerySegment("x", ['y']);
+
+        $imploded = QuerySegment::implode($separator, [$qs1, $qs2, $qs3]);
+
+        $expectedQuery = "foo x bar x baz";
+        $expectedArgs = [1, 'y', 'y', 3, 4];
+
+        $this->assertInstanceOf("Phormium\Query\QuerySegment", $imploded);
+        $this->assertSame($expectedQuery, $imploded->query());
+        $this->assertSame($expectedArgs, $imploded->args());
+    }
+
+    public function testEmbrace()
+    {
+        $query = "a = ? AND b = ?";
+        $args = [1, 2];
+
+        $segment = new QuerySegment($query, $args);
+        $embraced = QuerySegment::embrace($segment);
+
+        $this->assertSame("($query)", $embraced->query());
+        $this->assertSame($args, $embraced->args());
     }
 }
