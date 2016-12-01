@@ -4,6 +4,8 @@ namespace Phormium;
 
 use Evenement\EventEmitter;
 use Phormium\Database\Database;
+use Phormium\QueryBuilder\QueryBuilderInterface;
+
 
 /**
  * Central class. Global state everywhere. Such is Active Record.
@@ -101,6 +103,18 @@ class Orm
     public static function transaction(callable $callback)
     {
         return self::database()->transaction($callback);
+    }
+
+    /**
+     * Returns the QueryBuilder for a given database driver.
+     *
+     * @return QueryBuilderInterface
+     */
+    public static function queryBuilder($driver)
+    {
+        return self::container()
+            ->offsetGet('query_builder_factory')
+            ->getQueryBuilder($driver);
     }
 
     public static function getMeta($class)
