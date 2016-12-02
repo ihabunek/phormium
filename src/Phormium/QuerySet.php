@@ -421,7 +421,7 @@ class QuerySet
         } elseif ($argc === 2) {
             if (is_string($argv[0])) {
                 if (is_string($argv[1])) {
-                    return ColumnFilter::fromArray($args);
+                    return ColumnFilter::fromArray($argv);
                 } elseif (is_array($argv[1])) {
                     return new RawFilter($argv[0], $argv[1]);
                 }
