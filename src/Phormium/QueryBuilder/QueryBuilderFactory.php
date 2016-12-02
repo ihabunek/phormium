@@ -8,7 +8,7 @@ use Phormium\QueryBuilder\QueryBuilderInterface;
 class QueryBuilderFactory
 {
     /**
-     * Returns a SELECT query builder for a given driver.
+     * Returns a query builder for a given driver.
      *
      * @param  string $driver
      * @return QueryBuilderInterface

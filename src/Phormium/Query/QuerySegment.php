@@ -89,7 +89,7 @@ class QuerySegment
         }
 
         if (count($segments) === 1) {
-            return begin($segments);
+            return reset($segments);
         }
 
         $first = array_shift($segments);

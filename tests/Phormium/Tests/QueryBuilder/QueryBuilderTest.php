@@ -78,9 +78,9 @@ class QueryBuilderTest extends \PHPUnit_Framework_TestCase
             'FROM `foo` '  .
             'WHERE (`xx` = ? AND `yy` IS NOT NULL AND (`zz` BETWEEN ? AND ? OR max(?) > 0)) ' .
             'ORDER BY a desc, b asc ' .
-            'LIMIT ? OFFSET ?';
+            'LIMIT 123 OFFSET 321';
 
-        $expectedArgs = ["yy", 1, 2, 100, 123, 321];
+        $expectedArgs = ["yy", 1, 2, 100];
 
         $this->assertSame($expectedQuery, $segment->query());
         $this->assertSame($expectedArgs, $segment->args());

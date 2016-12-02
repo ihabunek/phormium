@@ -147,7 +147,7 @@ class QuerySet
     public function count($column = null)
     {
         $agg = new Aggregate(Aggregate::COUNT, $column);
-        return (integer) $this->query->aggregate($this->filter, $agg);
+        return (integer) $this->query->aggregate($agg, $this->filter);
     }
 
     /**
@@ -157,7 +157,7 @@ class QuerySet
     public function avg($column)
     {
         $agg = new Aggregate(Aggregate::AVERAGE, $column);
-        return $this->query->aggregate($this->filter, $agg);
+        return $this->query->aggregate($agg, $this->filter);
     }
 
     /**
@@ -167,7 +167,7 @@ class QuerySet
     public function max($column)
     {
         $agg = new Aggregate(Aggregate::MAX, $column);
-        return $this->query->aggregate($this->filter, $agg);
+        return $this->query->aggregate($agg, $this->filter);
     }
 
     /**
@@ -177,7 +177,7 @@ class QuerySet
     public function min($column)
     {
         $agg = new Aggregate(Aggregate::MIN, $column);
-        return $this->query->aggregate($this->filter, $agg);
+        return $this->query->aggregate($agg, $this->filter);
     }
 
     /**
@@ -187,7 +187,7 @@ class QuerySet
     public function sum($column)
     {
         $agg = new Aggregate(Aggregate::SUM, $column);
-        return $this->query->aggregate($this->filter, $agg);
+        return $this->query->aggregate($agg, $this->filter);
     }
 
     /**
@@ -346,7 +346,7 @@ class QuerySet
      */
     public function update($updates)
     {
-        return $this->query->batchUpdate($this->filter, $updates);
+        return $this->query->batchUpdate($updates, $this->filter);
     }
 
     /**

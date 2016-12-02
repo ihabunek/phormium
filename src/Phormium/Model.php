@@ -209,7 +209,7 @@ abstract class Model
      *
      * @return Filter
      */
-    public static function getPkFilter($values)
+    public static function getPkFilter(array $values)
     {
         $columns = self::getMeta()->getPkColumns();
 

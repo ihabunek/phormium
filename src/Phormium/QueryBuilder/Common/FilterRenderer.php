@@ -45,7 +45,13 @@ class FilterRenderer
 
     public function renderCompositeFilter(CompositeFilter $filter)
     {
-        $segments = array_map([$this, "renderFilter"], $filter->getFilters());
+        $subFilters = $filter->getFilters();
+
+        if (count($subFilters) === 1) {
+            return $this->renderFilter($subFilters[0]);
+        }
+
+        $segments = array_map([$this, "renderFilter"], $subFilters);
 
         $separator = new QuerySegment($filter->getOperation());
         $imploded = QuerySegment::implode($separator, $segments);

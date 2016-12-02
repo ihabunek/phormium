@@ -28,10 +28,12 @@ class QueryBuilder implements QueryBuilderInterface
         $this->filterRenderer = $filterRenderer;
     }
 
-    public function renderSelect($columns)
+    public function renderSelect($columns, $distinct)
     {
         $columns = array_map($this->quoteFn, $columns);
-        $query = "SELECT " . implode(", ", $columns);
+
+        $query = "SELECT " . ($distinct ? "DISTINCT " : "") .
+            implode(", ", $columns);
 
         return new QuerySegment($query);
     }
@@ -165,10 +167,11 @@ class QueryBuilder implements QueryBuilderInterface
         Filter $filter = null,
         $limit = null,
         $offset = null,
-        array $order = null
+        array $order = null,
+        $distinct = false
     ) {
         return QuerySegment::reduce([
-            $this->renderSelect($columns),
+            $this->renderSelect($columns, $distinct),
             $this->renderFrom($table),
             $this->renderWhere($filter),
             $this->renderOrderBy($order),
@@ -194,7 +197,7 @@ class QueryBuilder implements QueryBuilderInterface
         ]);
     }
 
-    public function buildUpdate($table, array $columns, array $values, Filter $filter)
+    public function buildUpdate($table, array $columns, array $values, Filter $filter = null)
     {
         return QuerySegment::reduce([
             $this->renderUpdate($table),

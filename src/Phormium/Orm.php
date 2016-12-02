@@ -108,7 +108,7 @@ class Orm
     /**
      * Returns the QueryBuilder for a given database driver.
      *
-     * @return QueryBuilderInterface
+     * @return Phormium\QueryBuilder\QueryBuilderInterface
      */
     public static function queryBuilder($driver)
     {

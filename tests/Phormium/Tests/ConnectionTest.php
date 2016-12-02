@@ -3,8 +3,9 @@
 namespace Phormium\Tests;
 
 use Phormium\Connection;
-use Phormium\Orm;
 use Phormium\Event;
+use Phormium\Orm;
+use Phormium\Query\QuerySegment;
 use Phormium\Tests\Models\Person;
 
 use PDOException;
@@ -69,7 +70,8 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $p2->insert();
         $p3->insert();
 
-        $numRows = $this->connection->execute("UPDATE person SET income = income + 1 WHERE name = '$name'");
+        $segment = new QuerySegment("UPDATE person SET income = income + 1 WHERE name = '$name'");
+        $numRows = $this->connection->execute($segment);
 
         $p1a = Person::get($p1->id);
         $p2a = Person::get($p2->id);
@@ -87,12 +89,14 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecuteFailure()
     {
-        $this->connection->execute("No one would have believed");
+        $segment = new QuerySegment("No one would have believed");
+        $this->connection->execute($segment);
     }
 
     public function testQuery()
     {
-        $result = $this->connection->query("SELECT count(*) as ct FROM person");
+        $segment = new QuerySegment("SELECT count(*) as ct FROM person");
+        $result = $this->connection->query($segment);
 
         $this->assertInternalType('array', $result);
         $this->assertCount(1, $result);
@@ -106,7 +110,8 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
      */
     public function testQueryFailure()
     {
-        $this->connection->query("in the last years of the nineteenth century");
+        $segment = new QuerySegment("in the last years of the nineteenth century");
+        $this->connection->query($segment);
     }
 
     public function testPreparedQuery()
@@ -115,7 +120,8 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $p = Person::fromArray(compact('name'));
         $p->insert();
 
-        $actual = $this->connection->preparedQuery("SELECT * FROM person WHERE name like ?", [$name]);
+        $segment = new QuerySegment("SELECT * FROM person WHERE name like ?", [$name]);
+        $actual = $this->connection->preparedQuery($segment);
 
         $expected = [
             [
@@ -137,7 +143,8 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
      */
     public function testPreparedQueryFailure()
     {
-        $this->connection->preparedQuery("that human affairs were being watched", []);
+        $segment = new QuerySegment("that human affairs were being watched");
+        $this->connection->preparedQuery($segment);
     }
 
     // ******************************************
@@ -146,10 +153,8 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
     public function testQueryEvents()
     {
-        $query = "SELECT * FROM person";
-        $arguments = [];
-
-        $this->connection->query($query);
+        $segment = new QuerySegment("SELECT * FROM person");
+        $this->connection->query($segment);
 
         $expected = [
             'query.started',
@@ -161,16 +166,15 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertEquals($expected, $this->triggeredEvents);
-        $this->checkTriggeredEvents($query, $arguments);
+        $this->checkTriggeredEvents($segment);
     }
 
     public function testQueryEventsFailure()
     {
-        $query = "from the timeless worlds of space.";
-        $arguments = [];
+        $segment = new QuerySegment("from the timeless worlds of space.");
 
         try {
-            $this->connection->query($query);
+            $this->connection->query($segment);
         } catch (PDOException $ex) {
 
         }
@@ -181,15 +185,14 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertEquals($expected, $this->triggeredEvents);
-        $this->checkTriggeredEvents($query, $arguments);
+        $this->checkTriggeredEvents($segment);
     }
 
     public function testPreparedQueryEvents()
     {
-        $query = "SELECT * FROM person WHERE name like ?";
-        $arguments = ['xxx'];
+        $segment = new QuerySegment("SELECT * FROM person WHERE name like ?", ['xxx']);
 
-        $this->connection->preparedQuery($query, $arguments);
+        $this->connection->preparedQuery($segment);
         $expected = [
             'query.started',
             'query.preparing',
@@ -202,17 +205,16 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertEquals($expected, $this->triggeredEvents);
-        $this->checkTriggeredEvents($query, $arguments);
+        $this->checkTriggeredEvents($segment);
     }
 
     public function testPreparedQueryEventsFailure()
     {
-        $query = "No one could have dreamed";
-        $arguments = [];
+        $segment = new QuerySegment("No one could have dreamed");
 
         $errored = false;
         try {
-            $this->connection->preparedQuery($query);
+            $this->connection->preparedQuery($segment);
         } catch (PDOException $ex) {
             $errored = true;
         }
@@ -236,15 +238,14 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertEquals($expected, $this->triggeredEvents);
-        $this->checkTriggeredEvents($query, $arguments);
+        $this->checkTriggeredEvents($segment);
     }
 
     public function testExecuteEvents()
     {
-        $query = "UPDATE person SET income = income + 1";
-        $arguments = [];
+        $segment = new QuerySegment("UPDATE person SET income = income + 1");
 
-        $this->connection->execute($query);
+        $this->connection->execute($segment);
         $expected = [
             'query.started',
             'query.executing',
@@ -253,17 +254,16 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertEquals($expected, $this->triggeredEvents);
-        $this->checkTriggeredEvents($query, $arguments);
+        $this->checkTriggeredEvents($segment);
     }
 
     public function testExecuteEventsFailure()
     {
-        $query = "we were being scrutinized";
-        $arguments = [];
+        $segment = new QuerySegment("we were being scrutinized");
 
         $errored = false;
         try {
-            $this->connection->execute($query);
+            $this->connection->execute($segment);
         } catch (PDOException $ex) {
             $errored = true;
         }
@@ -276,15 +276,14 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertEquals($expected, $this->triggeredEvents);
-        $this->checkTriggeredEvents($query, $arguments);
+        $this->checkTriggeredEvents($segment);
     }
 
     public function testPreparedExecuteEvents()
     {
-        $query = "UPDATE person SET income = income + 1 WHERE id = ?";
-        $arguments = [1];
+        $segment = new QuerySegment("UPDATE person SET income = income + 1 WHERE id = ?", [1]);
 
-        $this->connection->preparedExecute($query, $arguments);
+        $this->connection->preparedExecute($segment);
         $expected = [
             'query.started',
             'query.preparing',
@@ -295,18 +294,17 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertEquals($expected, $this->triggeredEvents);
-        $this->checkTriggeredEvents($query, $arguments);
+        $this->checkTriggeredEvents($segment);
     }
 
     public function testPreparedExecuteEventsFailure()
     {
-        $query = "as someone with a microscope studies creatures" .
-            "that swarm and multiply in a drop of water";
-        $arguments = [];
+        $segment = new QuerySegment("as someone with a microscope studies creatures" .
+            "that swarm and multiply in a drop of water");
 
         $errored = false;
         try {
-            $this->connection->preparedExecute($query, $arguments);
+            $this->connection->preparedExecute($segment);
         } catch (PDOException $ex) {
             $errored = true;
         }
@@ -330,10 +328,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertEquals($expected, $this->triggeredEvents);
-        $this->checkTriggeredEvents($query, $arguments);
+        $this->checkTriggeredEvents($segment);
     }
 
-    private function checkTriggeredEvents($query, $arguments)
+    private function checkTriggeredEvents(QuerySegment $segment)
     {
         $this->assertSame(
             count($this->triggeredEvents),
@@ -344,8 +342,8 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             $tArgs = $this->triggeredArguments[$key];
 
             // Checks valid for all events
-            $this->assertSame($query, $tArgs[0]);
-            $this->assertSame($arguments, $tArgs[1]);
+            $this->assertSame($segment->query(), $tArgs[0]);
+            $this->assertSame($segment->args(), $tArgs[1]);
             $this->assertInstanceOf("Phormium\\Database\\Connection", $tArgs[2]);
 
             // Check event argument count

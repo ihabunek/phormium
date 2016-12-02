@@ -2,7 +2,9 @@
 
 namespace Phormium;
 
+use Phormium\Database\Driver;
 use Phormium\Filter\Filter;
+use Phormium\Query\QuerySegment;
 
 use PDO;
 
@@ -52,21 +54,12 @@ class Query
             $columns = $this->meta->getColumns();
         }
 
-        $columns = implode(", ", $columns);
         $table = $this->meta->getTable();
         $class = $this->meta->getClass();
 
-        $database = $this->meta->getDatabase();
-        $conn = Orm::database()->getConnection($database);
-        $driver = $conn->getDriver();
+        $segment = $this->queryBuilder()->buildSelect($table, $columns, $filter, $limit, $offset, $order);
 
-        list($limit1, $limit2) = $this->constructLimitOffset($driver, $limit, $offset);
-        list($where, $args) = $this->constructWhere($filter);
-        $order = $this->constructOrder($order);
-
-        $query = "SELECT{$limit1} {$columns} FROM {$table}{$where}{$order}{$limit2};";
-
-        return $conn->preparedQuery($query, $args, $fetchType, $class);
+        return $this->connection()->preparedQuery($segment, $fetchType, $class);
     }
 
     /**
@@ -82,12 +75,14 @@ class Query
      *      the distinct values indexed by column name. If a single column is
      *      given will return an array of distinct values for that column.
      */
-    public function selectDistinct($filter, $order, array $columns, $limit, $offset)
-    {
+    public function selectDistinct(
+        Filter $filter = null,
+        array $order = null,
+        array $columns = null,
+        $limit = null,
+        $offset = null
+    ) {
         $table = $this->meta->getTable();
-        $database = $this->meta->getDatabase();
-        $conn = Orm::database()->getConnection($database);
-        $driver = $conn->getDriver();
 
         if (empty($columns)) {
             throw new \Exception("No columns given");
@@ -95,21 +90,14 @@ class Query
 
         $this->checkColumnsExist($columns);
 
-        $sqlColumns = implode(', ', $columns);
-
-        list($limit1, $limit2) = $this->constructLimitOffset($driver, $limit, $offset);
-        list($where, $args) = $this->constructWhere($filter);
-        $order = $this->constructOrder($order);
-
-        $query = "SELECT{$limit1} DISTINCT {$sqlColumns} FROM {$table}{$where}{$order}{$limit2};";
+        $segment = $this->queryBuilder()->buildSelect($table, $columns, $filter, $limit, $offset, $order, true);
 
         if (count($columns) > 1) {
             // If multiple columns, return array of arrays
-            return $conn->preparedQuery($query, $args);
+            return $this->connection()->preparedQuery($segment);
         } else {
             // If single column, return array of strings
-            $column = reset($columns);
-            return $this->singleColumnQuery($query, $args, $column);
+            return $this->connection()->singleColumnPreparedQuery($segment, reset($columns));
         }
     }
 
@@ -120,7 +108,7 @@ class Query
      * @param  Aggregate $aggregate  The aggregate to perform.
      * @return string                Result of the aggregate query.
      */
-    public function aggregate($filter, Aggregate $aggregate)
+    public function aggregate(Aggregate $aggregate, Filter $filter = null)
     {
         $table = $this->meta->getTable();
         $columns = $this->meta->getColumns();
@@ -137,15 +125,11 @@ class Query
             }
         }
 
-        list($where, $args) = $this->constructWhere($filter);
-        $select = $aggregate->render();
+        $segment = $this->queryBuilder()->buildSelectAggregate($table, $aggregate, $filter);
 
-        $query = "SELECT {$select} as aggregate FROM {$table}{$where};";
+        $data = $this->connection()->preparedQuery($segment);
 
-        $database = $this->meta->getDatabase();
-        $conn = Orm::database()->getConnection($database);
-        $data = $conn->preparedQuery($query, $args);
-        return $data[0]['aggregate'];
+        return array_shift($data[0]);
     }
 
     /**
@@ -182,44 +166,32 @@ class Query
         }
 
         // Collect query arguments
-        $args = [];
+        $values = [];
         foreach ($columns as $column) {
-            $args[] = $model->{$column};
+            $values[] = $model->{$column};
         }
-
-        $database = $this->meta->getDatabase();
-        $conn = Orm::database()->getConnection($database);
-        $driver = $conn->getDriver();
 
         // PostgreSQL needs a RETURNING clause to get the inserted ID because
         // it does not support PDO->lastInsertId().
-        $returning = "";
-        if ($driver == 'pgsql' && $pkAutogen) {
-            $pkColumn = $pkColumns[0];
-            $returning = " RETURNING $pkColumn";
-        }
+        $driver = $this->connection()->getDriver();
+        $returning = ($driver == Driver::PGSQL && $pkAutogen) ? $pkColumn : null;
 
-        // Construct the query
-        $query = "INSERT INTO {$table} (";
-        $query .= implode(', ', $columns);
-        $query .= ") VALUES (";
-        $query .= implode(', ', array_fill(0, count($columns), '?'));
-        $query .= "){$returning};";
+        $segment = $this->queryBuilder()->buildInsert($table, $columns, $values, $returning);
 
         // If primary key is generated by the database, populate it
         if ($pkAutogen) {
             // For Postgres, do fetch to retrieve the generated primary key via
             // the RETURNING clause. For others use PDO->lastInsertId().
             if ($driver == 'pgsql') {
-                $data = $conn->preparedQuery($query, $args);
+                $data = $this->connection()->preparedQuery($segment);
                 $id = $data[0][$pkColumn];
             } else {
-                $conn->preparedExecute($query, $args);
-                $id = $conn->getPDO()->lastInsertId();
+                $this->connection()->preparedExecute($segment);
+                $id = $this->connection()->getPDO()->lastInsertId();
             }
             $model->{$pkColumn} = $id;
         } else {
-            $conn->preparedExecute($query, $args);
+            $this->connection()->preparedExecute($segment);
         }
     }
 
@@ -230,9 +202,10 @@ class Query
     {
         $table = $this->meta->getTable();
         $pkColumns = $this->meta->getPkColumns();
-        $nonPkColumns = $this->meta->getNonPkColumns();
+        $columns = $this->meta->getNonPkColumns();
+        $filter = $model::getPkFilter($model->getPK());
 
-        if ($pkColumns === null) {
+        if (empty($pkColumns)) {
             throw new \Exception("Cannot update. Model does not have a primary key defined in _meta.");
         }
 
@@ -243,31 +216,14 @@ class Query
             }
         }
 
-        // Collect query arguments (primary key goes last, skip it here)
-        $args = [];
-        $updates = [];
-        foreach ($nonPkColumns as $column) {
-            $updates[] = "$column = ?";
-            $args[] = $model->{$column};
-        }
+        // Values to update
+        $values = array_map(function ($column) use ($model) {
+            return $model->{$column};
+        }, $columns);
 
-        // Add primary key to where and arguments
-        $where = [];
-        foreach ($pkColumns as $column) {
-            $where[] = "{$column} = ?";
-            $args[] = $model->$column;
-        }
+        $segment = $this->queryBuilder()->buildUpdate($table, $columns, $values, $filter);
 
-        // Construct the query
-        $query  = "UPDATE {$table} SET ";
-        $query .= implode(', ', $updates);
-        $query .= " WHERE ";
-        $query .= implode(' AND ', $where);
-
-        // Run the query
-        $database = $this->meta->getDatabase();
-        $conn = Orm::database()->getConnection($database);
-        return $conn->preparedExecute($query, $args);
+        return $this->connection()->preparedExecute($segment);
     }
 
     /**
@@ -277,77 +233,42 @@ class Query
     {
         $pk = $model->getPK();
         $table = $model->getMeta()->getTable();
+        $filter = $model::getPkFilter($pk);
 
-        // Construct where clause based on primary key
-        $args = [];
-        $where = [];
-        foreach ($pk as $column => $value) {
-            // All PK fields must be set
-            if (!isset($value)) {
-                throw new \Exception("Cannot delete. Primary key column [$column] is not set.");
-            }
+        $segment = $this->queryBuilder()->buildDelete($table, $filter);
 
-            $where[] = "{$column} = ?";
-            $args[] = $value;
-        }
-        $where = implode(' AND ', $where);
-        $query = "DELETE FROM {$table} WHERE {$where}";
-
-        // Run the query
-        $database = $this->meta->getDatabase();
-        $conn = Orm::database()->getConnection($database);
-        return $conn->preparedExecute($query, $args);
+        return $this->connection()->preparedExecute($segment);
     }
 
     /**
      * Constructs and executes an UPDATE statement for all records matching
      * the given filters.
      */
-    public function batchUpdate($filter, $updates)
+    public function batchUpdate(array $updates, Filter $filter = null)
     {
-        $columns = $this->meta->getColumns();
         $table = $this->meta->getTable();
 
-        // Check columns exist
-        $updateBits = [];
-        foreach ($updates as $column => $value) {
-            if (!in_array($column, $columns)) {
-                throw new \Exception("Column [$column] does not exist in table [$table].");
-            }
+        $updateColumns = array_keys($updates);
+        $updateValues = array_values($updates);
 
-            $updateBits[] = "{$column} = ?";
-        }
+        $this->checkColumnsExist($updateColumns);
 
-        // Construct the query
-        list($where, $args) = $this->constructWhere($filter);
-        $args = array_merge(array_values($updates), $args);
+        $segment = $this->queryBuilder()->buildUpdate($table, $updateColumns, $updateValues, $filter);
 
-        $query  = "UPDATE {$table} ";
-        $query .= "SET " . implode(', ', $updateBits);
-        $query .= $where;
-
-        // Run the query
-        $database = $this->meta->getDatabase();
-        $conn = Orm::database()->getConnection($database);
-        return $conn->preparedExecute($query, $args);
+        return $this->connection()->preparedExecute($segment);
     }
 
     /**
      * Constructs and executes a DELETE statement for all records matching
      * the given filters.
      */
-    public function batchDelete($filter)
+    public function batchDelete(Filter $filter = null)
     {
         $table = $this->meta->getTable();
 
-        // Construct the query
-        list($where, $args) = $this->constructWhere($filter);
-        $query = "DELETE FROM {$table}{$where}";
+        $segment = $this->queryBuilder()->buildDelete($table, $filter);
 
-        // Run the query
-        $database = $this->meta->getDatabase();
-        $conn = Orm::database()->getConnection($database);
-        return $conn->preparedExecute($query, $args);
+        return $this->connection()->preparedExecute($segment);
     }
 
     // ******************************************
@@ -370,91 +291,19 @@ class Query
         }
     }
 
-    /** Performs a prepared query and returns only a single column. */
-    private function singleColumnQuery($query, $args, $column)
+    private function connection()
+    {
+        $database = $this->meta->getDatabase();
+
+        return Orm::database()->getConnection($database);
+    }
+
+    private function queryBuilder()
     {
         $database = $this->meta->getDatabase();
         $conn = Orm::database()->getConnection($database);
-        $pdo = $conn->getPDO();
+        $driver = $conn->getDriver();
 
-        $stmt = $pdo->prepare($query);
-        $stmt->execute($args);
-
-        $data = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $data[] = $row[$column];
-        }
-
-        return $data;
-    }
-
-    /** Constructs a WHERE clause for a given filter. */
-    private function constructWhere(Filter $filter = null)
-    {
-        if ($filter === null) {
-            return ["", []];
-        }
-
-        list($where, $args) = $filter->render();
-
-        if (empty($where)) {
-            return ["", []];
-        }
-
-        $where = " WHERE $where";
-        return [$where, $args];
-    }
-
-    /** Constructs an ORDER BY clause. */
-    private function constructOrder($order)
-    {
-        if (empty($order)) {
-            return "";
-        }
-        return " ORDER BY " . implode(', ', $order);
-    }
-
-    /** Constructs the LIMIT/OFFSET clause. */
-    private function constructLimitOffset($driver, $limit, $offset)
-    {
-        // Checks
-        if (isset($offset) && !is_numeric($offset)) {
-            throw new \InvalidArgumentException("Invalid offset given [$offset].");
-        }
-        if (isset($limit) && !is_numeric($limit)) {
-            throw new \InvalidArgumentException("Invalid limit given [$limit].");
-        }
-
-        // Offset should not be set without a limit
-        if (isset($offset) && !isset($limit)) {
-            throw new \InvalidArgumentException("Offset given without a limit.");
-        }
-
-        $limit1 = ""; // Inserted after SELECT (for informix)
-        $limit2 = ""; // Inserted at end of query (for others)
-
-        // Construct the query part (database dependant)
-        switch ($driver) {
-            case "informix":
-                if (isset($offset)) {
-                    $limit1 .= " SKIP $offset";
-                }
-                if (isset($limit)) {
-                    $limit1 .= " LIMIT $limit";
-                }
-                break;
-
-            // Compatible with mysql, pgsql, sqlite, and possibly others
-            default:
-                if (isset($limit)) {
-                    $limit2 .= " LIMIT $limit";
-                }
-                if (isset($offset)) {
-                    $limit2 .= " OFFSET $offset";
-                }
-                break;
-        }
-
-        return [$limit1, $limit2];
+        return Orm::queryBuilder($driver);
     }
 }
