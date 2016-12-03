@@ -11,11 +11,6 @@ class CompositeFilter extends Filter
     const OP_AND = "AND";
     const OP_OR = "OR";
 
-    private $operations = [
-        self::OP_AND,
-        self::OP_OR,
-    ];
-
     /** Array of Filter objects. */
     private $filters = [];
 
@@ -24,8 +19,9 @@ class CompositeFilter extends Filter
 
     public function __construct($operation, array $filters = [])
     {
-        if (!in_array($operation, $this->operations)) {
-            $operations = implode(', ', $this->operations);
+        $operations = [self::OP_AND, self::OP_OR];
+        if (!in_array($operation, $operations)) {
+            $operations = implode(', ', $operations);
             throw new \Exception("Invalid composite filter operation [$operation]. Expected one of: $operations");
         }
 
