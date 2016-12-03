@@ -5,7 +5,7 @@ Installation
 Prerequisites
 -------------
 
-Phormium requires PHP 5.3 or greater with the PDO_ extension loaded, as well as
+Phormium requires PHP 5.4 or greater with the PDO_ extension loaded, as well as
 any PDO drivers for databases to wich you wish to connect.
 
 .. _PDO: http://php.net/manual/en/book.pdo.php
