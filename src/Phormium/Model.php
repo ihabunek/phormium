@@ -3,6 +3,7 @@
 namespace Phormium;
 
 use Phormium\Exception\ModelNotFoundException;
+use Phormium\Filter\Filter;
 use Phormium\Helper\Json;
 
 use Symfony\Component\Yaml\Yaml;
@@ -187,7 +188,6 @@ abstract class Model
         return self::fromArray($array, $strict);
     }
 
-
     /** Inner method used by get(), search() and exists(). */
     private static function getQuerySetForPK(array $argv, $argc)
     {
@@ -197,30 +197,43 @@ abstract class Model
             $argc = count($argv);
         }
 
-        // Model must have PK defined
-        $meta = self::getMeta();
-        $pkColumns = $meta->getPkColumns();
+        $filter = self::getPkFilter($argv);
 
-        if ($pkColumns === null) {
+        return self::objects()->filter($filter);
+    }
+
+    /**
+     * Creates a filter by given primary key values.
+     *
+     * @param  array $values Values to filter by. Same number as PK columns.
+     *
+     * @return Filter
+     */
+    public static function getPkFilter(array $values)
+    {
+        $columns = self::getMeta()->getPkColumns();
+
+        if (empty($columns)) {
             $class = get_called_class();
             throw new \Exception("Primary key not defined for model [$class].");
         }
 
-        // Check correct number of columns is given
-        $countPK = count($pkColumns);
-        if ($argc !== $countPK) {
-            $class = get_called_class();
-            throw new \Exception("Model [$class] has $countPK primary key columns. $argc arguments given.");
+        if (count($columns) !== count($values)) {
+            $format = "Model [%s] has %d primary key columns. %d arguments given.";
+            $msg = sprintf($format, get_called_class(), count($columns), count($values));
+            throw new \Exception($msg);
         }
 
-        // Create a queryset and filter by PK
-        $qs = self::objects();
-        foreach ($pkColumns as $name) {
-            $value = array_shift($argv);
-            $qs = $qs->filter($name, '=', $value);
+        if (count($columns) === 1) {
+            return Filter::col(array_shift($columns), '=', array_shift($values));
         }
 
-        return $qs;
+        $filter = Filter::_and();
+        foreach (array_combine($columns, $values) as $column => $value) {
+            $filter->add(Filter::col($column, "=", $value));
+        }
+
+        return $filter;
     }
 
     // ******************************************

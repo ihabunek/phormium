@@ -147,7 +147,7 @@ class QuerySet
     public function count($column = null)
     {
         $agg = new Aggregate(Aggregate::COUNT, $column);
-        return (integer) $this->query->aggregate($this->filter, $agg);
+        return (integer) $this->query->aggregate($agg, $this->filter);
     }
 
     /**
@@ -157,7 +157,7 @@ class QuerySet
     public function avg($column)
     {
         $agg = new Aggregate(Aggregate::AVERAGE, $column);
-        return $this->query->aggregate($this->filter, $agg);
+        return $this->query->aggregate($agg, $this->filter);
     }
 
     /**
@@ -167,7 +167,7 @@ class QuerySet
     public function max($column)
     {
         $agg = new Aggregate(Aggregate::MAX, $column);
-        return $this->query->aggregate($this->filter, $agg);
+        return $this->query->aggregate($agg, $this->filter);
     }
 
     /**
@@ -177,7 +177,7 @@ class QuerySet
     public function min($column)
     {
         $agg = new Aggregate(Aggregate::MIN, $column);
-        return $this->query->aggregate($this->filter, $agg);
+        return $this->query->aggregate($agg, $this->filter);
     }
 
     /**
@@ -187,7 +187,7 @@ class QuerySet
     public function sum($column)
     {
         $agg = new Aggregate(Aggregate::SUM, $column);
-        return $this->query->aggregate($this->filter, $agg);
+        return $this->query->aggregate($agg, $this->filter);
     }
 
     /**
@@ -346,7 +346,7 @@ class QuerySet
      */
     public function update($updates)
     {
-        return $this->query->batchUpdate($this->filter, $updates);
+        return $this->query->batchUpdate($updates, $this->filter);
     }
 
     /**
@@ -421,7 +421,7 @@ class QuerySet
         } elseif ($argc === 2) {
             if (is_string($argv[0])) {
                 if (is_string($argv[1])) {
-                    return ColumnFilter::fromArray($args);
+                    return ColumnFilter::fromArray($argv);
                 } elseif (is_array($argv[1])) {
                     return new RawFilter($argv[0], $argv[1]);
                 }
@@ -461,9 +461,11 @@ class QuerySet
 
     private function checkColumnFilter(ColumnFilter $filter)
     {
-        if (isset($filter->column) && !in_array($filter->column, $this->meta->getColumns())) {
+        $column = $filter->column();
+
+        if (isset($column) && !$this->meta->columnExists($column)) {
             $table = $this->meta->getTable();
-            throw new \Exception("Invalid filter: Column [$filter->column] does not exist in table [$table].");
+            throw new \Exception("Invalid filter: Column [$column] does not exist in table [$table].");
         }
     }
 
@@ -480,7 +482,7 @@ class QuerySet
             throw new \Exception("Invalid order direction [$direction]. Expected 'asc' or 'desc'.");
         }
 
-        if (!in_array($column, $this->meta->getColumns())) {
+        if (!$this->meta->columnExists($column)) {
             $table = $this->meta->getTable();
             throw new \Exception("Cannot order by column [$column] because it does not exist in table [$table].");
         }

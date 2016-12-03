@@ -7,9 +7,6 @@ namespace Phormium\Filter;
  */
 abstract class Filter
 {
-    /** Renders the filter to SQL. */
-    abstract public function render();
-
     /**
      * Creates a new AND composite filter from given filter components.
      *

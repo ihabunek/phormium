@@ -265,7 +265,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Cannot update. Model does not have a primary key defined in _meta.
+     * @expectedExceptionMessage Primary key not defined for model [Phormium\Tests\Models\PkLess].
      */
     public function testUpdatePkless()
     {
@@ -294,50 +294,6 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(0, $count);
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Cannot delete. Primary key column [id] is not set.
-     */
-    public function testDeleteWithoutPK()
-    {
-        $person = new Person();
-        $person->delete();
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Cannot delete. Primary key column [tradeno] is not set.
-     */
-    public function testDeleteWithoutPKComposite1()
-    {
-        $trade = new Trade();
-        $trade->tradedate = date('Y-m-d');
-        $trade->delete();
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Cannot delete. Primary key column [tradedate] is not set.
-     */
-    public function testDeleteWithoutPKComposite2()
-    {
-        $trade = new Trade();
-        $trade->tradeno = 100;
-        $trade->delete();
-    }
-
-    /**
-     * This test case currently fails on MySQL.
-     * The $update instance holds a "string" id, but
-     * update requires an int id.
-     *
-     * For MySQL it needs to read:
-     *
-     * $update = Person::get($person1->id);
-     * $update->id = (int)$update->id;
-     * ...
-     * $update->save();
-     */
     public function testSelectAndUpdate()
     {
         $person1 = new Person();

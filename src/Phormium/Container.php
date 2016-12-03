@@ -5,12 +5,13 @@ namespace Phormium;
 use Evenement\EventEmitter;
 
 use Phormium\Config\ArrayLoader;
-use Phormium\Config\JsonLoader;
-use Phormium\Config\YamlLoader;
-use Phormium\Config\PostProcessor;
 use Phormium\Config\Configuration;
+use Phormium\Config\JsonLoader;
+use Phormium\Config\PostProcessor;
+use Phormium\Config\YamlLoader;
 use Phormium\Database\Database;
 use Phormium\Database\Factory;
+use Phormium\QueryBuilder\QueryBuilderFactory;
 
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Loader\DelegatingLoader;
@@ -91,6 +92,10 @@ class Container extends \Pimple\Container
                 $this['database.factory'],
                 $this['emitter']
             );
+        };
+
+        $this['query_builder_factory'] = function () {
+            return new QueryBuilderFactory();
         };
     }
 }

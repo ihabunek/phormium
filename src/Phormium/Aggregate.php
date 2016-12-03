@@ -47,9 +47,4 @@ class Aggregate
         $this->type = $type;
         $this->column = $column;
     }
-
-    public function render()
-    {
-        return "{$this->type}({$this->column})";
-    }
 }

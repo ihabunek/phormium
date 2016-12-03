@@ -3,10 +3,10 @@
 namespace Phormium\Database;
 
 use Evenement\EventEmitter;
-use Phormium\Event;
-
 use PDO;
 use PDOStatement;
+use Phormium\Event;
+use Phormium\Query\QuerySegment;
 
 /**
  * Wrapper for a PDO connection, which enables direct SQL executions and access
@@ -60,13 +60,39 @@ class Connection
      * @param string $class When using PDO::FETCH_CLASS, class to fetch into.
      * @return array The resulting data.
      */
-    public function preparedQuery($query, array $arguments = [], $fetchStyle = PDO::FETCH_ASSOC, $class = null)
+    public function preparedQuery(QuerySegment $segment, $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
+        $query = $segment->query();
+        $arguments = $segment->args();
+
         $this->emitter->emit(Event::QUERY_STARTED, [$query, $arguments, $this]);
 
         $stmt = $this->pdoPrepare($query, $arguments);
         $this->pdoExecute($query, $arguments, $stmt);
         $data = $this->pdoFetch($query, $arguments, $stmt, $fetchStyle, $class);
+
+        $this->emitter->emit(Event::QUERY_COMPLETED, [$query, $arguments, $this, $data]);
+
+        return $data;
+    }
+
+    /**
+     * Performs a prepared query and returns only a single column.
+     *
+     * @param  QuerySegment $segment SQL to execute.
+     * @param  string       $column  Column to fetch.
+     * @return array
+     */
+    public function singleColumnPreparedQuery(QuerySegment $segment, $column)
+    {
+        $query = $segment->query();
+        $arguments = $segment->args();
+
+        $this->emitter->emit(Event::QUERY_STARTED, [$query, $arguments, $this]);
+
+        $stmt = $this->pdoPrepare($query, $arguments);
+        $this->pdoExecute($query, $arguments, $stmt);
+        $data = $this->pdoFetchSingleColumn($query, $arguments, $stmt, $column);
 
         $this->emitter->emit(Event::QUERY_COMPLETED, [$query, $arguments, $this, $data]);
 
@@ -80,13 +106,14 @@ class Connection
      * If queries are repeated it's often the better to use preparedQuery()
      * from performance perspective.
      *
-     * @param string $query The SQL query to execute.
-     * @param integer $fetchStyle One of PDO::FETCH_* constants.
+     * @param  QuerySegment $segment SQL to execute.
+     * @param  integer $fetchStyle One of PDO::FETCH_* constants.
      * @return array The resulting data.
      */
-    public function query($query, $fetchStyle = PDO::FETCH_ASSOC, $class = null)
+    public function query(QuerySegment $segment, $fetchStyle = PDO::FETCH_ASSOC, $class = null)
     {
-        $arguments = [];
+        $query = $segment->query();
+        $arguments = $segment->args();
 
         $this->emitter->emit(Event::QUERY_STARTED, [$query, $arguments, $this]);
 
@@ -106,9 +133,10 @@ class Connection
      * @param $query The SQL query to execute.
      * @return integer Number of rows affected by the query.
      */
-    public function execute($query)
+    public function execute(QuerySegment $segment)
     {
-        $arguments = [];
+        $query = $segment->query();
+        $arguments = $segment->args();
 
         $this->emitter->emit(Event::QUERY_STARTED, [$query, $arguments, $this]);
 
@@ -130,8 +158,11 @@ class Connection
      * @param array $arguments The arguments used to substitute params.
      * @return integer Number of rows affected by the query.
      */
-    public function preparedExecute($query, $arguments = [])
+    public function preparedExecute(QuerySegment $segment)
     {
+        $query = $segment->query();
+        $arguments = $segment->args();
+
         $this->emitter->emit(Event::QUERY_STARTED, [$query, $arguments, $this]);
 
         $stmt = $this->pdoPrepare($query, $arguments);
@@ -282,6 +313,25 @@ class Connection
                 } else {
                     $data = $stmt->fetchAll($fetchStyle);
                 }
+            }
+        } catch (\Exception $ex) {
+            $this->emitter->emit(Event::QUERY_ERROR, [$query, $arguments, $this, $ex]);
+            throw $ex;
+        }
+
+        $this->emitter->emit(Event::QUERY_FETCHED, [$query, $arguments, $this]);
+
+        return $data;
+    }
+
+    private function pdoFetchSingleColumn($query, $arguments, PDOStatement $stmt, $column)
+    {
+        $this->emitter->emit(Event::QUERY_FETCHING, [$query, $arguments, $this]);
+
+        try {
+            $data = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $data[] = $row[$column];
             }
         } catch (\Exception $ex) {
             $this->emitter->emit(Event::QUERY_ERROR, [$query, $arguments, $this, $ex]);

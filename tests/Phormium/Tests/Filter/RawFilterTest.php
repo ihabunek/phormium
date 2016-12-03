@@ -18,8 +18,9 @@ class RawFilterTest extends \PHPUnit_Framework_TestCase
         $arguments = ['foo'];
 
         $filter = new RawFilter($condition, $arguments);
-        $actual = $filter->render();
-        $expected = [$condition, $arguments];
+
+        $this->assertSame($condition, $filter->condition);
+        $this->assertSame($arguments, $filter->arguments);
     }
 
     function testFactory()
@@ -28,8 +29,9 @@ class RawFilterTest extends \PHPUnit_Framework_TestCase
         $arguments = ['foo'];
 
         $filter = Filter::raw($condition, $arguments);
-        $actual = $filter->render();
-        $expected = [$condition, $arguments];
+
+        $this->assertSame($condition, $filter->condition);
+        $this->assertSame($arguments, $filter->arguments);
     }
 
     function testQuerySet()

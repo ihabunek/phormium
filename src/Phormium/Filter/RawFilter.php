@@ -17,12 +17,4 @@ class RawFilter extends Filter
         $this->condition = $condition;
         $this->arguments = $arguments;
     }
-
-    public function render()
-    {
-        return [
-            $this->condition,
-            $this->arguments
-        ];
-    }
 }

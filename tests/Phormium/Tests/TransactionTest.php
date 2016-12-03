@@ -4,7 +4,7 @@ namespace Phormium\Tests;
 
 
 use Phormium\Orm;
-
+use Phormium\Query\QuerySegment;
 use Phormium\Tests\Models\Person;
 
 /**
@@ -157,14 +157,16 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $id = $person->id;
         $conn = Orm::database()->getConnection('testdb');
 
+        $query = new QuerySegment("UPDATE person SET income = income + 1");
+
         Orm::begin();
-        $conn->execute("UPDATE person SET income = income + 1");
+        $conn->execute($query);
         Orm::rollback();
 
         $this->assertEquals(100, Person::get($id)->income);
 
         Orm::begin();
-        $conn->execute("UPDATE person SET income = income + 1");
+        $conn->execute($query);
         Orm::commit();
 
         $this->assertEquals(101, Person::get($id)->income);
@@ -180,14 +182,16 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $id = $person->id;
         $conn = Orm::database()->getConnection('testdb');
 
+        $segment = new QuerySegment("UPDATE person SET income = ?", [200]);
+
         Orm::begin();
-        $conn->preparedExecute("UPDATE person SET income = ?", [200]);
+        $conn->preparedExecute($segment);
         Orm::rollback();
 
         $this->assertEquals(100, Person::get($id)->income);
 
         Orm::begin();
-        $conn->preparedExecute("UPDATE person SET income = ?", [200]);
+        $conn->preparedExecute($segment);
         Orm::commit();
 
         $this->assertEquals(200, Person::get($id)->income);
