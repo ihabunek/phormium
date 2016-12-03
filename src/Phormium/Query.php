@@ -111,12 +111,10 @@ class Query
     public function aggregate(Aggregate $aggregate, Filter $filter = null)
     {
         $table = $this->meta->getTable();
-        $columns = $this->meta->getColumns();
-
         $column = $aggregate->column;
         $type = $aggregate->type;
 
-        if (!in_array($column, $columns)) {
+        if (!$this->meta->columnExists($column)) {
             if (!($type === Aggregate::COUNT && $column === '*')) {
                 throw new \Exception(
                     "Error forming aggregate query. " .
@@ -284,7 +282,7 @@ class Query
         $columns = $this->meta->getColumns();
 
         foreach ($columns as $column) {
-            if (!in_array($column, $columns)) {
+            if (!$this->meta->columnExists($column)) {
                 $table = $this->meta->getTable();
                 throw new \Exception("Column [$column] does not exist in table [$table].");
             }

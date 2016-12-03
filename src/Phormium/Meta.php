@@ -64,4 +64,9 @@ class Meta
     {
         return $this->nonPK;
     }
+
+    public function columnExists($name)
+    {
+        return in_array($name, $this->columns);
+    }
 }
