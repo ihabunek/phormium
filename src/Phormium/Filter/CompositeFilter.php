@@ -41,26 +41,6 @@ class CompositeFilter extends Filter
         $this->filters[] = $filter;
     }
 
-    public function render()
-    {
-        if (empty($this->filters)) {
-            throw new \Exception("Canot render composite filter. No filters defined.");
-        }
-
-        $where = [];
-        $args = [];
-
-        foreach ($this->filters as $filter) {
-            list($w, $a) = $filter->render();
-            $args = array_merge($args, $a);
-            $where[] = $w;
-        }
-
-        $separator = " " . $this->operation . " ";
-        $where = "(" . implode($separator, $where) . ")";
-        return [$where, $args];
-    }
-
     public function getFilters()
     {
         return $this->filters;

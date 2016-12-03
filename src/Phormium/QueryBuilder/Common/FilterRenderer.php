@@ -47,6 +47,10 @@ class FilterRenderer
     {
         $subFilters = $filter->getFilters();
 
+        if (empty($subFilters)) {
+            throw new \Exception("Canot render composite filter. No filters defined.");
+        }
+
         if (count($subFilters) === 1) {
             return $this->renderFilter($subFilters[0]);
         }
@@ -186,7 +190,7 @@ class FilterRenderer
         if (!is_array($value)) {
             $type = gettype($value);
             $msg = "Filter $operation requires an array, $type given.";
-            throw new InvalidArgumentException($msg);
+            throw new \InvalidArgumentException($msg);
         }
     }
 
@@ -195,7 +199,7 @@ class FilterRenderer
         if (!is_scalar($value)) {
             $type = gettype($value);
             $msg = "Filter $operation requires a scalar value, $type given.";
-            throw new InvalidArgumentException($msg);
+            throw new \InvalidArgumentException($msg);
         }
     }
 
@@ -205,7 +209,7 @@ class FilterRenderer
         if ($count !== $expected) {
             $msg = "Filter $operation requires an array with $expected values, ";
             $msg .= "given array has $count values.";
-            throw new InvalidArgumentException($msg);
+            throw new \InvalidArgumentException($msg);
         }
     }
 
@@ -213,7 +217,7 @@ class FilterRenderer
     {
         if (empty($array)) {
             $msg = "Filter $operation requires a non-empty array, empty array given.";
-            throw new InvalidArgumentException($msg);
+            throw new \InvalidArgumentException($msg);
         }
     }
 }
