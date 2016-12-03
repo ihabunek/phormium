@@ -28,13 +28,14 @@ class ColumnFilter extends Filter
     const OP_NOT_NULL_ALT = 'IS NOT NULL';
 
     /** The filter operation, one of OP_* constants. */
-    public $operation;
+    private $operation;
 
     /** Column on which to filter. */
-    public $column;
+    private $column;
 
     /** The value to use in filtering, depends on operation. */
-    public $value;
+    private $value;
+
 
     public function __construct($column, $operation, $value = null)
     {
@@ -42,6 +43,25 @@ class ColumnFilter extends Filter
         $this->column = $column;
         $this->value = $value;
     }
+
+    // --- Accessors -----------------------------------------------------------
+
+    public function operation()
+    {
+        return $this->operation;
+    }
+
+    public function column()
+    {
+        return $this->column;
+    }
+
+    public function value()
+    {
+        return $this->value;
+    }
+
+    // --- Factories -----------------------------------------------------------
 
     /**
      * Creates a new ColumnFilter from values in an array [$column, $operation,

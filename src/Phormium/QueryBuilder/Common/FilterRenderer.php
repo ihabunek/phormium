@@ -68,9 +68,9 @@ class FilterRenderer
      */
     public function renderColumnFilter(ColumnFilter $filter)
     {
-        $column = $this->quoter->quote($filter->column);
-        $operation = $filter->operation;
-        $value = $filter->value;
+        $column = $this->quoter->quote($filter->column());
+        $operation = $filter->operation();
+        $value = $filter->value();
 
         switch ($operation) {
             case ColumnFilter::OP_EQUALS:

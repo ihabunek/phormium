@@ -461,9 +461,11 @@ class QuerySet
 
     private function checkColumnFilter(ColumnFilter $filter)
     {
-        if (isset($filter->column) && !$this->meta->columnExists($filter->column)) {
+        $column = $filter->column();
+
+        if (isset($column) && !$this->meta->columnExists($column)) {
             $table = $this->meta->getTable();
-            throw new \Exception("Invalid filter: Column [$filter->column] does not exist in table [$table].");
+            throw new \Exception("Invalid filter: Column [$column] does not exist in table [$table].");
         }
     }
 
