@@ -25,20 +25,33 @@ class CompositeFilter extends Filter
             throw new \Exception("Invalid composite filter operation [$operation]. Expected one of: $operations");
         }
 
-        $this->operation = $operation;
-
-        foreach ($filters as $filter) {
+        foreach ($filters as &$filter) {
             if (is_array($filter)) {
                 $filter = ColumnFilter::fromArray($filter);
             }
-
-            $this->add($filter);
         }
+
+        $this->operation = $operation;
+        $this->filters = $filters;
     }
 
-    public function add(Filter $filter)
+    /**
+     * Returns a new instance of CompositeFilter with the given filter added to
+     * existing $filters.
+     *
+     * Does not mutate the object.
+     *
+     * @param  Filter $filter The filter to add.
+     *
+     * @return CompositeFilter
+     */
+    public function withAdded(Filter $filter)
     {
-        $this->filters[] = $filter;
+        $operation = $this->getOperation();
+        $filters = $this->getFilters();
+        $filters[] = $filter;
+
+        return new CompositeFilter($operation, $filters);
     }
 
     public function getFilters()

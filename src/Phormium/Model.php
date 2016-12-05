@@ -3,9 +3,9 @@
 namespace Phormium;
 
 use Phormium\Exception\ModelNotFoundException;
+use Phormium\Filter\CompositeFilter;
 use Phormium\Filter\Filter;
 use Phormium\Helper\Json;
-
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -228,12 +228,12 @@ abstract class Model
             return Filter::col(array_shift($columns), '=', array_shift($values));
         }
 
-        $filter = Filter::_and();
+        $filters = [];
         foreach (array_combine($columns, $values) as $column => $value) {
-            $filter->add(Filter::col($column, "=", $value));
+            $filters[] = Filter::col($column, "=", $value);
         }
 
-        return $filter;
+        return new CompositeFilter(CompositeFilter::OP_AND, $filters);
     }
 
     // ******************************************

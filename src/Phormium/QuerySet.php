@@ -445,7 +445,7 @@ class QuerySet
         }
 
         $this->checkFilter($filter);
-        $this->filter->add($filter);
+        $this->filter = $this->filter->withAdded($filter);
     }
 
     private function checkFilter(Filter $filter)
@@ -507,22 +507,5 @@ class QuerySet
     public function getMeta()
     {
         return $this->meta;
-    }
-
-
-    // ******************************************
-    // *** Cloning                            ***
-    // ******************************************
-
-    /**
-     * When cloning a QuerySet, also clone the root Filter.
-     *
-     * The Query and Meta objects can stay the same, they do not change.
-     */
-    public function __clone()
-    {
-        if (isset($this->filter)) {
-            $this->filter = clone $this->filter;
-        }
     }
 }

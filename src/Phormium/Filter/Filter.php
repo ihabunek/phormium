@@ -18,10 +18,7 @@ abstract class Filter
      */
     public static function _and()
     {
-        return new CompositeFilter(
-            CompositeFilter::OP_AND,
-            func_get_args()
-        );
+        return new CompositeFilter(CompositeFilter::OP_AND, func_get_args());
     }
 
     /**
@@ -35,10 +32,7 @@ abstract class Filter
      */
     public static function _or()
     {
-        return new CompositeFilter(
-            CompositeFilter::OP_OR,
-            func_get_args()
-        );
+        return new CompositeFilter(CompositeFilter::OP_OR, func_get_args());
     }
 
     /**
