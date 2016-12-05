@@ -50,15 +50,14 @@ Person::find(10);  // Returns null if the model doesn't exist
 Person::exists(10);
 
 // Also works for composite primary keys
-Trade::get('2013-01-01', 100);
-Trade::find('2013-01-01', 100);
-Trade::exists('2013-01-01', 100);
+Post::get('2013-01-01', 100);
+Post::find('2013-01-01', 100);
+Post::exists('2013-01-01', 100);
 
 // Primary keys can also be given as arrays
-$tradePK = array('2013-01-01', 100);
-Trade::get($tradePK);
-Trade::find($tradePK);
-Trade::exists($tradePK);
+Post::get(['2013-01-01', 100]);
+Post::find(['2013-01-01', 100]);
+Post::exists(['2013-01-01', 100]);
 
 // Fetch, update, save
 $person = Person::get(10);
@@ -80,6 +79,11 @@ $persons = Person::objects()
 $count = Person::objects()
     ->filter('salary', '>', 10000)
     ->count();
+
+// Check if any records matching criteria exist
+$count = Person::objects()
+    ->filter('salary', '>', 10000)
+    ->exists();
 
 // Distinct values
 $count = Person::objects()
@@ -119,10 +123,10 @@ Person::objects()
 Person::objects()->filter('name', 'like', 'Ivan%')->avg('salary');
 Person::objects()->filter('name', 'like', 'Marko%')->min('birthday');
 
-// Custom queries
-$conn = DB::getConnection('myconn');
-$data1 = $conn->query("SELECT * FROM mytable;");
-$data2 = $conn->preparedQuery("SELECT * FROM mytable WHERE mycol > :value", array("value" => 10))
+// Custom filters with argument binding
+Person::objects()
+    ->filter("my_func(salary) > ?", [100])
+    ->fetch();
 ```
 
 See [documentation](http://phormium.readthedocs.org/en/latest/) for full
