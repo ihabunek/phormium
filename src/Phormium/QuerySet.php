@@ -471,7 +471,7 @@ class QuerySet
 
     private function checkCompositeFilter(CompositeFilter $filter)
     {
-        foreach ($filter->getFilters() as $filter) {
+        foreach ($filter->filters() as $filter) {
             $this->checkFilter($filter);
         }
     }

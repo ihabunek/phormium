@@ -15,6 +15,16 @@ This causes several BC breaks:
   The class remains used as an event catalogue only.
 * `Conf` is removed, to configure Phormium use `Orm::configure()`
 * Made `Printer` methods non-static
+* Made `ColumnFilter`, `RawFilter` and `CompositeFilter` immutable.
+  `CompositeFilter::add()` no longer exists because it mutated the filter, and
+  has been replaced with `CompositeFilter::withAdded()` which returns a new
+  `CompositeFilter` instance.
+* Made `ColumnFilter`, `RawFilter` and `CompositeFilter` properties private,
+  available via getter methods which are named the same as the properties, e.g.
+  `ColumnFilter::value()`
+* Renamed existing `CompositeFilter` accessor methods:
+** `CompositeFilter::getOperation()` -> `CompositeFilter::operation()`
+** `CompositeFilter::getFilters()` -> `CompositeFilter::filters()`
 
 Deprecated methods will emit a deprecation warning when used and will be removed
 in the next release.

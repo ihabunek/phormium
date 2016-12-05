@@ -47,19 +47,19 @@ class CompositeFilter extends Filter
      */
     public function withAdded(Filter $filter)
     {
-        $operation = $this->getOperation();
-        $filters = $this->getFilters();
+        $operation = $this->operation();
+        $filters = $this->filters();
         $filters[] = $filter;
 
         return new CompositeFilter($operation, $filters);
     }
 
-    public function getFilters()
+    public function filters()
     {
         return $this->filters;
     }
 
-    public function getOperation()
+    public function operation()
     {
         return $this->operation;
     }

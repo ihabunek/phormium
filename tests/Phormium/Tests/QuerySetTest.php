@@ -56,7 +56,7 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($qs1, $qs2);
 
         $this->assertInstanceOf("\\Phormium\\Filter\\CompositeFilter", $qs2->getFilter());
-        $this->assertCount(1, $qs2->getFilter()->getFilters());
+        $this->assertCount(1, $qs2->getFilter()->filters());
 
         $this->assertEmpty($qs1->getOrder());
         $this->assertEmpty($qs2->getOrder());

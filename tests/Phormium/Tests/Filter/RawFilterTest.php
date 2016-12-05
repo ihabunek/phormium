@@ -44,9 +44,9 @@ class RawFilterTest extends \PHPUnit_Framework_TestCase
         $filter1 = $qs->getFilter();
         $expected = "\\Phormium\\Filter\\CompositeFilter";
         $this->assertInstanceOf($expected, $filter1);
-        $this->assertSame('AND', $filter1->getOperation());
+        $this->assertSame('AND', $filter1->operation());
 
-        $filters = $filter1->getFilters();
+        $filters = $filter1->filters();
         $this->assertCount(1, $filters);
 
         $filter2 = $filters[0];

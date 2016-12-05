@@ -45,7 +45,7 @@ class FilterRenderer
 
     public function renderCompositeFilter(CompositeFilter $filter)
     {
-        $subFilters = $filter->getFilters();
+        $subFilters = $filter->filters();
 
         if (empty($subFilters)) {
             throw new \Exception("Canot render composite filter. No filters defined.");
@@ -57,7 +57,7 @@ class FilterRenderer
 
         $segments = array_map([$this, "renderFilter"], $subFilters);
 
-        $separator = new QuerySegment($filter->getOperation());
+        $separator = new QuerySegment($filter->operation());
         $imploded = QuerySegment::implode($separator, $segments);
 
         return QuerySegment::embrace($imploded);
