@@ -40,7 +40,7 @@ class FilterRenderer
 
     public function renderRawFilter(RawFilter $filter)
     {
-        return new QuerySegment($filter->condition, $filter->arguments);
+        return new QuerySegment($filter->condition(), $filter->arguments());
     }
 
     public function renderCompositeFilter(CompositeFilter $filter)

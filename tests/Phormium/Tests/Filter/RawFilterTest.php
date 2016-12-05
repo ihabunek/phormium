@@ -19,8 +19,8 @@ class RawFilterTest extends \PHPUnit_Framework_TestCase
 
         $filter = new RawFilter($condition, $arguments);
 
-        $this->assertSame($condition, $filter->condition);
-        $this->assertSame($arguments, $filter->arguments);
+        $this->assertSame($condition, $filter->condition());
+        $this->assertSame($arguments, $filter->arguments());
     }
 
     function testFactory()
@@ -30,8 +30,8 @@ class RawFilterTest extends \PHPUnit_Framework_TestCase
 
         $filter = Filter::raw($condition, $arguments);
 
-        $this->assertSame($condition, $filter->condition);
-        $this->assertSame($arguments, $filter->arguments);
+        $this->assertSame($condition, $filter->condition());
+        $this->assertSame($arguments, $filter->arguments());
     }
 
     function testQuerySet()
@@ -53,7 +53,7 @@ class RawFilterTest extends \PHPUnit_Framework_TestCase
         $expected = "\\Phormium\\Filter\\RawFilter";
         $this->assertInstanceOf($expected, $filter2);
 
-        $this->assertSame($condition, $filter2->condition);
-        $this->assertSame($arguments, $filter2->arguments);
+        $this->assertSame($condition, $filter2->condition());
+        $this->assertSame($arguments, $filter2->arguments());
     }
 }

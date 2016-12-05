@@ -8,13 +8,23 @@ namespace Phormium\Filter;
  */
 class RawFilter extends Filter
 {
-    public $condition;
+    private $condition;
 
-    public $arguments;
+    private $arguments;
 
     public function __construct($condition, array $arguments = [])
     {
         $this->condition = $condition;
         $this->arguments = $arguments;
+    }
+
+    public function condition()
+    {
+        return $this->condition;
+    }
+
+    public function arguments()
+    {
+        return $this->arguments;
     }
 }
