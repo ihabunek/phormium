@@ -3,12 +3,12 @@
 namespace Phormium;
 
 use PDO;
-
 use Phormium\Filter\ColumnFilter;
 use Phormium\Filter\CompositeFilter;
 use Phormium\Filter\Filter;
 use Phormium\Filter\RawFilter;
 use Phormium\Query\ColumnOrder;
+use Phormium\Query\LimitOffset;
 use Phormium\Query\OrderBy;
 
 /**
@@ -45,18 +45,11 @@ class QuerySet
     private $filter;
 
     /**
-     * Maximum number of rows to fetch.
+     * Fetching limitations.
      *
-     * @var integer
+     * @var Phormium\Query\LimitOffset
      */
-    private $limit;
-
-    /**
-     * Offset of the first row to return.
-     *
-     * @var integer
-     */
-    private $offset;
+    private $limitOffset;
 
     public function __construct(Query $query, Meta $meta)
     {
@@ -121,17 +114,8 @@ class QuerySet
      */
     public function limit($limit, $offset = null)
     {
-        if (!is_null($limit) && !is_int($limit) && !preg_match('/^[0-9]+$/', $limit)) {
-            throw new \Exception("Limit must be an integer or null.");
-        }
-
-        if (!is_null($offset) && !is_int($offset) && !preg_match('/^[0-9]+$/', $offset)) {
-            throw new \Exception("Offset must be an integer or null.");
-        }
-
         $qs = clone $this;
-        $qs->limit = $limit;
-        $qs->offset = $offset;
+        $qs->limitOffset = new LimitOffset($limit, $offset);
         return $qs;
     }
 
@@ -215,8 +199,7 @@ class QuerySet
             $this->filter,
             $this->order,
             null,
-            $this->limit,
-            $this->offset,
+            $this->limitOffset,
             PDO::FETCH_CLASS
         );
     }
@@ -269,8 +252,7 @@ class QuerySet
             $this->filter,
             $this->order,
             $columns,
-            $this->limit,
-            $this->offset,
+            $this->limitOffset,
             PDO::FETCH_ASSOC
         );
     }
@@ -295,8 +277,7 @@ class QuerySet
             $this->filter,
             $this->order,
             $columns,
-            $this->limit,
-            $this->offset,
+            $this->limitOffset,
             PDO::FETCH_NUM
         );
     }
@@ -316,8 +297,7 @@ class QuerySet
             $this->filter,
             $this->order,
             [$column],
-            $this->limit,
-            $this->offset,
+            $this->limitOffset,
             PDO::FETCH_NUM
         );
 
@@ -340,8 +320,7 @@ class QuerySet
             $this->filter,
             $this->order,
             $columns,
-            $this->limit,
-            $this->offset
+            $this->limitOffset
         );
     }
 

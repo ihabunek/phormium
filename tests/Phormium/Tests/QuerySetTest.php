@@ -104,7 +104,6 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         $this->assertSame("name", $columnOrder->column());
         $this->assertSame("desc", $columnOrder->direction());
 
-
         $qs3 = $qs2->orderBy('id');
         $orderBy3 = $qs3->getOrder();
         $columnOrder1 = $orderBy3->orders()[0];
@@ -232,7 +231,7 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Limit must be an integer or null.
+     * @expectedExceptionMessage $limit must be a positive integer or null
      */
     public function testLimitedFetchWrongLimit1()
     {
@@ -241,7 +240,7 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Limit must be an integer or null.
+     * @expectedExceptionMessage $limit must be a positive integer or null
      */
     public function testLimitedFetchWrongLimit2()
     {
@@ -250,7 +249,7 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Offset must be an integer or null.
+     * @expectedExceptionMessage $offset must be a positive integer or null
      */
     public function testLimitedFetchWrongOffset1()
     {
@@ -259,7 +258,7 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Offset must be an integer or null.
+     * @expectedExceptionMessage $offset must be a positive integer or null
      */
     public function testLimitedFetchWrongOffset2()
     {

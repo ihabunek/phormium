@@ -5,6 +5,7 @@ namespace Phormium;
 use PDO;
 use Phormium\Database\Driver;
 use Phormium\Filter\Filter;
+use Phormium\Query\LimitOffset;
 use Phormium\Query\OrderBy;
 use Phormium\Query\QuerySegment;
 
@@ -32,8 +33,7 @@ class Query
      * @param array $order Array of [<column>, <direction>] pairs used to form
      *      the ORDER BY clause.
      * @param array $columns Array of columns to fetch, or NULL for all columns.
-     * @param integer $limit The max. number of rows to fetch.
-     * @param integer $offset The number of rows to skip from beginning.
+     * @param LimitOffset $limitOffset Limits for fetching.
      * @param integer $fetchType Fetch type; one of PDO::FETCH_* constants.
      *
      * @return array An array of {@link Model} instances when using
@@ -44,9 +44,8 @@ class Query
         Filter $filter = null,
         OrderBy $order = null,
         array $columns = null,
-        $limit = null,
-        $offset = null,
-        $fetchType = PDO::FETCH_CLASS
+        LimitOffset $limitOffset = null,
+        $fetchType = PDO::FETCH_CLASSl
     ) {
         if (isset($columns)) {
             $this->checkColumnsExist($columns);
@@ -57,7 +56,7 @@ class Query
         $table = $this->meta->getTable();
         $class = $this->meta->getClass();
 
-        $segment = $this->queryBuilder()->buildSelect($table, $columns, $filter, $limit, $offset, $order);
+        $segment = $this->queryBuilder()->buildSelect($table, $columns, $filter, $limitOffset, $order);
 
         return $this->connection()->preparedQuery($segment, $fetchType, $class);
     }
@@ -67,8 +66,7 @@ class Query
      *
      * @param Filter $filter A filter instance used to form the WHERE clause.
      * @param array $order Array of strings used to form the ORDER BY clause.
-     * @param integer $limit The max. number of rows to fetch.
-     * @param integer $offset The number of rows to skip from beginning.
+     * @param LimitOffset $limitOffset Limits for fetching.
      *
      * @return array An array distinct values. If multiple columns are given,
      *      will return an array of arrays, and each of these will have
@@ -79,8 +77,7 @@ class Query
         Filter $filter = null,
         OrderBy $order = null,
         array $columns = null,
-        $limit = null,
-        $offset = null
+        LimitOffset $limitOffset = null
     ) {
         $table = $this->meta->getTable();
 
@@ -90,7 +87,7 @@ class Query
 
         $this->checkColumnsExist($columns);
 
-        $segment = $this->queryBuilder()->buildSelect($table, $columns, $filter, $limit, $offset, $order, true);
+        $segment = $this->queryBuilder()->buildSelect($table, $columns, $filter, $limitOffset, $order, true);
 
         if (count($columns) > 1) {
             // If multiple columns, return array of arrays

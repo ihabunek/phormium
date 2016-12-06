@@ -6,6 +6,7 @@ use Phormium\Aggregate;
 use Phormium\Database\Driver;
 use Phormium\Filter\Filter;
 use Phormium\Query\ColumnOrder;
+use Phormium\Query\LimitOffset;
 use Phormium\Query\OrderBy;
 use Phormium\Query\QuerySegment;
 use Phormium\QueryBuilder\QueryBuilderFactory;
@@ -35,14 +36,14 @@ class QueryBuilderTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $limit = 123;
-        $offset = 321;
+        $limitOffset = new LimitOffset(123, 321);
+
         $order = new OrderBy([
             ColumnOrder::desc("a"),
             ColumnOrder::asc("b")
         ]);
 
-        $segment = $queryBuilder->buildSelect($table, $columns, $filter, $limit, $offset, $order);
+        $segment = $queryBuilder->buildSelect($table, $columns, $filter, $limitOffset, $order);
 
         $expectedQuery =
             'SELECT "a", "b", "c" ' .
@@ -72,15 +73,14 @@ class QueryBuilderTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $limit = 123;
-        $offset = 321;
+        $limitOffset = new LimitOffset(123, 321);
 
         $order = new OrderBy([
             ColumnOrder::desc("a"),
             ColumnOrder::asc("b")
         ]);
 
-        $segment = $queryBuilder->buildSelect($table, $columns, $filter, $limit, $offset, $order);
+        $segment = $queryBuilder->buildSelect($table, $columns, $filter, $limitOffset, $order);
 
         $expectedQuery =
             'SELECT `a`, `b`, `c` ' .

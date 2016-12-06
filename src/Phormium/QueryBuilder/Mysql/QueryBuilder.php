@@ -2,6 +2,7 @@
 
 namespace Phormium\QueryBuilder\Mysql;
 
+use Phormium\Query\LimitOffset;
 use Phormium\Query\QuerySegment;
 use Phormium\QueryBuilder\Common\QueryBuilder as CommonQueryBuilder;
 
@@ -10,24 +11,14 @@ class QueryBuilder extends CommonQueryBuilder
     /**
      * MySQL doesn't support binding limit/offset params. :/
      */
-    public function renderLimitOffset($limit, $offset)
+    public function renderLimitOffset(LimitOffset $limitOffset = null)
     {
-        if (!isset($limit) && !isset($offset)) {
+        if (!isset($limitOffset)) {
             return new QuerySegment();
         }
 
-        if (isset($offset) && !is_numeric($offset)) {
-            throw new \InvalidArgumentException("Invalid offset given [$offset].");
-        }
-
-        if (isset($limit) && !is_numeric($limit)) {
-            throw new \InvalidArgumentException("Invalid limit given [$limit].");
-        }
-
-        // Offset should not be set without a limit
-        if (isset($offset) && !isset($limit)) {
-            throw new \InvalidArgumentException("Offset given without a limit.");
-        }
+        $limit = $limitOffset->limit();
+        $offset = $limitOffset->offset();
 
         $limitSegment = isset($limit) ?
             new QuerySegment("LIMIT $limit") :
