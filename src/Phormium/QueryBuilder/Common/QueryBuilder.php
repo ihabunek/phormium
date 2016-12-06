@@ -4,9 +4,10 @@ namespace Phormium\QueryBuilder\Common;
 
 use Phormium\Aggregate;
 use Phormium\Filter\Filter;
+use Phormium\Query\ColumnOrder;
+use Phormium\Query\OrderBy;
 use Phormium\Query\QuerySegment;
 use Phormium\QueryBuilder\QueryBuilderInterface;
-
 
 class QueryBuilder implements QueryBuilderInterface
 {
@@ -67,15 +68,28 @@ class QueryBuilder implements QueryBuilderInterface
     }
 
     /** Constructs an ORDER BY clause. */
-    public function renderOrderBy($order)
+    public function renderOrderBy(OrderBy $orderBy = null)
     {
-        if (empty($order)) {
+        if (!isset($orderBy)) {
             return new QuerySegment();
         }
 
-        $query = "ORDER BY " . implode(', ', $order);
+        $orders = array_map(function ($order) {
+            return $this->renderColumnOrder($order);
+        }, $orderBy->orders());
+
+        $query = "ORDER BY " . implode(', ', $orders);
 
         return new QuerySegment($query);
+    }
+
+    /** Constructs a segment of the ORDER BY clause which orders by one column. */
+    public function renderColumnOrder(ColumnOrder $order)
+    {
+        $column = $this->quoter->quote($order->column());
+        $direction = strtoupper($order->direction());
+
+        return "$column $direction";
     }
 
     /** Constructs the LIMIT/OFFSET clause. */
@@ -167,14 +181,14 @@ class QueryBuilder implements QueryBuilderInterface
         Filter $filter = null,
         $limit = null,
         $offset = null,
-        array $order = null,
+        OrderBy $orderBy = null,
         $distinct = false
     ) {
         return QuerySegment::reduce([
             $this->renderSelect($columns, $distinct),
             $this->renderFrom($table),
             $this->renderWhere($filter),
-            $this->renderOrderBy($order),
+            $this->renderOrderBy($orderBy) ,
             $this->renderLimitOffset($limit, $offset),
         ]);
     }

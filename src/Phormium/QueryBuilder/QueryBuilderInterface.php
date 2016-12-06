@@ -4,11 +4,11 @@ namespace Phormium\QueryBuilder;
 
 use Phormium\Aggregate;
 use Phormium\Filter\Filter;
-
+use Phormium\Query\OrderBy;
 
 interface QueryBuilderInterface
 {
-    public function buildSelect($table, array $columns, Filter $filter = null, $limit = null, $offset = null, array $order = null, $distinct = false);
+    public function buildSelect($table, array $columns, Filter $filter = null, $limit = null, $offset = null, OrderBy $orderBy = null, $distinct = false);
 
     public function buildSelectAggregate($table, Aggregate $aggregate, Filter $filter = null);
 

@@ -2,12 +2,14 @@
 
 namespace Phormium\Tests\QueryBuilder;
 
+use Phormium\Aggregate;
 use Phormium\Database\Driver;
 use Phormium\Filter\Filter;
+use Phormium\Query\ColumnOrder;
+use Phormium\Query\OrderBy;
 use Phormium\Query\QuerySegment;
 use Phormium\QueryBuilder\QueryBuilderFactory;
 use Phormium\QueryBuilder\QueryBuilderInterface;
-use Phormium\Aggregate;
 
 class QueryBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,7 +37,10 @@ class QueryBuilderTest extends \PHPUnit_Framework_TestCase
 
         $limit = 123;
         $offset = 321;
-        $order = ["a desc", "b asc"];
+        $order = new OrderBy([
+            ColumnOrder::desc("a"),
+            ColumnOrder::asc("b")
+        ]);
 
         $segment = $queryBuilder->buildSelect($table, $columns, $filter, $limit, $offset, $order);
 
@@ -43,7 +48,7 @@ class QueryBuilderTest extends \PHPUnit_Framework_TestCase
             'SELECT "a", "b", "c" ' .
             'FROM "foo" '  .
             'WHERE ("xx" = ? AND "yy" IS NOT NULL AND ("zz" BETWEEN ? AND ? OR max(?) > 0)) ' .
-            'ORDER BY a desc, b asc ' .
+            'ORDER BY "a" DESC, "b" ASC ' .
             'LIMIT ? OFFSET ?';
 
         $expectedArgs = ["yy", 1, 2, 100, 123, 321];
@@ -69,7 +74,11 @@ class QueryBuilderTest extends \PHPUnit_Framework_TestCase
 
         $limit = 123;
         $offset = 321;
-        $order = ["a desc", "b asc"];
+
+        $order = new OrderBy([
+            ColumnOrder::desc("a"),
+            ColumnOrder::asc("b")
+        ]);
 
         $segment = $queryBuilder->buildSelect($table, $columns, $filter, $limit, $offset, $order);
 
@@ -77,7 +86,7 @@ class QueryBuilderTest extends \PHPUnit_Framework_TestCase
             'SELECT `a`, `b`, `c` ' .
             'FROM `foo` '  .
             'WHERE (`xx` = ? AND `yy` IS NOT NULL AND (`zz` BETWEEN ? AND ? OR max(?) > 0)) ' .
-            'ORDER BY a desc, b asc ' .
+            'ORDER BY `a` DESC, `b` ASC ' .
             'LIMIT 123 OFFSET 321';
 
         $expectedArgs = ["yy", 1, 2, 100];

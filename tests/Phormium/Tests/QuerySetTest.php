@@ -94,22 +94,34 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($qs1->getFilter());
         $this->assertNull($qs2->getFilter());
+        $this->assertNull($qs1->getOrder());
 
-        $this->assertEmpty($qs1->getOrder());
+        $orderBy2 = $qs2->getOrder();
+        $columnOrder = $orderBy2->orders()[0];
 
-        $expected = ['name desc'];
-        $actual = $qs2->getOrder();
-        $this->assertSame($expected, $actual);
+        $this->assertInstanceOf("Phormium\\Query\\OrderBy", $orderBy2);
+        $this->assertCount(1, $orderBy2->orders());
+        $this->assertSame("name", $columnOrder->column());
+        $this->assertSame("desc", $columnOrder->direction());
+
 
         $qs3 = $qs2->orderBy('id');
-        $expected = ['name desc', 'id asc'];
-        $actual = $qs3->getOrder();
-        $this->assertSame($expected, $actual);
+        $orderBy3 = $qs3->getOrder();
+        $columnOrder1 = $orderBy3->orders()[0];
+        $columnOrder2 = $orderBy3->orders()[1];
+
+        $this->assertInstanceOf("Phormium\\Query\\OrderBy", $orderBy3);
+        $this->assertNotSame($orderBy3, $orderBy2);
+        $this->assertCount(2, $orderBy3->orders());
+        $this->assertSame("name", $columnOrder1->column());
+        $this->assertSame("desc", $columnOrder1->direction());
+        $this->assertSame("id", $columnOrder2->column());
+        $this->assertSame("asc", $columnOrder2->direction());
     }
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Invalid order direction [!!!]. Expected 'asc' or 'desc'.
+     * @expectedExceptionMessage Invalid $direction [!!!]. Expected one of [asc, desc].
      */
     public function testOrderInvalidDirection()
     {

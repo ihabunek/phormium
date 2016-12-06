@@ -8,6 +8,8 @@ use Phormium\Filter\ColumnFilter;
 use Phormium\Filter\CompositeFilter;
 use Phormium\Filter\Filter;
 use Phormium\Filter\RawFilter;
+use Phormium\Query\ColumnOrder;
+use Phormium\Query\OrderBy;
 
 /**
  * Performs lazy database lookup for sets of objects.
@@ -30,8 +32,10 @@ class QuerySet
 
     /**
      * Order by clauses.
+     *
+     * @var Phormium\OrderBy
      */
-    private $order = [];
+    private $order;
 
     /**
      * The root filter.
@@ -478,32 +482,40 @@ class QuerySet
 
     public function addOrder($column, $direction)
     {
-        if ($direction !== 'asc' && $direction !== 'desc') {
-            throw new \Exception("Invalid order direction [$direction]. Expected 'asc' or 'desc'.");
-        }
-
         if (!$this->meta->columnExists($column)) {
             $table = $this->meta->getTable();
             throw new \Exception("Cannot order by column [$column] because it does not exist in table [$table].");
         }
 
-        $this->order[] = "{$column} {$direction}";
+        $order = new ColumnOrder($column, $direction);
+
+        $this->order = isset($this->order) ?
+            $this->order->withAdded($order) : new OrderBy([$order]);
     }
 
     // ******************************************
     // *** Accessors                          ***
     // ******************************************
 
+    /**
+     * @return Phormium\Filter\Filter
+     */
     public function getFilter()
     {
         return $this->filter;
     }
 
+    /**
+     * @return Phormium\Query\OrderBy
+     */
     public function getOrder()
     {
         return $this->order;
     }
 
+    /**
+     * @return Phormium\Meta
+     */
     public function getMeta()
     {
         return $this->meta;

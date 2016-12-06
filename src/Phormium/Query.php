@@ -2,11 +2,11 @@
 
 namespace Phormium;
 
+use PDO;
 use Phormium\Database\Driver;
 use Phormium\Filter\Filter;
+use Phormium\Query\OrderBy;
 use Phormium\Query\QuerySegment;
-
-use PDO;
 
 /**
  * Generates and executes SQL queries.
@@ -42,7 +42,7 @@ class Query
      */
     public function select(
         Filter $filter = null,
-        array $order = null,
+        OrderBy $order = null,
         array $columns = null,
         $limit = null,
         $offset = null,
@@ -77,7 +77,7 @@ class Query
      */
     public function selectDistinct(
         Filter $filter = null,
-        array $order = null,
+        OrderBy $order = null,
         array $columns = null,
         $limit = null,
         $offset = null
