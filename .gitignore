@@ -6,3 +6,5 @@ composer.phar
 composer.lock
 /.project
 /.settings
+*.sublime-project
+*.sublime-workspace
