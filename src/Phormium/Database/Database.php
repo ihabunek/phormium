@@ -25,11 +25,12 @@ class Database
     private $beginTriggered = false;
 
     /**
-     * Database configuration array.
+     * Array of established database connections.
      *
      * @var array
      */
-    protected $databases;
+    protected $connections = [];
+
 
     public function __construct(Factory $factory, EventEmitter $emitter)
     {
