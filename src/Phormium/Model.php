@@ -50,7 +50,7 @@ abstract class Model
      */
     public static function getQuery()
     {
-        return new Query(self::getMeta());
+        return Orm::getQuery(get_called_class());
     }
 
     /**
@@ -61,6 +61,7 @@ abstract class Model
     {
         $meta = self::getMeta();
         $query = self::getQuery();
+
         return new QuerySet($query, $meta);
     }
 

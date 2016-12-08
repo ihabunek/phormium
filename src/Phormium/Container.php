@@ -103,5 +103,10 @@ class Container extends \Pimple\Container
         $this['query_builder.factory'] = function () {
             return new QueryBuilderFactory($this['query_builder.cache']);
         };
+
+        // Cache for Query objects
+        $this['query.cache'] = function () {
+            return new \ArrayObject();
+        };
     }
 }

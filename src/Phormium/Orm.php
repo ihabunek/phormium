@@ -4,6 +4,7 @@ namespace Phormium;
 
 use Evenement\EventEmitter;
 use Phormium\Database\Database;
+use Phormium\Exception\OrmException;
 use Phormium\QueryBuilder\QueryBuilderInterface;
 
 /**
@@ -109,7 +110,7 @@ class Orm
      *
      * @return Phormium\QueryBuilder\QueryBuilderInterface
      */
-    public static function queryBuilder($driver)
+    public static function getQueryBuilder($driver)
     {
         $cache = self::$container['query_builder.cache'];
         $factory = self::$container['query_builder.factory'];
@@ -119,6 +120,33 @@ class Orm
         }
 
         return $cache[$driver];
+    }
+
+    private static function getDatabaseDriver($database)
+    {
+        $databases = self::$container['config']['databases'];
+
+        if (!isset($databases[$database])) {
+            throw new OrmException("Database [$database] is not configured.");
+        }
+
+        return $databases[$database]['driver'];
+    }
+
+    public static function getQuery($class)
+    {
+        $cache = self::$container['query.cache'];
+
+        if (!isset($cache[$class])) {
+            $meta = self::getMeta($class);
+            $database = $meta->getDatabase();
+            $driver = self::getDatabaseDriver($database);
+            $queryBuilder = self::getQueryBuilder($driver);
+
+            $cache[$class] = new Query($meta, $queryBuilder, self::database());
+        }
+
+        return $cache[$class];
     }
 
     public static function getMeta($class)
