@@ -6,7 +6,6 @@ use Evenement\EventEmitter;
 use Phormium\Database\Database;
 use Phormium\QueryBuilder\QueryBuilderInterface;
 
-
 /**
  * Central class. Global state everywhere. Such is Active Record.
  */
@@ -112,9 +111,14 @@ class Orm
      */
     public static function queryBuilder($driver)
     {
-        return self::container()
-            ->offsetGet('query_builder_factory')
-            ->getQueryBuilder($driver);
+        $cache = self::$container['query_builder.cache'];
+        $factory = self::$container['query_builder.factory'];
+
+        if (!isset($cache[$driver])) {
+            $cache[$driver] = $factory->getQueryBuilder($driver);
+        }
+
+        return $cache[$driver];
     }
 
     public static function getMeta($class)

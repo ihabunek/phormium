@@ -94,8 +94,14 @@ class Container extends \Pimple\Container
             );
         };
 
-        $this['query_builder_factory'] = function () {
-            return new QueryBuilderFactory();
+        // Cache for query builders
+        $this['query_builder.cache'] = function () {
+            return new \ArrayObject();
+        };
+
+        // Query builder factory
+        $this['query_builder.factory'] = function () {
+            return new QueryBuilderFactory($this['query_builder.cache']);
         };
     }
 }
