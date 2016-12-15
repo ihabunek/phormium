@@ -7,6 +7,8 @@ use Phormium\Filter\ColumnFilter;
 use Phormium\Filter\CompositeFilter;
 use Phormium\Filter\Filter;
 use Phormium\Filter\RawFilter;
+use Phormium\Meta;
+use Phormium\Query;
 use Phormium\Query\ColumnOrder;
 use Phormium\Query\LimitOffset;
 use Phormium\Query\OrderBy;
@@ -19,35 +21,35 @@ class QuerySet
     /**
      * Meta data of the Model this QuerySet is handling.
      *
-     * @var Phormium\Meta
+     * @var Meta
      */
     private $meta;
 
     /**
      * The Query object used for constructing queries.
      *
-     * @var Phormium\Query
+     * @var Query
      */
     private $query;
 
     /**
      * Order by clauses.
      *
-     * @var Phormium\OrderBy
+     * @var OrderBy
      */
     private $order;
 
     /**
      * The root filter.
      *
-     * @var Phormium\Filter\Filter
+     * @var Filter
      */
     private $filter;
 
     /**
      * Fetching limitations.
      *
-     * @var Phormium\Query\LimitOffset
+     * @var LimitOffset
      */
     private $limitOffset;
 
@@ -477,7 +479,7 @@ class QuerySet
     // ******************************************
 
     /**
-     * @return Phormium\Filter\Filter
+     * @return Filter
      */
     public function getFilter()
     {
@@ -485,7 +487,7 @@ class QuerySet
     }
 
     /**
-     * @return Phormium\Query\OrderBy
+     * @return OrderBy
      */
     public function getOrder()
     {
