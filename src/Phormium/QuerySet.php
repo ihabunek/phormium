@@ -495,10 +495,18 @@ class QuerySet
     }
 
     /**
-     * @return Phormium\Meta
+     * @return Meta
      */
     public function getMeta()
     {
         return $this->meta;
+    }
+
+    /**
+     * @return LimitOffset
+     */
+    public function getLimitOffset()
+    {
+        return $this->limitOffset;
     }
 }
