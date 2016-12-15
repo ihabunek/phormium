@@ -161,21 +161,21 @@ class Orm
         return $cache[$class];
     }
 
+    /**
+     * Returns the Meta class for a given Model class (cached).
+     *
+     * @param  string $class Model class name.
+     * @return Meta The corresponding Meta class.
+     */
     public static function getMeta($class)
     {
-        // Return from cache if exists
         $cache = self::$container['meta.cache'];
-        if (isset($cache[$class])) {
-            return $cache[$class];
+        $builder = self::$container['meta.builder'];
+
+        if (!isset($cache[$class])) {
+            $cache[$class] = $builder->build($class);
         }
 
-        // Build the meta object
-        $builder = self::$container['meta.builder'];
-        $meta = $builder->build($class);
-
-        // Save to cache
-        $cache[$class] = $meta;
-
-        return $meta;
+        return $cache[$class];
     }
 }
