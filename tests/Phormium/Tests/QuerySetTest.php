@@ -124,7 +124,7 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
      */
     public function testOrderInvalidDirection()
     {
-        Person::objects()->orderBy('name', '!!!')->fetch();
+        Person::objects()->orderBy('name', '!!!');
     }
 
     /**
@@ -133,7 +133,7 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
      */
     public function testOrderInvalidColumn()
     {
-        Person::objects()->orderBy('xxx', 'asc')->fetch();
+        Person::objects()->orderBy('xxx', 'asc');
     }
 
     public function testBatch()
@@ -193,6 +193,37 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         // Repeated delete should yield 0 count
         $count = $qs->delete();
         $this->assertSame(0, $count);
+    }
+
+    public function testLazyFetch()
+    {
+        $uniq = uniqid('lazy');
+
+        $persons = [
+            Person::fromArray(['name' => "{$uniq}_1"]),
+            Person::fromArray(['name' => "{$uniq}_2"]),
+            Person::fromArray(['name' => "{$uniq}_3"]),
+            Person::fromArray(['name' => "{$uniq}_4"]),
+            Person::fromArray(['name' => "{$uniq}_5"]),
+        ];
+
+        foreach ($persons as $person) {
+            $person->save();
+        }
+
+        $qs = Person::objects()
+            ->filter('name', 'like', "{$uniq}%")
+            ->orderBy('name');
+
+        $this->assertSame(5, $qs->count());
+
+        $counter = 0;
+        foreach ($qs->fetchLazy() as $key => $person) {
+            $this->assertEquals($persons[$key], $person);
+            $counter += 1;
+        }
+
+        $this->assertSame(5, $counter);
     }
 
     public function testLimitedFetch()

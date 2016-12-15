@@ -127,10 +127,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             [
                 'id' => $p->id,
                 'name' => $name,
-                'email' => NULL,
-                'birthday' => NULL,
-                'created' => NULL,
-                'income' => NULL,
+                'email' => null,
+                'birthday' => null,
+                'created' => null,
+                'income' => null,
             ]
         ];
 
@@ -192,7 +192,39 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     {
         $segment = new QuerySegment("SELECT * FROM person WHERE name like ?", ['xxx']);
 
+        $this->assertEmpty($this->triggeredEvents);
+
         $this->connection->preparedQuery($segment);
+
+        $expected = [
+            'query.started',
+            'query.preparing',
+            'query.prepared',
+            'query.executing',
+            'query.executed',
+            'query.fetching',
+            'query.fetched',
+            'query.completed',
+        ];
+
+        $this->assertEquals($expected, $this->triggeredEvents);
+        $this->checkTriggeredEvents($segment);
+    }
+
+    public function testPreparedQueryGeneratorEvents()
+    {
+        $segment = new QuerySegment("SELECT * FROM person WHERE name like ?", ['xxx']);
+
+        $class = "Phormium\\Tests\\Models\\Person";
+
+        $this->assertEmpty($this->triggeredEvents);
+
+        $generator = $this->connection->preparedQueryGenerator($segment, $class);
+
+        foreach ($generator as $item) {
+            $this->assertInstanceOf($class, $item);
+        }
+
         $expected = [
             'query.started',
             'query.preparing',

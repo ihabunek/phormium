@@ -76,6 +76,23 @@ class Connection
         return $data;
     }
 
+    public function preparedQueryGenerator(QuerySegment $segment, $class)
+    {
+        $query = $segment->query();
+        $arguments = $segment->args();
+
+        $this->emitter->emit(Event::QUERY_STARTED, [$query, $arguments, $this]);
+
+        $finally = function () use ($query, $arguments) {
+            $this->emitter->emit(Event::QUERY_COMPLETED, [$query, $arguments, $this, null]);
+        };
+
+        $stmt = $this->pdoPrepare($query, $arguments);
+        $this->pdoExecute($query, $arguments, $stmt);
+
+        return $this->pdoFetchGenerator($query, $arguments, $stmt, $class, $finally);
+    }
+
     /**
      * Performs a prepared query and returns only a single column.
      *
@@ -322,6 +339,32 @@ class Connection
         $this->emitter->emit(Event::QUERY_FETCHED, [$query, $arguments, $this]);
 
         return $data;
+    }
+
+    /**
+     * Similar to pdoFetch, but returns a generator which yields results
+     * instead of returning a fully fetched array.
+     *
+     * @return Generator
+     */
+    private function pdoFetchGenerator($query, $arguments, PDOStatement $stmt, $class, callable $finally)
+    {
+        $this->emitter->emit(Event::QUERY_FETCHING, [$query, $arguments, $this]);
+
+        try {
+            $stmt->setFetchMode(PDO::FETCH_CLASS, $class);
+
+            while ($row = $stmt->fetch()) {
+                yield $row;
+            }
+        } catch (\Exception $ex) {
+            $this->emitter->emit(Event::QUERY_ERROR, [$query, $arguments, $this, $ex]);
+            throw $ex;
+        }
+
+        $this->emitter->emit(Event::QUERY_FETCHED, [$query, $arguments, $this]);
+
+        $finally();
     }
 
     private function pdoFetchSingleColumn($query, $arguments, PDOStatement $stmt, $column)

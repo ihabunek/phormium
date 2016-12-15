@@ -10,6 +10,8 @@ place, the central `Phormium\Orm` class.
 
 New features:
 
+* `QuerySet`s are now iterable - this will fetch rows one by one instead of
+  fetching all at once.
 * Column and table names are properly quoted in SQL as expected by each
   database - double quotes for most and backticks for MySQL.
 

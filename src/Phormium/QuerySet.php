@@ -16,7 +16,7 @@ use Phormium\Query\OrderBy;
 /**
  * Performs lazy database lookup for sets of objects.
  */
-class QuerySet
+class QuerySet implements \IteratorAggregate
 {
     /**
      * Meta data of the Model this QuerySet is handling.
@@ -203,6 +203,22 @@ class QuerySet
             null,
             $this->limitOffset,
             PDO::FETCH_CLASS
+        );
+    }
+
+    /**
+     * Similar to `fetch()` but returns a generator instead of all the fetched
+     * data as an array.
+     */
+    public function fetchLazy()
+    {
+        return $this->query->select(
+            $this->filter,
+            $this->order,
+            null,
+            $this->limitOffset,
+            PDO::FETCH_CLASS,
+            true
         );
     }
 
@@ -508,5 +524,14 @@ class QuerySet
     public function getLimitOffset()
     {
         return $this->limitOffset;
+    }
+
+    // ******************************************
+    // *** IteratorAggregate interface        ***
+    // ******************************************
+
+    public function getIterator()
+    {
+        return $this->fetchLazy();
     }
 }

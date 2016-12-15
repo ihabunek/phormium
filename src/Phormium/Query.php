@@ -51,7 +51,9 @@ class Query
      * @param LimitOffset $limitOffset Limits for fetching.
      * @param integer $fetchType Fetch type; one of PDO::FETCH_* constants.
      *
-     * @return array An array of {@link Model} instances when using
+     * @return array|Generator Returns an array if $lazy is set to false, or a
+     *                         generator if it's set to true. The contents will
+     *                         c
      *      PDO::FETCH_CLASS, an array of associative arrays when using
      *      PDO::FETCH_ASSOC.
      */
@@ -60,7 +62,8 @@ class Query
         OrderBy $order = null,
         array $columns = null,
         LimitOffset $limitOffset = null,
-        $fetchType = PDO::FETCH_CLASSl
+        $fetchType = PDO::FETCH_CLASS,
+        $lazy = false
     ) {
         if (isset($columns)) {
             $this->checkColumnsExist($columns);
@@ -73,7 +76,9 @@ class Query
 
         $segment = $this->queryBuilder->buildSelect($table, $columns, $filter, $limitOffset, $order);
 
-        return $this->getConnection()->preparedQuery($segment, $fetchType, $class);
+        return $lazy ?
+            $this->getConnection()->preparedQueryGenerator($segment, $class) :
+            $this->getConnection()->preparedQuery($segment, $fetchType, $class);
     }
 
     /**
