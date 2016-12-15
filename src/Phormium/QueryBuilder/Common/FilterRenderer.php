@@ -8,7 +8,6 @@ use Phormium\Filter\Filter;
 use Phormium\Filter\RawFilter;
 use Phormium\Query\QuerySegment;
 
-
 class FilterRenderer
 {
     /**

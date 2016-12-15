@@ -108,7 +108,7 @@ class Orm
     /**
      * Returns the QueryBuilder for a given database driver.
      *
-     * @return Phormium\QueryBuilder\QueryBuilderInterface
+     * @return QueryBuilderInterface
      */
     public static function getQueryBuilder($driver)
     {
@@ -122,6 +122,12 @@ class Orm
         return $cache[$driver];
     }
 
+    /**
+     * For a given database, returns the driver name.
+     *
+     * @param  string $database Name of the database.
+     * @return string           Driver name.
+     */
     private static function getDatabaseDriver($database)
     {
         $databases = self::$container['config']['databases'];
@@ -133,6 +139,12 @@ class Orm
         return $databases[$database]['driver'];
     }
 
+    /**
+     * Returns the Query class for a given Model class (cached).
+     *
+     * @param  string $class Model class name.
+     * @return Query The corresponding Query class.
+     */
     public static function getQuery($class)
     {
         $cache = self::$container['query.cache'];
