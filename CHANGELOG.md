@@ -8,23 +8,27 @@ This release reorganizes the code substantially. The global state which was
 littered all over the project (DB, Conf, Event) is now consolidated in one
 place, the central `Phormium\Orm` class.
 
-This causes several BC breaks:
+New features:
+
+* Column and table names are properly quoted in SQL as expected by each
+  database - double quotes for most and backticks for MySQL.
+
+This causes several breaks to **backward compatibility**:
 
 * `DB` class is deprecated in favour of `Orm::database()`
-* Static methods in `Event` are deprecated in favour of `Orm::emitter()`
-  The class remains used as an event catalogue only.
-* `Conf` is removed, to configure Phormium use `Orm::configure()`
+* `Event` class is deprecated in favour of `Orm::emitter()`
+* `Conf` class has been removed, use `Orm::configure()`
 * Made `Printer` methods non-static
 * Made `ColumnFilter`, `RawFilter` and `CompositeFilter` immutable.
-  `CompositeFilter::add()` no longer exists because it mutated the filter, and
-  has been replaced with `CompositeFilter::withAdded()` which returns a new
-  `CompositeFilter` instance.
-* Made `ColumnFilter`, `RawFilter` and `CompositeFilter` properties private,
-  available via getter methods which are named the same as the properties, e.g.
-  `ColumnFilter::value()`
+  * `CompositeFilter::add()` no longer exists because it mutated the filter, and
+   has been replaced with `CompositeFilter::withAdded()` which returns a new
+   `CompositeFilter` instance.
+  * Made `ColumnFilter`, `RawFilter` and `CompositeFilter` properties private,
+   available via getter methods which are named the same as the properties, e.g.
+   `ColumnFilter::value()`
 * Renamed existing `CompositeFilter` accessor methods:
-** `CompositeFilter::getOperation()` -> `CompositeFilter::operation()`
-** `CompositeFilter::getFilters()` -> `CompositeFilter::filters()`
+  * `CompositeFilter::getOperation()` -> `CompositeFilter::operation()`
+  * `CompositeFilter::getFilters()` -> `CompositeFilter::filters()`
 
 Deprecated methods will emit a deprecation warning when used and will be removed
 in the next release.
