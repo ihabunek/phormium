@@ -17,6 +17,7 @@ New features:
 
 This causes several breaks to **backward compatibility**:
 
+* **Requires PHP 5.6**
 * `DB` class is deprecated in favour of `Orm::database()`
 * `Event` class is deprecated in favour of `Orm::emitter()`
 * `Conf` class has been removed, use `Orm::configure()`
