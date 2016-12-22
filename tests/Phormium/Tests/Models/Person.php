@@ -16,4 +16,5 @@ class Person extends \Phormium\Model
     public $birthday;
     public $created;
     public $income;
+    public $is_cool;
 }

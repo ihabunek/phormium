@@ -34,7 +34,7 @@ class PrinterTest extends \PHPUnit_Framework_TestCase
         $actual = Person::objects()->filter("name", "=", $name)->dump(true);
         $lines = explode(PHP_EOL, $actual);
 
-        $this->assertRegExp("/^\\s*id\\s+name\\s+email\\s+birthday\\s+created\\s+income\\s*$/", $lines[0]);
+        $this->assertRegExp("/^\\s*id\\s+name\\s+email\\s+birthday\\s+created\\s+income\\s+is_cool\\s*$/", $lines[0]);
         $this->assertRegExp("/^=+$/", $lines[1]);
         $this->assertRegExp("/^\\s*$id1\\s+Freddy Mercury\\s+100(.00)?\\s*$/", $lines[2]);
         $this->assertRegExp("/^\\s*$id2\\s+Freddy Mercury\\s+200(.00)?\\s*$/", $lines[3]);
@@ -82,7 +82,7 @@ class PrinterTest extends \PHPUnit_Framework_TestCase
 
         $lines = explode(PHP_EOL, $actual);
 
-        $this->assertRegExp("/^\\s*id\\s+name\\s+email\\s+birthday\\s+created\\s+income\\s*$/", $lines[0]);
+        $this->assertRegExp("/^\\s*id\\s+name\\s+email\\s+birthday\\s+created\\s+income\\s+is_cool\\s*$/", $lines[0]);
         $this->assertRegExp("/^=+$/", $lines[1]);
         $this->assertRegExp("/^\\s*$id1\\s+Rob Halford\\s+100(.00)?\\s*$/", $lines[2]);
         $this->assertRegExp("/^\\s*$id2\\s+Rob Halford\\s+200(.00)?\\s*$/", $lines[3]);

@@ -4,13 +4,14 @@ CREATE DATABASE phormium_tests;
 USE phormium_tests;
 
 CREATE TABLE person (
-  id INTEGER NOT NULL AUTO_INCREMENT,
-  name 	VARCHAR(255) NOT NULL,
-  email VARCHAR(255),
-  birthday DATE,
-  created DATETIME,
-  income DECIMAL(10,2),
-  PRIMARY KEY (id)
+    id INTEGER NOT NULL AUTO_INCREMENT,
+    name 	VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
+    birthday DATE,
+    created DATETIME,
+    income DECIMAL(10,2),
+    is_cool BOOLEAN,
+    PRIMARY KEY (id)
 );
 
 DROP TABLE IF EXISTS contact;

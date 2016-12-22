@@ -21,9 +21,14 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testNewPerson()
     {
+        $now = date('Y-m-d H:i:s');
+
         $p = new Person();
         $p->name = 'Test Person';
         $p->email = 'test.person@example.com';
+        $p->birthday = '1970-01-01';
+        $p->created = $now;
+        $p->income = 50.37;
 
         $this->assertNull($p->id);
         $p->save();
@@ -563,7 +568,8 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             'email' => 'miki@example.com',
             'birthday' => null,
             'created' => null,
-            'income' => 100000
+            'income' => 100000,
+            'is_cool' => null,
         ];
 
         $this->assertSame($expected, $person->toArray());
@@ -577,7 +583,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             'income' => 100000,
         ]);
 
-        $expected = '{"id":null,"name":"Michael Kiske","email":"miki@example.com","birthday":null,"created":null,"income":100000}';
+        $expected = '{"id":null,"name":"Michael Kiske","email":"miki@example.com","birthday":null,"created":null,"income":100000,"is_cool":null}';
 
         $this->assertSame($expected, $person->toJSON());
     }
@@ -597,6 +603,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             'birthday: null',
             'created: null',
             'income: 100000',
+            'is_cool: null',
         ]) . "\n";
 
         $this->assertSame($expected, $person->toYAML());
@@ -654,6 +661,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             'birthday: "1928-04-09"',
             'created: NULL',
             'income: 1000',
+            'is_cool: NULL',
         ]);
         $expected .= "\n\n";
 
