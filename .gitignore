@@ -6,5 +6,6 @@ composer.phar
 composer.lock
 /.project
 /.settings
+/phpunit.xml
 *.sublime-project
 *.sublime-workspace
