@@ -30,9 +30,6 @@
         "psr-0": {"Phormium": "src/"}
     },
     "autoload-dev": {
-        "psr-0": {
-            "Phormium\\Tests": "tests/"
-        },
         "psr-4": {
             "Phormium\\Tests\\Models\\": "tests/models/"
         }
