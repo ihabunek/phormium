@@ -49,6 +49,36 @@ class Connection
         $this->driver = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
     }
 
+    // -- Accessors ------------------------------------------------------------
+
+    /**
+     * Returns the underlying PDO connection
+     *
+     * @return PDO
+     */
+    public function getPDO()
+    {
+        return $this->pdo;
+    }
+
+    /** Returns the name of the driver for the underlying PDO connection. */
+    public function getDriver()
+    {
+        return $this->driver;
+    }
+
+    /**
+     * Returns the Emitter
+     *
+     * @return Emitter
+     */
+    public function getEmitter()
+    {
+        return $this->emitter;
+    }
+
+    // -- Query methods --------------------------------------------------------
+
     /**
      * Prepares and executes an SQL query using the given SQL and arguments.
      *
@@ -190,21 +220,7 @@ class Connection
         return $stmt->rowCount();
     }
 
-    /**
-     * Returns the underlying PDO connection
-     *
-     * @return PDO
-     */
-    public function getPDO()
-    {
-        return $this->pdo;
-    }
-
-    /** Returns the name of the driver for the underlying PDO connection. */
-    public function getDriver()
-    {
-        return $this->driver;
-    }
+    // -- Transaction methods --------------------------------------------------
 
     /** Calls BEGIN on the underlying PDO connection */
     public function beginTransaction()
@@ -238,6 +254,8 @@ class Connection
     {
         return $this->inTransaction;
     }
+
+    // -- Private methods ------------------------------------------------------
 
     private function pdoPrepare($query, $arguments)
     {
