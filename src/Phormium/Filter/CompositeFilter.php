@@ -29,6 +29,11 @@ class CompositeFilter extends Filter
             if (is_array($filter)) {
                 $filter = ColumnFilter::fromArray($filter);
             }
+
+            if (!($filter instanceof Filter)) {
+                $type = gettype($filter);
+                throw new \Exception("CompositeFilter requires an array of Filter objects as second argument, got [$type].");
+            }
         }
 
         $this->operation = $operation;

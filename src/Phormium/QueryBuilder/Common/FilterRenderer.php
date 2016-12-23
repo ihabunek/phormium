@@ -121,8 +121,6 @@ class FilterRenderer
      */
     private function renderSimple($column, $operation, $value)
     {
-        $this->checkIsScalar($value, $operation);
-
         $where = "{$column} {$operation} ?";
 
         return new QuerySegment($where, [$value]);
@@ -130,9 +128,6 @@ class FilterRenderer
 
     private function renderBetween($column, $operation, $values)
     {
-        $this->checkIsArray($values, $operation);
-        $this->checkArrayCount($values, 2, $operation);
-
         $where = "$column BETWEEN ? AND ?";
 
         return new QuerySegment($where, $values);
@@ -140,9 +135,6 @@ class FilterRenderer
 
     private function renderIn($column, $operation, $values)
     {
-        $this->checkIsArray($values, $operation);
-        $this->checkArrayNotEmpty($values, $operation);
-
         $placeholders = array_fill(0, count($values), '?');
         $where = "$column IN (" . implode(', ', $placeholders) . ")";
 
@@ -151,8 +143,6 @@ class FilterRenderer
 
     private function renderLikeCaseInsensitive($column, $operation, $value)
     {
-        $this->checkIsScalar($value, $operation);
-
         $where = "lower($column) LIKE lower(?)";
 
         return new QuerySegment($where, [$value]);
@@ -160,9 +150,6 @@ class FilterRenderer
 
     private function renderNotIn($column, $operation, $values)
     {
-        $this->checkIsArray($values, $operation);
-        $this->checkArrayNotEmpty($values, $operation);
-
         $placeholders = array_fill(0, count($values), '?');
         $where = "$column NOT IN (" . implode(', ', $placeholders) . ")";
 
@@ -177,46 +164,5 @@ class FilterRenderer
     private function renderNotNull($column)
     {
         return new QuerySegment("$column IS NOT NULL");
-    }
-
-
-    // ******************************************
-    // *** Validation functions               ***
-    // ******************************************
-
-    private function checkIsArray($value, $operation)
-    {
-        if (!is_array($value)) {
-            $type = gettype($value);
-            $msg = "Filter $operation requires an array, $type given.";
-            throw new \InvalidArgumentException($msg);
-        }
-    }
-
-    private function checkIsScalar($value, $operation)
-    {
-        if (!is_scalar($value)) {
-            $type = gettype($value);
-            $msg = "Filter $operation requires a scalar value, $type given.";
-            throw new \InvalidArgumentException($msg);
-        }
-    }
-
-    private function checkArrayCount(array $array, $expected, $operation)
-    {
-        $count = count($array);
-        if ($count !== $expected) {
-            $msg = "Filter $operation requires an array with $expected values, ";
-            $msg .= "given array has $count values.";
-            throw new \InvalidArgumentException($msg);
-        }
-    }
-
-    private function checkArrayNotEmpty(array $array, $operation)
-    {
-        if (empty($array)) {
-            $msg = "Filter $operation requires a non-empty array, empty array given.";
-            throw new \InvalidArgumentException($msg);
-        }
     }
 }

@@ -2,39 +2,39 @@
 
 namespace Phormium\Tests;
 
+use Phormium\Orm;
 use Phormium\Tests\Models\Person;
 
-use Phormium\Filter\Filter;
-use Phormium\Filter\RawFilter;
-
 /**
+ * Tests in this class actually run some queries, unlike other test classes in
+ * this namespace.
+ *
  * @group filter
  */
-class RawFilterTest extends \PHPUnit_Framework_TestCase
+class FilterTest extends \PHPUnit_Framework_TestCase
 {
-    function testConstruction()
+    public static function setUpBeforeClass()
     {
-        $condition = "lower(name) = ?";
-        $arguments = ['foo'];
-
-        $filter = new RawFilter($condition, $arguments);
-
-        $this->assertSame($condition, $filter->condition());
-        $this->assertSame($arguments, $filter->arguments());
+        Orm::configure(PHORMIUM_CONFIG_FILE);
     }
 
-    function testFactory()
+    public function testCaseInsensitiveLike()
     {
-        $condition = "lower(name) = ?";
-        $arguments = ['foo'];
+        $qs = Person::objects()->filter('name', 'ilike', 'pero');
 
-        $filter = Filter::raw($condition, $arguments);
+        $qs->delete();
+        $this->assertFalse($qs->exists());
 
-        $this->assertSame($condition, $filter->condition());
-        $this->assertSame($arguments, $filter->arguments());
+        Person::fromArray(['name' => "PERO"])->insert();
+        Person::fromArray(['name' => "pero"])->insert();
+        Person::fromArray(['name' => "Pero"])->insert();
+        Person::fromArray(['name' => "pERO"])->insert();
+
+        $this->assertSame(4, $qs->count());
+        $this->assertCount(4, $qs->fetch());
     }
 
-    function testQuerySet()
+    function testRawFilter()
     {
         $condition = "lower(name) = ?";
         $arguments = ['foo'];

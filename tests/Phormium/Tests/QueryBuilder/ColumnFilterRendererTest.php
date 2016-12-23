@@ -32,16 +32,6 @@ class ColumnFilterRendererTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Filter = requires a scalar value, array given.
-     */
-    public function testEqWrongParam()
-    {
-        $filter = new ColumnFilter('test', '=', []);
-        $this->render($filter);
-    }
-
     public function testNeq1()
     {
         $filter = new ColumnFilter('test', '!=', 1);
@@ -72,16 +62,6 @@ class ColumnFilterRendererTest extends \PHPUnit_Framework_TestCase
         $actual = $this->render($filter);
         $expected = new QuerySegment('"test" IS NOT NULL', []);
         $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Filter != requires a scalar value, array given.
-     */
-    public function testNeqWrongParam()
-    {
-        $filter = new ColumnFilter('test', '!=', []);
-        $this->render($filter);
     }
 
     public function testGt()
@@ -124,90 +104,12 @@ class ColumnFilterRendererTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Filter IN requires an array, integer given.
-     */
-    public function testInWrongParam1()
-    {
-        $filter = new ColumnFilter('test', 'in', 1);
-        $this->render($filter);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Filter IN requires an array, string given.
-     */
-    public function testInWrongParam2()
-    {
-        $filter = new ColumnFilter('test', 'in', "1");
-        $this->render($filter);
-    }
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Filter IN requires an array, NULL given.
-     */
-    public function testInWrongParam3()
-    {
-        $filter = new ColumnFilter('test', 'in', null);
-        $this->render($filter);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Filter IN requires a non-empty array, empty array given.
-     */
-    public function testInWrongParam4()
-    {
-        $filter = new ColumnFilter('test', 'in', []);
-        $this->render($filter);
-    }
-
     public function testNotIn()
     {
         $filter = new ColumnFilter('test', 'not in', [1, 2, 3]);
         $actual = $this->render($filter);
         $expected = new QuerySegment('"test" NOT IN (?, ?, ?)', [1, 2, 3]);
         $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Filter NOT IN requires an array, integer given.
-     */
-    public function testNotInWrongParam1()
-    {
-        $filter = new ColumnFilter('test', 'not in', 1);
-        $this->render($filter);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Filter NOT IN requires an array, string given.
-     */
-    public function testNotInWrongParam2()
-    {
-        $filter = new ColumnFilter('test', 'not in', "1");
-        $this->render($filter);
-    }
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Filter NOT IN requires an array, NULL given.
-     */
-    public function testNotInWrongParam3()
-    {
-        $filter = new ColumnFilter('test', 'not in', null);
-        $this->render($filter);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Filter NOT IN requires a non-empty array, empty array given.
-     */
-    public function testNotInWrongParam4()
-    {
-        $filter = new ColumnFilter('test', 'not in', []);
-        $this->render($filter);
     }
 
     public function testIsNull()
@@ -265,47 +167,4 @@ class ColumnFilterRendererTest extends \PHPUnit_Framework_TestCase
         $expected = new QuerySegment('"test" BETWEEN ? AND ?', [10, 20]);
         $this->assertEquals($expected, $actual);
     }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Filter BETWEEN requires an array, string given.
-     */
-    public function testBetweenWrongParam1()
-    {
-        $filter = new ColumnFilter('test', 'between', 'xxx');
-        $this->render($filter);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Filter BETWEEN requires an array, NULL given.
-     */
-    public function testBetweenWrongParam2()
-    {
-        $filter = new ColumnFilter('test', 'between', null);
-        $this->render($filter);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Filter BETWEEN requires an array with 2 values, given array has 1 values.
-     */
-    public function testBetweenWrongParam3()
-    {
-        $filter = new ColumnFilter('test', 'between', [1]);
-        $this->render($filter);
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Unknown filter operation [XXX]
-     */
-    public function testUnknownOp()
-    {
-        $filter = new ColumnFilter('test', 'xxx');
-        $this->render($filter);
-    }
-
-
-
 }
