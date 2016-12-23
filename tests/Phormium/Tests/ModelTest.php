@@ -3,6 +3,7 @@
 namespace Phormium\Tests;
 
 use Phormium\Orm;
+use Phormium\Database\Driver;
 use Phormium\Tests\Models\Asset;
 use Phormium\Tests\Models\Contact;
 use Phormium\Tests\Models\Person;
@@ -45,6 +46,42 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $p3 = Person::get([$id]);
         $this->assertInstanceOf("Phormium\\Tests\\Models\\Person", $p3);
         $this->assertEquals($p, $p3);
+    }
+
+    public function testBooleanFalse()
+    {
+        $p = new Person();
+        $p->name = "Courtney Love";
+        $p->is_cool = false;
+        $p->save();
+
+        $p2 = Person::get($p->id);
+
+        // The postgres driver retrieves actual booleans, others return 1/0
+        $driver = Orm::database()->getConnection('testdb')->getDriver();
+        if ($driver == Driver::PGSQL) {
+            $this->assertFalse($p2->is_cool);
+        } else {
+            $this->assertSame('0', $p2->is_cool);
+        }
+    }
+
+    public function testBooleanTrue()
+    {
+        $p = new Person();
+        $p->name = "Courtney Barnett";
+        $p->is_cool = true;
+        $p->save();
+
+        $p2 = Person::get($p->id);
+
+        // The postgres driver retrieves actual booleans, others return 1/0
+        $driver = Orm::database()->getConnection('testdb')->getDriver();
+        if ($driver == Driver::PGSQL) {
+            $this->assertTrue($p2->is_cool);
+        } else {
+            $this->assertSame('1', $p2->is_cool);
+        }
     }
 
     public function testNewTrade()

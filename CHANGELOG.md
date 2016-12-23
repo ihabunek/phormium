@@ -36,10 +36,11 @@ This causes several breaks to **backward compatibility**:
 Deprecated methods will emit a deprecation warning when used and will be removed
 in the next release.
 
-Other changes:
+Bug fixes:
 
-* Fix: Apply limit and offset to distinct queries (#18)
 * Fix: `Connection->execute()` should return the number of affected rows (#12)
+* Fix: Apply limit and offset to distinct queries (#18)
+* Fix: Fix handling of boolean `false` (#24)
 
 0.8.0 / 2015-05-07
 ------------------
