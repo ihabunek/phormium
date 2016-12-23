@@ -112,8 +112,8 @@ class Orm
      */
     public static function getQueryBuilder($driver)
     {
-        $cache = self::$container['query_builder.cache'];
-        $factory = self::$container['query_builder.factory'];
+        $cache = self::container()['query_builder.cache'];
+        $factory = self::container()['query_builder.factory'];
 
         if (!isset($cache[$driver])) {
             $cache[$driver] = $factory->getQueryBuilder($driver);
@@ -130,13 +130,13 @@ class Orm
      */
     private static function getDatabaseDriver($database)
     {
-        $databases = self::$container['config']['databases'];
+        $config = self::container()->offsetGet('config');
 
-        if (!isset($databases[$database])) {
+        if (!isset($config['databases'][$database])) {
             throw new OrmException("Database [$database] is not configured.");
         }
 
-        return $databases[$database]['driver'];
+        return $config['databases'][$database]['driver'];
     }
 
     /**
@@ -147,7 +147,7 @@ class Orm
      */
     public static function getQuery($class)
     {
-        $cache = self::$container['query.cache'];
+        $cache = self::container()['query.cache'];
 
         if (!isset($cache[$class])) {
             $meta = self::getMeta($class);
@@ -169,8 +169,8 @@ class Orm
      */
     public static function getMeta($class)
     {
-        $cache = self::$container['meta.cache'];
-        $builder = self::$container['meta.builder'];
+        $cache = self::container()['meta.cache'];
+        $builder = self::container()['meta.builder'];
 
         if (!isset($cache[$class])) {
             $cache[$class] = $builder->build($class);
