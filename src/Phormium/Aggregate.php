@@ -14,16 +14,7 @@ class Aggregate
     const MIN = 'min';
     const SUM = 'sum';
 
-    /** Available aggregates. */
-    private $types = [
-        self::AVERAGE,
-        self::COUNT,
-        self::MAX,
-        self::MIN,
-        self::SUM,
-    ];
-
-    /** Aggregate type. One of $types constants. */
+    /** Aggregate function. */
     private $type;
 
     /** Column on which to perform the aggregation. */
@@ -31,8 +22,10 @@ class Aggregate
 
     public function __construct($type, $column = null)
     {
-        if (!in_array($type, $this->types)) {
-            $types = implode(', ', $this->types);
+        $types = [self::AVERAGE, self::COUNT, self::MAX, self::MIN, self::SUM];
+
+        if (!in_array($type, $types)) {
+            $types = implode(', ', $types);
             throw new \Exception("Invalid aggregate type [$type]. Supported types: $types.");
         }
 
