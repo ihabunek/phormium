@@ -26,7 +26,7 @@ class OrderBy
 
         foreach ($orders as $order) {
             if (!($order instanceof ColumnOrder)) {
-                $type = typeof($order);
+                $type = gettype($order);
                 throw new OrmException("Expected \$orders to be instances of Phormium\\Query\\ColumnOrder. Given [$type].");
             }
         }
