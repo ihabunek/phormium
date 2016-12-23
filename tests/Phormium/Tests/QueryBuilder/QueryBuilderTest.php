@@ -2,9 +2,9 @@
 
 namespace Phormium\Tests\QueryBuilder;
 
-use Phormium\Aggregate;
 use Phormium\Database\Driver;
 use Phormium\Filter\Filter;
+use Phormium\Query\Aggregate;
 use Phormium\Query\ColumnOrder;
 use Phormium\Query\LimitOffset;
 use Phormium\Query\OrderBy;

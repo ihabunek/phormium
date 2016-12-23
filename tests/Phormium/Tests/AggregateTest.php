@@ -3,8 +3,7 @@
 namespace Phormium\Tests;
 
 use Phormium\Orm;
-use Phormium\Aggregate;
-
+use Phormium\Query\Aggregate;
 use Phormium\Tests\Models\Trade;
 
 /**
@@ -69,28 +68,10 @@ class AggregateTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Invalid aggregate type [xxx].
-     */
-    public function testInvalidType()
-    {
-        $agg = new Aggregate('xxx', 'yyy');
-    }
-
-    /**
-     * @expectedException \Exception
      * @expectedExceptionMessage Error forming aggregate query. Column [xxx] does not exist in table [trade].
      */
     public function testInvalidColumn()
     {
         Trade::objects()->avg('xxx');
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Aggregate type [avg] requires a column to be given.
-     */
-    public function testRequiresColumnError()
-    {
-        $agg = new Aggregate(Aggregate::AVERAGE, null);
     }
 }

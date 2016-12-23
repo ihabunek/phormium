@@ -1,6 +1,6 @@
 <?php
 
-namespace Phormium;
+namespace Phormium\Query;
 
 /**
  * Generates the SELECT clause for aggregate statements.

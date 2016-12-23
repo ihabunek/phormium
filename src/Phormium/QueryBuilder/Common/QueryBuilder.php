@@ -2,8 +2,8 @@
 
 namespace Phormium\QueryBuilder\Common;
 
-use Phormium\Aggregate;
 use Phormium\Filter\Filter;
+use Phormium\Query\Aggregate;
 use Phormium\Query\ColumnOrder;
 use Phormium\Query\LimitOffset;
 use Phormium\Query\OrderBy;

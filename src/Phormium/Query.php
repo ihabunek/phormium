@@ -6,6 +6,7 @@ use PDO;
 use Phormium\Database\Driver;
 use Phormium\Database\Database;
 use Phormium\Filter\Filter;
+use Phormium\Query\Aggregate;
 use Phormium\Query\LimitOffset;
 use Phormium\Query\OrderBy;
 use Phormium\Query\QuerySegment;

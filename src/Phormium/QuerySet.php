@@ -9,6 +9,7 @@ use Phormium\Filter\Filter;
 use Phormium\Filter\RawFilter;
 use Phormium\Meta;
 use Phormium\Query;
+use Phormium\Query\Aggregate;
 use Phormium\Query\ColumnOrder;
 use Phormium\Query\LimitOffset;
 use Phormium\Query\OrderBy;
