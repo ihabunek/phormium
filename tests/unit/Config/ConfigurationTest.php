@@ -1,11 +1,12 @@
 <?php
 
-namespace Phormium\Tests\Config;
+namespace Phormium\Tests;
 
 use Phormium\Config\Configuration;
 
 /**
  * @group config
+ * @group unit
  */
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {

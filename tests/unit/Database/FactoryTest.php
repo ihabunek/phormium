@@ -1,16 +1,17 @@
 <?php
 
-namespace Phormium\Tests;
-
+namespace Phormium\Tests\Unit\Database;
 
 use Mockery as m;
-
+use PDO;
 use Phormium\Database\Database;
 use Phormium\Database\Factory;
 use Phormium\Event;
 
-use PDO;
-
+/**
+ * @group unit
+ * @group database
+ */
 class FactoryTest extends \PHPUnit_Framework_TestCase
 {
     private $config = [
@@ -37,14 +38,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     protected function getMockEmitter()
     {
-        $emitter = m::mock("Evenement\\EventEmitter");
-
-        // $emitter->shouldReceive('on')->once()
-        //     ->with(Event::QUERY_STARTED, m::type('callable'));
-
-        // $emitter->shouldReceive('emit');
-
-        return $emitter;
+        return m::mock("Evenement\\EventEmitter");
     }
 
     public function testAttributes1()

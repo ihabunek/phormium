@@ -1,13 +1,13 @@
 <?php
 
-namespace Phormium\Tests\Config;
+namespace Phormium\Tests;
 
 use PDO;
-
 use Phormium\Config\PostProcessor;
 
 /**
  * @group config
+ * @group unit
  */
 class PostProcessorTest extends \PHPUnit_Framework_TestCase
 {
