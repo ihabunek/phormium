@@ -275,6 +275,8 @@ class Connection
 
     private function pdoExecute($query, $arguments, PDOStatement $stmt)
     {
+        $arguments = array_map([$this, "prepareArgument"], $arguments);
+
         $this->emitter->emit(Event::QUERY_EXECUTING, [$query, $arguments, $this]);
 
         try {
@@ -285,6 +287,21 @@ class Connection
         }
 
         $this->emitter->emit(Event::QUERY_EXECUTED, [$query, $arguments, $this]);
+    }
+
+    /**
+     * Convert boolean arguments to "1" and "0".
+     *
+     * PDO casts arguments to strings so true and false become "1" and ""
+     * respectively. Some databases don't recognize the empty string as false.
+     */
+    private function prepareArgument($argument)
+    {
+        if (is_bool($argument)) {
+            return $argument ? "1" : "0";
+        }
+
+        return $argument;
     }
 
     private function pdoQuery($query, $arguments)

@@ -1,12 +1,13 @@
 DROP TABLE IF EXISTS person;
 CREATE TABLE person (
-  id SERIAL,
-  name 	VARCHAR(255) NOT NULL,
-  email VARCHAR(255),
-  birthday DATE,
-  created TIMESTAMP,
-  income DECIMAL(10,2),
-  PRIMARY KEY (id)
+    id SERIAL,
+    name 	VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
+    birthday DATE,
+    created TIMESTAMP,
+    income DECIMAL(10,2),
+    is_cool BOOLEAN,
+    PRIMARY KEY (id)
 );
 
 DROP TABLE IF EXISTS contact;

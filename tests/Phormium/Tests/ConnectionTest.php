@@ -131,6 +131,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 'birthday' => null,
                 'created' => null,
                 'income' => null,
+                'is_cool' => null,
             ]
         ];
 

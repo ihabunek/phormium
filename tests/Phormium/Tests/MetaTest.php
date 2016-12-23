@@ -24,9 +24,9 @@ class MetaTest extends \PHPUnit_Framework_TestCase
         $table = 'person';
         $class = 'Phormium\\Tests\\Models\\Person';
         $database = 'testdb';
-        $columns = ['id', 'name', 'email', 'birthday', 'created', 'income'];
+        $columns = ['id', 'name', 'email', 'birthday', 'created', 'income', 'is_cool'];
         $pk = ['id'];
-        $nonPK = ['name', 'email', 'birthday', 'created', 'income'];
+        $nonPK = ['name', 'email', 'birthday', 'created', 'income', 'is_cool'];
 
         $expected = new Meta($table, $database, $class, $columns, $pk, $nonPK);
         $actual = Person::getMeta();
