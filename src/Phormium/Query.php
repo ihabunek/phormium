@@ -128,8 +128,8 @@ class Query
     public function aggregate(Aggregate $aggregate, Filter $filter = null)
     {
         $table = $this->meta->getTable();
-        $column = $aggregate->column;
-        $type = $aggregate->type;
+        $column = $aggregate->column();
+        $type = $aggregate->type();
 
         if (!$this->meta->columnExists($column)) {
             if (!($type === Aggregate::COUNT && $column === '*')) {

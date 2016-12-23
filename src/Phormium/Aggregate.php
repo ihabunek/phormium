@@ -24,10 +24,10 @@ class Aggregate
     ];
 
     /** Aggregate type. One of $types constants. */
-    public $type;
+    private $type;
 
     /** Column on which to perform the aggregation. */
-    public $column;
+    private $column;
 
     public function __construct($type, $column = null)
     {
@@ -46,5 +46,17 @@ class Aggregate
 
         $this->type = $type;
         $this->column = $column;
+    }
+
+    // -- Accessors ------------------------------------------------------------
+
+    public function type()
+    {
+        return $this->type;
+    }
+
+    public function column()
+    {
+        return $this->column;
     }
 }

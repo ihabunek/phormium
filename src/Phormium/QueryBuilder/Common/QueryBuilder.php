@@ -112,10 +112,14 @@ class QueryBuilder implements QueryBuilderInterface
     /** SELECT clause for selecting an aggregate */
     protected function renderSelectAggregate(Aggregate $aggregate)
     {
-        $column = $aggregate->column !== "*" ?
-            $this->quoter->quote($aggregate->column) : $aggregate->column;
+        $type = $aggregate->type();
+        $column = $aggregate->column();
 
-        $query = "SELECT {$aggregate->type}({$column}) AS aggregate";
+        if ($column !== '*') {
+            $column = $this->quoter->quote($column);
+        }
+
+        $query = "SELECT {$type}({$column}) AS aggregate";
 
         return new QuerySegment($query);
     }

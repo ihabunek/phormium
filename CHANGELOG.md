@@ -32,6 +32,7 @@ This causes several breaks to **backward compatibility**:
 * Renamed existing `CompositeFilter` accessor methods:
   * `CompositeFilter::getOperation()` -> `CompositeFilter::operation()`
   * `CompositeFilter::getFilters()` -> `CompositeFilter::filters()`
+* Made `Aggregate` properties private, available via getter methods.
 
 Deprecated methods will emit a deprecation warning when used and will be removed
 in the next release.
