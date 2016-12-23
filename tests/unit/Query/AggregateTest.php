@@ -1,11 +1,9 @@
 <?php
 
-namespace Phormium\Tests\Unit;
-
 use Phormium\Query\Aggregate;
 
 /**
- * @group aggregate
+ * @group query
  * @group unit
  */
 class AggregateTest extends \PHPUnit_Framework_TestCase

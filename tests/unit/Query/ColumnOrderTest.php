@@ -1,10 +1,11 @@
 <?php
 
-namespace Phormium\Tests\Query;
-
 use Phormium\Query\ColumnOrder;
 
-
+/**
+ * @group query
+ * @group unit
+ */
 class ColumnOrderTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstruct()

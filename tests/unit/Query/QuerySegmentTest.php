@@ -1,10 +1,11 @@
 <?php
 
-namespace Phormium\Tests\Query;
-
 use Phormium\Query\QuerySegment;
 
-
+/**
+ * @group query
+ * @group unit
+ */
 class QuerySegmentTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstruct()
@@ -65,6 +66,26 @@ class QuerySegmentTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf("Phormium\Query\QuerySegment", $imploded);
         $this->assertSame($expectedQuery, $imploded->query());
         $this->assertSame($expectedArgs, $imploded->args());
+    }
+
+    public function testImplodeEmpty()
+    {
+        $separator = new QuerySegment("x", ['y']);
+
+        $imploded = QuerySegment::implode($separator, []);
+        $this->assertSame("", $imploded->query());
+        $this->assertSame([], $imploded->args());
+
+    }
+
+    public function testImplodeSingle()
+    {
+        $segment = new QuerySegment("foo", ['bar']);
+        $separator = new QuerySegment("bla", ['tra']);
+
+        $imploded = QuerySegment::implode($separator, [$segment]);
+        $this->assertSame($segment, $imploded);
+
     }
 
     public function testEmbrace()
