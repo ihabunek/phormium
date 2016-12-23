@@ -29,7 +29,12 @@
         "psr-0": {"Phormium": "src/"}
     },
     "autoload-dev": {
-        "psr-0": {"Phormium\\Tests": "tests/"}
+        "psr-0": {
+            "Phormium\\Tests": "tests/"
+        },
+        "psr-4": {
+            "Phormium\\Tests\\Models\\": "tests/models/"
+        }
     },
     "support": {
         "issues": "https://github.com/ihabunek/phormium/issues"
