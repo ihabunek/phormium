@@ -2,7 +2,7 @@
 
 namespace Phormium\Filter;
 
-use InvalidArgumentException;
+use Phormium\Exception\InvalidQueryException;
 
 /**
  * A filter for SQL queries which converts to a single WHERE condition.
@@ -50,12 +50,12 @@ class ColumnFilter extends Filter
     {
         if (!is_string($column)) {
             $type = gettype($column);
-            throw new \InvalidArgumentException("Argument \$column must be a string, $type given.");
+            throw new InvalidQueryException("Argument \$column must be a string, $type given.");
         }
 
         if (!is_string($operation)) {
             $type = gettype($operation);
-            throw new \InvalidArgumentException("Argument \$operation must be a string, $type given.");
+            throw new InvalidQueryException("Argument \$operation must be a string, $type given.");
         }
 
         $operation = strtoupper($operation);
@@ -97,7 +97,7 @@ class ColumnFilter extends Filter
                 break;
 
             default:
-                throw new \InvalidArgumentException("Unknown filter operation [$operation].");
+                throw new InvalidQueryException("Unknown filter operation [$operation].");
         }
     }
 
@@ -108,7 +108,7 @@ class ColumnFilter extends Filter
         if (!is_array($value)) {
             $type = gettype($value);
             $msg = "Filter $operation requires an array, $type given.";
-            throw new \InvalidArgumentException($msg);
+            throw new InvalidQueryException($msg);
         }
     }
 
@@ -118,7 +118,7 @@ class ColumnFilter extends Filter
             if (!is_scalar($value)) {
                 $type = gettype($value);
                 $msg = "Filter $operation requires an array of scalars, array containing $type given.";
-                throw new \InvalidArgumentException($msg);
+                throw new InvalidQueryException($msg);
             }
         }
     }
@@ -128,7 +128,7 @@ class ColumnFilter extends Filter
         if (isset($value) && !is_scalar($value)) {
             $type = gettype($value);
             $msg = "Filter $operation requires a scalar value, $type given.";
-            throw new \InvalidArgumentException($msg);
+            throw new InvalidQueryException($msg);
         }
     }
 
@@ -137,7 +137,7 @@ class ColumnFilter extends Filter
         if (!is_scalar($value)) {
             $type = gettype($value);
             $msg = "Filter $operation requires a scalar value, $type given.";
-            throw new \InvalidArgumentException($msg);
+            throw new InvalidQueryException($msg);
         }
     }
 
@@ -147,7 +147,7 @@ class ColumnFilter extends Filter
         if ($count !== $expected) {
             $msg = "Filter $operation requires an array with $expected values, ";
             $msg .= "given array has $count values.";
-            throw new \InvalidArgumentException($msg);
+            throw new InvalidQueryException($msg);
         }
     }
 
@@ -155,7 +155,7 @@ class ColumnFilter extends Filter
     {
         if (empty($array)) {
             $msg = "Filter $operation requires a non-empty array, empty array given.";
-            throw new \InvalidArgumentException($msg);
+            throw new InvalidQueryException($msg);
         }
     }
 
@@ -164,7 +164,7 @@ class ColumnFilter extends Filter
         if ($value !== null) {
             $type = gettype($value);
             $msg = "Filter $operation requires the value to be NULL, $type given.";
-            throw new \InvalidArgumentException($msg);
+            throw new InvalidQueryException($msg);
         }
     }
 
@@ -201,7 +201,7 @@ class ColumnFilter extends Filter
             case 3:
                 return new ColumnFilter($array[0], $array[1], $array[2]);
             default:
-                throw new \Exception("Invalid filter sepecification.");
+                throw new InvalidQueryException("Invalid filter sepecification.");
         }
     }
 }

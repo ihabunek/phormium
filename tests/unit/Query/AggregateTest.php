@@ -20,7 +20,7 @@ class AggregateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Invalid aggregate type [xxx].
      */
     public function testInvalidType()
@@ -29,7 +29,7 @@ class AggregateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Aggregate type [avg] requires a column to be given.
      */
     public function testRequiresColumnError()

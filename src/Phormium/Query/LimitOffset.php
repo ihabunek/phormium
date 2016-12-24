@@ -2,7 +2,7 @@
 
 namespace Phormium\Query;
 
-use Phormium\Exception\OrmException;
+use Phormium\Exception\InvalidQueryException;
 use Phormium\Helper\Assert;
 use Phormium\Query\ColumnOrder;
 
@@ -28,15 +28,15 @@ class LimitOffset
     public function __construct($limit, $offset = null)
     {
         if (isset($limit) && !Assert::isPositiveInteger($limit)) {
-            throw new OrmException("\$limit must be a positive integer or null.");
+            throw new InvalidQueryException("\$limit must be a positive integer or null.");
         }
 
         if (isset($offset) && !Assert::isPositiveInteger($offset)) {
-            throw new OrmException("\$offset must be a positive integer or null.");
+            throw new InvalidQueryException("\$offset must be a positive integer or null.");
         }
 
         if (isset($offset) && !isset($limit)) {
-            throw new OrmException("\$offset cannot be given without a \$limit.");
+            throw new InvalidQueryException("\$offset cannot be given without a \$limit.");
         }
 
         $this->limit = $limit;

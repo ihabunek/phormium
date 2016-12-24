@@ -39,7 +39,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Invalid filter sepecification
      */
     public function testFilterFromArrayExceptionTooMany()
@@ -48,7 +48,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Invalid filter sepecification
      */
     public function testFilterFromArrayExceptionTooFew()
@@ -57,7 +57,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Argument $column must be a string, integer given.
      */
     public function testInvalidColumn()
@@ -66,7 +66,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Argument $operation must be a string, integer given.
      */
     public function testInvalidOperation()
@@ -75,7 +75,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Filter = requires a scalar value, array given.
      */
     public function testEqWrongParam()
@@ -93,7 +93,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Filter > requires a scalar value, array given.
      */
     public function testGtWrongParam()
@@ -102,7 +102,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Filter != requires a scalar value, array given.
      */
     public function testNeqWrongParam()
@@ -121,7 +121,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Filter IN requires an array, integer given.
      */
     public function testInWrongParam1()
@@ -130,7 +130,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Filter IN requires an array, string given.
      */
     public function testInWrongParam2()
@@ -138,7 +138,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
         new ColumnFilter('test', 'in', "1");
     }
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Filter IN requires an array, NULL given.
      */
     public function testInWrongParam3()
@@ -147,7 +147,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Filter IN requires a non-empty array, empty array given.
      */
     public function testInWrongParam4()
@@ -156,7 +156,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Filter NOT IN requires an array, integer given.
      */
     public function testNotInWrongParam1()
@@ -165,7 +165,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Filter NOT IN requires an array, string given.
      */
     public function testNotInWrongParam2()
@@ -173,7 +173,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
         new ColumnFilter('test', 'not in', "1");
     }
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Filter NOT IN requires an array, NULL given.
      */
     public function testNotInWrongParam3()
@@ -182,7 +182,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Filter NOT IN requires a non-empty array, empty array given.
      */
     public function testNotInWrongParam4()
@@ -200,7 +200,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Filter BETWEEN requires an array, string given.
      */
     public function testBetweenWrongParam1()
@@ -209,7 +209,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Filter BETWEEN requires an array, NULL given.
      */
     public function testBetweenWrongParam2()
@@ -218,7 +218,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Filter BETWEEN requires an array with 2 values, given array has 1 values.
      */
     public function testBetweenWrongParam3()
@@ -227,7 +227,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Unknown filter operation [XXX]
      */
     public function testUnknownOp()

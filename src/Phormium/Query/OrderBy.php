@@ -2,7 +2,7 @@
 
 namespace Phormium\Query;
 
-use Phormium\Exception\OrmException;
+use Phormium\Exception\InvalidQueryException;
 use Phormium\Query\ColumnOrder;
 
 /**
@@ -21,13 +21,13 @@ class OrderBy
     public function __construct(array $orders)
     {
         if (empty($orders)) {
-            throw new OrmException("OrderBy needs at least one ColumnOrder element, empty array given.");
+            throw new InvalidQueryException("OrderBy needs at least one ColumnOrder element, empty array given.");
         }
 
         foreach ($orders as $order) {
             if (!($order instanceof ColumnOrder)) {
                 $type = gettype($order);
-                throw new OrmException("Expected \$orders to be instances of Phormium\\Query\\ColumnOrder. Given [$type].");
+                throw new InvalidQueryException("Expected \$orders to be instances of Phormium\\Query\\ColumnOrder. Given [$type].");
             }
         }
 
