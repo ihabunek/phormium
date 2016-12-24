@@ -7,7 +7,7 @@ linked via a foreign key.
 
 Consider a Person and Contact tables like these:
 
-.. image:: ./images/relation.png
+.. image:: ./images/relation.jpg
 
 The Contact table has a foreign key which references the Person table via
 the ``person_id`` field. This makes Person the parent table, and Contact the
@@ -138,7 +138,7 @@ Relations also work for tables with composite primary/foreign keys.
 
 For example, consider these tables:
 
-.. image:: ./images/relation-composite.png
+.. image:: ./images/relation-composite.jpg
 
 Models for these tables can be implemented as:
 
@@ -155,6 +155,8 @@ Models for these tables can be implemented as:
         public $date;
 
         public $no;
+
+        public $content;
 
         public function tags()
         {
@@ -177,6 +179,8 @@ Models for these tables can be implemented as:
         public $post_date;
 
         public $post_no;
+
+        public $value;
 
         public function post()
         {
