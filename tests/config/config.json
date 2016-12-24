@@ -1,7 +1,0 @@
-{
-	"databases": {
-	    "mydb": {
-	        "dsn": "sqlite:tmp/test.db"
-	    }
-    }
-}
