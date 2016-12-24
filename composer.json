@@ -23,9 +23,6 @@
     "require-dev": {
         "mockery/mockery": "@stable"
     },
-    "suggest": {
-        "apache/log4php": "Required for query logging"
-    },
     "autoload": {
         "psr-0": {"Phormium": "src/"}
     },
