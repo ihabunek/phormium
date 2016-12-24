@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <phpunit bootstrap="../bootstrap.php" colors="true">
-    <testsuite name="Phormium test suite">
-        <directory>../../../tests/Phormium/Tests</directory>
+    <testsuite name="unit">
+        <directory>../../../tests/unit</directory>
+    </testsuite>
+    <testsuite name="integration">
+        <directory>../../../tests/integration</directory>
     </testsuite>
     <filter>
         <whitelist>
