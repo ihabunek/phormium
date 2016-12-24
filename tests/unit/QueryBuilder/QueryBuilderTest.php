@@ -1,6 +1,6 @@
 <?php
 
-namespace Phormium\Tests\QueryBuilder;
+namespace Phormium\Tests\Unit\QueryBuilder;
 
 use Phormium\Database\Driver;
 use Phormium\Filter\Filter;
@@ -12,6 +12,10 @@ use Phormium\Query\QuerySegment;
 use Phormium\QueryBuilder\QueryBuilderFactory;
 use Phormium\QueryBuilder\QueryBuilderInterface;
 
+/**
+ * @group unit
+ * @group querybuilder
+ */
 class QueryBuilderTest extends \PHPUnit_Framework_TestCase
 {
     /** @return QueryBuilderInterface */

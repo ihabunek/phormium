@@ -1,6 +1,6 @@
 <?php
 
-namespace Phormium\Tests;
+namespace Phormium\Tests\Integration;
 
 use Phormium\Connection;
 use Phormium\Event;
@@ -13,7 +13,7 @@ use PDOException;
 /**
  * @group connection
  */
-class ConnectionTest extends \PHPUnit_Framework_TestCase
+class ConnectionTest extends DbTest
 {
     private $connection;
     private $driver;
@@ -32,11 +32,6 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         'query.completed',
         'query.error',
     ];
-
-    public static function setUpBeforeClass()
-    {
-        Orm::configure(PHORMIUM_CONFIG_FILE);
-    }
 
     public function setUp()
     {

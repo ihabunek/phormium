@@ -31,7 +31,9 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Phormium\\Tests\\Models\\": "tests/models/"
+            "Phormium\\Tests\\Integration\\": "tests/integration/",
+            "Phormium\\Tests\\Models\\": "tests/models/",
+            "Phormium\\Tests\\Unit\\": "tests/unit/"
         }
     },
     "support": {

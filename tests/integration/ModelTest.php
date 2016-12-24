@@ -1,6 +1,6 @@
 <?php
 
-namespace Phormium\Tests;
+namespace Phormium\Tests\Integration;
 
 use Phormium\Orm;
 use Phormium\Database\Driver;
@@ -703,5 +703,14 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $expected .= "\n\n";
 
         $this->assertSame($expected, $actual);
+    }
+
+    public function testGetMeta()
+    {
+        // Just to improve code coverage
+        $meta1 = Person::getMeta();
+        $meta2 = Person::objects()->getMeta();
+
+        $this->assertSame($meta1, $meta2);
     }
 }

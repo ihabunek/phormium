@@ -1,6 +1,6 @@
 <?php
 
-namespace Phormium\Tests;
+namespace Phormium\Tests\Integration;
 
 use Phormium\Orm;
 use Phormium\Printer;

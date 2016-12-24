@@ -1,12 +1,11 @@
 <?php
 
-namespace Phormium\Tests;
+namespace Phormium\Tests\Integration;
 
 use Phormium\Filter\ColumnFilter;
 use Phormium\Filter\Filter;
 use Phormium\Orm;
 use Phormium\QuerySet;
-
 use Phormium\Tests\Models\Person;
 
 /**

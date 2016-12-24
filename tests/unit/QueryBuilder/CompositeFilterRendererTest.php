@@ -1,6 +1,6 @@
 <?php
 
-namespace Phormium\Tests\QueryBuilder;
+namespace Phormium\Tests\Unit\QueryBuilder;
 
 use Phormium\Filter\ColumnFilter;
 use Phormium\Filter\CompositeFilter;
@@ -9,6 +9,10 @@ use Phormium\Query\QuerySegment;
 use Phormium\QueryBuilder\Common\FilterRenderer;
 use Phormium\QueryBuilder\Common\Quoter;
 
+/**
+ * @group unit
+ * @group querybuilder
+ */
 class CompositeRendererTest extends \PHPUnit_Framework_TestCase
 {
     private function render(Filter $filter)

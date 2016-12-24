@@ -1,15 +1,15 @@
 <?php
 
-namespace Phormium\Tests\Helper;
+namespace Phormium\Tests\Unit\Helper;
 
 use Phormium\Helper\Assert;
 
 /**
+ * @group unit
  * @group helper
  */
 class AssertTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testIsInteger()
     {
         $this->assertTrue(Assert::isInteger(10));

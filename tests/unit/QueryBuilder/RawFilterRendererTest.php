@@ -1,6 +1,6 @@
 <?php
 
-namespace Phormium\Tests\QueryBuilder;
+namespace Phormium\Tests\Unit\QueryBuilder;
 
 use Phormium\Filter\Filter;
 use Phormium\Filter\RawFilter;
@@ -8,6 +8,10 @@ use Phormium\Query\QuerySegment;
 use Phormium\QueryBuilder\Common\FilterRenderer;
 use Phormium\QueryBuilder\Common\Quoter;
 
+/**
+ * @group unit
+ * @group querybuilder
+ */
 class RawFilterRendererTest extends \PHPUnit_Framework_TestCase
 {
     private function render(Filter $filter)

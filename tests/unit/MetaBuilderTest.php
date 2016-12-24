@@ -1,16 +1,69 @@
 <?php
 
-namespace Phormium\Tests;
+namespace Phormium\Tests\Unit;
 
+use Phormium\Meta;
 use Phormium\MetaBuilder;
 
+/**
+ * @group unit
+ */
 class MetaBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    public function testPersonMeta()
+    {
+        $table = 'person';
+        $class = 'Phormium\\Tests\\Models\\Person';
+        $database = 'testdb';
+        $columns = ['id', 'name', 'email', 'birthday', 'created', 'income', 'is_cool'];
+        $pk = ['id'];
+        $nonPK = ['name', 'email', 'birthday', 'created', 'income', 'is_cool'];
+
+        $expected = new Meta($table, $database, $class, $columns, $pk, $nonPK);
+
+        $builder = new MetaBuilder();
+        $actual = $builder->build($class);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testTradeMeta()
+    {
+        $table = 'trade';
+        $class = 'Phormium\\Tests\\Models\\Trade';
+        $database = 'testdb';
+        $columns = ['tradedate', 'tradeno', 'price', 'quantity'];
+        $pk = ['tradedate', 'tradeno'];
+        $nonPK = ['price', 'quantity'];
+
+        $expected = new Meta($table, $database, $class, $columns, $pk, $nonPK);
+
+        $builder = new MetaBuilder();
+        $actual = $builder->build($class);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testPkLessMeta()
+    {
+        $table = 'pkless';
+        $class = 'Phormium\\Tests\\Models\\PkLess';
+        $database = 'testdb';
+        $columns = ['foo', 'bar', 'baz'];
+        $pk = null;
+        $nonPK = ['foo', 'bar', 'baz'];
+
+        $expected = new Meta($table, $database, $class, $columns, $pk, $nonPK);
+
+        $builder = new MetaBuilder();
+        $actual = $builder->build($class);
+        $this->assertEquals($expected, $actual);
+    }
+
     public function testParse1()
     {
         $builder = new MetaBuilder();
         $meta = $builder->build("Phormium\\Tests\\Models\\Model1");
 
+        $this->assertInstanceOf(Meta::class, $meta);
         $this->assertSame('model1', $meta->getTable());
         $this->assertSame('database1', $meta->getDatabase());
         $this->assertSame(['id', 'foo', 'bar', 'baz'], $meta->getColumns());
@@ -24,6 +77,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = new MetaBuilder();
         $meta = $builder->build("Phormium\\Tests\\Models\\Model2");
 
+        $this->assertInstanceOf(Meta::class, $meta);
         $this->assertSame('model2', $meta->getTable());
         $this->assertSame('database1', $meta->getDatabase());
         $this->assertSame(['foo', 'bar', 'baz'], $meta->getColumns());

@@ -1,21 +1,17 @@
 <?php
 
-namespace Phormium\Tests;
+namespace Phormium\Tests\Integration;
 
 use Phormium\Orm;
 use Phormium\Query\Aggregate;
 use Phormium\Tests\Models\Trade;
 
 /**
+ * @group integration
  * @group aggregate
  */
-class AggregateTest extends \PHPUnit_Framework_TestCase
+class AggregateTest extends DbTest
 {
-    public static function setUpBeforeClass()
-    {
-        Orm::configure(PHORMIUM_CONFIG_FILE);
-    }
-
     public function testAggregates()
     {
         $tradedate = date('Y-m-d');
