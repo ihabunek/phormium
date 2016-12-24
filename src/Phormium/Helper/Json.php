@@ -2,6 +2,8 @@
 
 namespace Phormium\Helper;
 
+use Phormium\Exception\OrmException;
+
 /**
  * Encodes and decodes JSON.
  */
@@ -18,7 +20,7 @@ class Json
 
         if ($json === false) {
             $msg = json_last_error_msg();
-            throw new \Exception("Failed dumping JSON: $msg");
+            throw new OrmException("Failed dumping JSON: $msg");
         }
 
         return $json;
@@ -36,7 +38,7 @@ class Json
         $errorCode = json_last_error();
         if ($errorCode !== JSON_ERROR_NONE) {
             $msg = json_last_error_msg();
-            throw new \Exception("Failed parsing JSON: $msg");
+            throw new OrmException("Failed parsing JSON: $msg");
         }
 
         return $data;

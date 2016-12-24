@@ -2,6 +2,7 @@
 
 namespace Phormium\QueryBuilder\Common;
 
+use Phormium\Exception\OrmException;
 use Phormium\Filter\ColumnFilter;
 use Phormium\Filter\CompositeFilter;
 use Phormium\Filter\Filter;
@@ -34,7 +35,7 @@ class FilterRenderer
             return $this->renderRawFilter($filter);
         }
 
-        throw new \InvalidArgumentException("Unknown filter class: " . get_class($filter));
+        throw new OrmException("Unknown filter class: " . get_class($filter));
     }
 
     public function renderRawFilter(RawFilter $filter)
@@ -47,7 +48,7 @@ class FilterRenderer
         $subFilters = $filter->filters();
 
         if (empty($subFilters)) {
-            throw new \Exception("Canot render composite filter. No filters defined.");
+            throw new OrmException("Canot render composite filter. No filters defined.");
         }
 
         if (count($subFilters) === 1) {
@@ -111,7 +112,7 @@ class FilterRenderer
                 return $this->renderBetween($column, $operation, $value);
 
             default:
-                throw new \Exception("Unknown filter operation [{$operation}].");
+                throw new OrmException("Unknown filter operation [{$operation}].");
         }
     }
 

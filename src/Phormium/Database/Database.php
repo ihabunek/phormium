@@ -4,6 +4,7 @@ namespace Phormium\Database;
 
 use Evenement\EventEmitter;
 use Phormium\Event;
+use Phormium\Exception\DatabaseException;
 
 /**
  * Handles database connections.
@@ -85,12 +86,12 @@ class Database
      * @param string     $name       Connection name
      * @param Connection $connection The connection object
      *
-     * @throws \Exception If the connection with the given name already exists.
+     * @throws DatabaseException If the connection with the given name already exists.
      */
     public function setConnection($name, Connection $connection)
     {
         if (isset($this->connections[$name])) {
-            throw new \Exception("Connection \"$name\" is already connected. " .
+            throw new DatabaseException("Connection \"$name\" is already connected. " .
                 "Please disconnect it before calling setConnection().");
         }
 
@@ -141,7 +142,7 @@ class Database
     public function begin()
     {
         if ($this->beginTriggered) {
-            throw new \Exception("Already in transaction.");
+            throw new DatabaseException("Already in transaction.");
         }
 
         $this->beginTriggered = true;
@@ -153,7 +154,7 @@ class Database
     public function commit()
     {
         if (!$this->beginTriggered) {
-            throw new \Exception("Cannot commit. Not in transaction.");
+            throw new DatabaseException("Cannot commit. Not in transaction.");
         }
 
         // Commit all started transactions
@@ -173,7 +174,7 @@ class Database
     public function rollback()
     {
         if (!$this->beginTriggered) {
-            throw new \Exception("Cannot roll back. Not in transaction.");
+            throw new DatabaseException("Cannot roll back. Not in transaction.");
         }
 
         // Roll back all started transactions
@@ -199,7 +200,7 @@ class Database
             $callback();
         } catch (\Exception $ex) {
             $this->rollback();
-            throw new \Exception("Transaction failed. Rolled back.", 0, $ex);
+            throw new DatabaseException("Transaction failed. Rolled back.", 0, $ex);
         }
 
         $this->commit();

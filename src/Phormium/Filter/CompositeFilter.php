@@ -2,6 +2,8 @@
 
 namespace Phormium\Filter;
 
+use Phormium\Exception\InvalidQueryException;
+
 /**
  * A filter which consists of several Filter objects which are joined by an
  * AND or OR operation.
@@ -22,7 +24,7 @@ class CompositeFilter extends Filter
         $operations = [self::OP_AND, self::OP_OR];
         if (!in_array($operation, $operations)) {
             $operations = implode(', ', $operations);
-            throw new \Exception("Invalid composite filter operation [$operation]. Expected one of: $operations");
+            throw new InvalidQueryException("Invalid composite filter operation [$operation]. Expected one of: $operations");
         }
 
         foreach ($filters as &$filter) {
@@ -32,7 +34,7 @@ class CompositeFilter extends Filter
 
             if (!($filter instanceof Filter)) {
                 $type = gettype($filter);
-                throw new \Exception("CompositeFilter requires an array of Filter objects as second argument, got [$type].");
+                throw new InvalidQueryException("CompositeFilter requires an array of Filter objects as second argument, got [$type].");
             }
         }
 

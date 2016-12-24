@@ -84,15 +84,15 @@ class MetaBuilder
     private function checkModel($class)
     {
         if (!is_string($class)) {
-            throw new \InvalidArgumentException("Invalid model given");
+            throw new InvalidModelException("Invalid model given");
         }
 
         if (!class_exists($class)) {
-            throw new \InvalidArgumentException("Class \"$class\" does not exist.");
+            throw new InvalidModelException("Class \"$class\" does not exist.");
         }
 
         if (!is_subclass_of($class, "Phormium\\Model")) {
-            throw new \InvalidArgumentException("Class \"$class\" is not a subclass of Phormium\\Model.");
+            throw new InvalidModelException("Class \"$class\" is not a subclass of Phormium\\Model.");
         }
     }
 

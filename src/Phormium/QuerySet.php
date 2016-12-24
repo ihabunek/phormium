@@ -3,6 +3,8 @@
 namespace Phormium;
 
 use PDO;
+use Phormium\Exception\InvalidQueryException;
+use Phormium\Exception\OrmException;
 use Phormium\Filter\ColumnFilter;
 use Phormium\Filter\CompositeFilter;
 use Phormium\Filter\Filter;
@@ -231,8 +233,9 @@ class QuerySet implements \IteratorAggregate
      * exception if query matches zero rows. If set to TRUE, will return null if
      * query matches zero rows.
      *
-     * @throws \Exception If multiple rows are found.
-     * @throws \Exception If no rows are found and $allowEmpty is FALSE.
+     * @throws OrmException If multiple rows are found.
+     * @throws OrmException If no rows are found and $allowEmpty is FALSE.
+     *
      * @return Model
      */
     public function single($allowEmpty = false)
@@ -241,11 +244,11 @@ class QuerySet implements \IteratorAggregate
         $count = count($data);
 
         if ($count > 1) {
-            throw new \Exception("Query returned $count rows. Requested a single row.");
+            throw new OrmException("Query returned $count rows. Requested a single row.");
         }
 
         if ($count == 0 && !$allowEmpty) {
-            throw new \Exception("Query returned 0 rows. Requested a single row.");
+            throw new OrmException("Query returned 0 rows. Requested a single row.");
         }
 
         return isset($data[0]) ? $data[0] : null;
@@ -432,7 +435,7 @@ class QuerySet implements \IteratorAggregate
             return ColumnFilter::fromArray($argv);
         }
 
-        throw new \InvalidArgumentException("Invalid filter arguments.");
+        throw new InvalidQueryException("Invalid filter arguments.");
     }
 
     /**
@@ -467,7 +470,7 @@ class QuerySet implements \IteratorAggregate
 
         if (isset($column) && !$this->meta->columnExists($column)) {
             $table = $this->meta->getTable();
-            throw new \Exception("Invalid filter: Column [$column] does not exist in table [$table].");
+            throw new InvalidQueryException("Invalid filter: Column [$column] does not exist in table [$table].");
         }
     }
 
@@ -482,7 +485,7 @@ class QuerySet implements \IteratorAggregate
     {
         if (!$this->meta->columnExists($column)) {
             $table = $this->meta->getTable();
-            throw new \Exception("Cannot order by column [$column] because it does not exist in table [$table].");
+            throw new InvalidQueryException("Cannot order by column [$column] because it does not exist in table [$table].");
         }
 
         $order = new ColumnOrder($column, $direction);

@@ -56,7 +56,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Phormium\Exception\DatabaseException
      * @expectedExceptionMessage Connection "foo" is already connected.
      */
     public function testSetConnectionError()
@@ -116,7 +116,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException Phormium\Exception\DatabaseException
      * @expectedExceptionMessage Already in transaction.
      */
     public function testBeginTwice()
@@ -149,7 +149,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException Phormium\Exception\DatabaseException
      * @expectedExceptionMessage Cannot commit. Not in transaction.
      */
     public function testCommitOutsideOfTransaction()
@@ -181,7 +181,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException Phormium\Exception\DatabaseException
      * @expectedExceptionMessage Cannot roll back. Not in transaction.
      */
     public function testRollbackOutsideOfTransaction()
@@ -210,7 +210,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException Phormium\Exception\DatabaseException
      * @expectedExceptionMessage Transaction failed. Rolled back.
      */
     public function testTransactionCallbackRollback()

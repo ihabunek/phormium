@@ -87,7 +87,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException Phormium\Exception\InvalidModelException
      * @expectedExceptionMessage Invalid model given
      */
     public function testInvalidClass1()
@@ -97,7 +97,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException Phormium\Exception\InvalidModelException
      * @expectedExceptionMessage Class "Some\Class" does not exist.
      */
     public function testInvalidClass2()
@@ -107,7 +107,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException Phormium\Exception\InvalidModelException
      * @expectedExceptionMessage Class "Phormium\Tests\Models\NotModel" is not a subclass of Phormium\Model.
      */
     public function testInvalidClass3()

@@ -78,9 +78,9 @@ class QuerySegment
      * Implodes an array of QuerySegment by inserting a separator QuerySegment
      * between each two segments in the array, then reducing them.
      *
-     * @param  QuerySegment $separator [description]
-     * @param  array        $segments  [description]
-     * @return [type]                  [description]
+     * @param  QuerySegment    $separator
+     * @param  QuerySegment[]  $segments
+     * @return QuerySegment
      */
     public static function implode(QuerySegment $separator, array $segments)
     {

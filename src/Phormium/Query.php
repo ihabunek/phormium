@@ -3,8 +3,9 @@
 namespace Phormium;
 
 use PDO;
-use Phormium\Database\Driver;
 use Phormium\Database\Database;
+use Phormium\Database\Driver;
+use Phormium\Exception\InvalidQueryException;
 use Phormium\Filter\Filter;
 use Phormium\Query\Aggregate;
 use Phormium\Query\LimitOffset;
@@ -103,7 +104,7 @@ class Query
         $table = $this->meta->getTable();
 
         if (empty($columns)) {
-            throw new \Exception("No columns given");
+            throw new InvalidQueryException("No columns given");
         }
 
         $this->checkColumnsExist($columns);
@@ -134,7 +135,7 @@ class Query
 
         if (!$this->meta->columnExists($column)) {
             if (!($type === Aggregate::COUNT && $column === '*')) {
-                throw new \Exception(
+                throw new InvalidQueryException(
                     "Error forming aggregate query. " .
                     "Column [$column] does not exist in table [$table]."
                 );
@@ -176,7 +177,7 @@ class Query
         if (!$pkAutogen) {
             foreach ($pkColumns as $column) {
                 if (!isset($model->{$column})) {
-                    throw new \Exception("Cannot insert. Primary key column(s) not set.");
+                    throw new InvalidQueryException("Cannot insert. Primary key column(s) not set.");
                 }
             }
         }
@@ -222,13 +223,13 @@ class Query
         $filter = $model::getPkFilter($model->getPK());
 
         if (empty($pkColumns)) {
-            throw new \Exception("Cannot update. Model does not have a primary key defined in _meta.");
+            throw new InvalidQueryException("Cannot update. Model does not have a primary key defined in _meta.");
         }
 
         // All pk fields must be set to attempt an update
         foreach ($pkColumns as $column) {
             if (!isset($model->{$column})) {
-                throw new \Exception("Cannot update. Primary key column [$column] is not set.");
+                throw new InvalidQueryException("Cannot update. Primary key column [$column] is not set.");
             }
         }
 
@@ -302,7 +303,7 @@ class Query
         foreach ($columns as $column) {
             if (!$this->meta->columnExists($column)) {
                 $table = $this->meta->getTable();
-                throw new \Exception("Column [$column] does not exist in table [$table].");
+                throw new InvalidQueryException("Column [$column] does not exist in table [$table].");
             }
         }
     }

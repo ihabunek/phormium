@@ -2,6 +2,8 @@
 
 namespace Phormium\Query;
 
+use Phormium\Exception\InvalidQueryException;
+
 /**
  * Generates the SELECT clause for aggregate statements.
  */
@@ -26,14 +28,14 @@ class Aggregate
 
         if (!in_array($type, $types)) {
             $types = implode(', ', $types);
-            throw new \Exception("Invalid aggregate type [$type]. Supported types: $types.");
+            throw new InvalidQueryException("Invalid aggregate type [$type]. Supported types: $types.");
         }
 
         if (!isset($column)) {
             if ($type === self::COUNT) {
                 $column = "*";
             } else {
-                throw new \Exception("Aggregate type [$type] requires a column to be given.");
+                throw new InvalidQueryException("Aggregate type [$type] requires a column to be given.");
             }
         }
 

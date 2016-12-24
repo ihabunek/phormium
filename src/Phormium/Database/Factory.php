@@ -3,8 +3,8 @@
 namespace Phormium\Database;
 
 use Evenement\EventEmitter;
-
 use PDO;
+use Phormium\Exception\DatabaseException;
 
 /**
  * Database Connection factory.
@@ -35,7 +35,7 @@ class Factory
     public function newConnection($name)
     {
         if (!isset($this->databases[$name])) {
-            throw new \Exception("Database \"$name\" is not configured.");
+            throw new DatabaseException("Database \"$name\" is not configured.");
         }
 
         // Extract settings
@@ -65,7 +65,7 @@ class Factory
         // Apply the attributes
         foreach ($attributes as $key => $value) {
             if (!$pdo->setAttribute($key, $value)) {
-                throw new \Exception("Failed setting PDO attribute \"$key\" to \"$value\" on database \"$name\".");
+                throw new DatabaseException("Failed setting PDO attribute \"$key\" to \"$value\" on database \"$name\".");
             }
         }
 

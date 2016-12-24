@@ -2,6 +2,8 @@
 
 namespace Phormium\Config;
 
+use Phormium\Exception\ConfigurationException;
+
 class PostProcessor
 {
     /**
@@ -42,7 +44,7 @@ class PostProcessor
         $count = preg_match('/^([a-z]+):/', $dsn, $matches);
 
         if ($count !== 1) {
-            throw new \Exception("Invalid DSN: \"$dsn\". The DSN should start with '<driver>:'");
+            throw new ConfigurationException("Invalid DSN: \"$dsn\". The DSN should start with '<driver>:'");
         }
 
         return $matches[1];
@@ -56,13 +58,13 @@ class PostProcessor
             try {
                 $procName = $this->processConstant($name, false);
             } catch (\Exception $ex) {
-                throw new \Exception("Invalid attribute \"$name\" specified in configuration for database \"$dbName\".");
+                throw new ConfigurationException("Invalid attribute \"$name\" specified in configuration for database \"$dbName\".");
             }
 
             try {
                 $procValue = $this->processConstant($value, true);
             } catch (\Exception $ex) {
-                throw new \Exception("Invalid value given for attribute \"$name\", in configuration for database \"$dbName\".");
+                throw new ConfigurationException("Invalid value given for attribute \"$name\", in configuration for database \"$dbName\".");
             }
 
             $processed[$procName] = $procValue;
@@ -89,6 +91,6 @@ class PostProcessor
             return $value;
         }
 
-        throw new \Exception("Invalid constant value");
+        throw new ConfigurationException("Invalid constant value");
     }
 }

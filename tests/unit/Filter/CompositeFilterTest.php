@@ -55,7 +55,7 @@ class CompositeFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Invalid composite filter operation [foo]. Expected one of: AND, OR
      */
     public function testInvalidOperation()
@@ -64,7 +64,7 @@ class CompositeFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage CompositeFilter requires an array of Filter objects as second argument, got [string].
      */
     public function testInvalidSubfilter()

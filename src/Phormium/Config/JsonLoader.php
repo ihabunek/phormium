@@ -2,6 +2,8 @@
 
 namespace Phormium\Config;
 
+use Phormium\Exception\OrmException;
+use Phormium\Exception\ConfigurationException;
 use Phormium\Helper\Json;
 
 /**
@@ -11,9 +13,13 @@ class JsonLoader extends FileLoader
 {
     public function load($resource, $type = null)
     {
-        $data = $this->loadFile($resource);
+        $json = $this->loadFile($resource);
 
-        return Json::parse($data, true);
+        try {
+            return Json::parse($json, true);
+        } catch (OrmException $ex) {
+            throw new ConfigurationException("Failed parsing JSON configuration file.", 0, $ex);
+        }
     }
 
     public function supports($resource, $type = null)

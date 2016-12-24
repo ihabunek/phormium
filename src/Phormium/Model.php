@@ -2,7 +2,9 @@
 
 namespace Phormium;
 
+use Phormium\Exception\InvalidQueryException;
 use Phormium\Exception\ModelNotFoundException;
+use Phormium\Exception\OrmException;
 use Phormium\Filter\CompositeFilter;
 use Phormium\Filter\Filter;
 use Phormium\Helper\Json;
@@ -216,13 +218,13 @@ abstract class Model
 
         if (empty($columns)) {
             $class = get_called_class();
-            throw new \Exception("Primary key not defined for model [$class].");
+            throw new OrmException("Primary key not defined for model [$class].");
         }
 
         if (count($columns) !== count($values)) {
             $format = "Model [%s] has %d primary key columns. %d arguments given.";
             $msg = sprintf($format, get_called_class(), count($columns), count($values));
-            throw new \Exception($msg);
+            throw new OrmException($msg);
         }
 
         if (count($columns) === 1) {
@@ -254,7 +256,7 @@ abstract class Model
         $pkColumns = self::getMeta()->getPkColumns();
 
         if ($pkColumns === null) {
-            throw new \Exception("Model not writable because primary key is not defined in _meta.");
+            throw new OrmException("Model not writable because primary key is not defined in _meta.");
         }
 
         // Check if all primary key columns are populated
@@ -343,7 +345,7 @@ abstract class Model
         }
 
         if (!is_array($values)) {
-            throw new \Exception("Given argument is not an array.");
+            throw new OrmException("Given argument is not an array.");
         }
 
         foreach ($values as $name => $value) {
@@ -352,7 +354,7 @@ abstract class Model
             } else {
                 if ($strict) {
                     $class = get_class($this);
-                    throw new \Exception("Property [$name] does not exist in class [$class].");
+                    throw new OrmException("Property [$name] does not exist in class [$class].");
                 }
             }
         }

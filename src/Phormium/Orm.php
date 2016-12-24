@@ -27,7 +27,7 @@ class Orm
     public static function container()
     {
         if (!isset(self::$container)) {
-            throw new \Exception("Phormium is not configured.");
+            throw new OrmException("Phormium is not configured.");
         }
 
         return self::$container;

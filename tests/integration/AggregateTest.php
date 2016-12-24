@@ -63,7 +63,7 @@ class AggregateTest extends DbTest
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException Phormium\Exception\InvalidQueryException
      * @expectedExceptionMessage Error forming aggregate query. Column [xxx] does not exist in table [trade].
      */
     public function testInvalidColumn()

@@ -46,6 +46,21 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
         unlink($tempFile);
     }
 
+    /**
+     * @expectedException Phormium\Exception\ConfigurationException
+     * @expectedExceptionMessage Failed parsing JSON configuration file.
+     */
+    public function testJsonLoaderInvalidSyntax()
+    {
+        $tempFile = tempnam(sys_get_temp_dir(), "pho") . ".json";
+        file_put_contents($tempFile, "this is not json");
+
+        $loader = new JsonLoader();
+        $loader->load($tempFile);
+
+        unlink($tempFile);
+    }
+
     public function testYamlLoader()
     {
         $config = ['foo' => 'bar'];
@@ -68,7 +83,7 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException Phormium\Exception\ConfigurationException
      * @expectedExceptionMessage Config file not found at "doesnotexist.yaml".
      */
     public function testLoadFileFailed()

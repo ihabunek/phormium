@@ -31,7 +31,7 @@ class PostProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException Phormium\Exception\ConfigurationException
      * @expectedExceptionMessage Invalid constant value
      */
     public function testProcessConstantError1()
@@ -41,7 +41,7 @@ class PostProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException Phormium\Exception\ConfigurationException
      * @expectedExceptionMessage Invalid constant value
      */
     public function testProcessConstantError2()
@@ -89,7 +89,7 @@ class PostProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException Phormium\Exception\ConfigurationException
      * @expectedExceptionMessage Invalid attribute "foo" specified in configuration for database "one".
      */
     public function testProcessConfigError1()
@@ -108,7 +108,7 @@ class PostProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException Phormium\Exception\ConfigurationException
      * @expectedExceptionMessage Invalid value given for attribute "PDO::ATTR_TIMEOUT", in configuration for database "one".
      */
     public function testProcessConfigError2()

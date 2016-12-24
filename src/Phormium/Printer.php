@@ -2,6 +2,8 @@
 
 namespace Phormium;
 
+use Phormium\Exception\OrmException;
+
 /**
  * Helper class for printing QuerySet data to the console.
  */
@@ -33,7 +35,7 @@ class Printer
             return $this->dumpArray($input, $return);
         }
 
-        throw new \Exception("Invalid input for dump(): not array or QuerySet.");
+        throw new OrmException("Invalid input for dump(): not array or QuerySet.");
     }
 
     /** Dump implementation for arrays. */
@@ -45,7 +47,7 @@ class Printer
 
         $firstRow = $array[0];
         if (!is_array($firstRow)) {
-            throw new \Exception("Invalid input for dump(): first element not an array.");
+            throw new OrmException("Invalid input for dump(): first element not an array.");
         }
 
         $columns = array_keys($firstRow);
@@ -82,7 +84,7 @@ class Printer
             }
 
             if (!is_array($item)) {
-                throw new \Exception("Invalid input for dump(): element not an array or Model.");
+                throw new OrmException("Invalid input for dump(): element not an array or Model.");
             }
 
             foreach ($columns as $column) {

@@ -2,6 +2,7 @@
 
 namespace Phormium\Config;
 
+use Phormium\Exception\ConfigurationException;
 use Symfony\Component\Config\Loader\Loader;
 
 /**
@@ -12,12 +13,12 @@ abstract class FileLoader extends Loader
     protected function loadFile($path)
     {
         if (!file_exists($path)) {
-            throw new \Exception("Config file not found at \"$path\".");
+            throw new ConfigurationException("Config file not found at \"$path\".");
         }
 
         $data = file_get_contents($path);
         if ($data === false) {
-            throw new \Exception("Error loading config file from \"$path\".");
+            throw new ConfigurationException("Error loading config file from \"$path\".");
         }
 
         return $data;

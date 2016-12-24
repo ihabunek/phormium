@@ -2,7 +2,7 @@
 
 namespace Phormium\Query;
 
-use Phormium\Exception\OrmException;
+use Phormium\Exception\InvalidQueryException;
 
 /**
  * A value object representing ordering by a column, a part of the ORDER BY
@@ -36,12 +36,12 @@ class ColumnOrder
 
         if (!in_array($direction, $directions)) {
             $directions = implode(", ", $directions);
-            throw new OrmException("Invalid \$direction [$direction]. Expected one of [$directions].");
+            throw new InvalidQueryException("Invalid \$direction [$direction]. Expected one of [$directions].");
         }
 
         if (!is_string($column)) {
             $type = gettype($column);
-            throw new OrmException("Invalid \$column type [$type], expected string.");
+            throw new InvalidQueryException("Invalid \$column type [$type], expected string.");
         }
 
         $this->column = $column;
