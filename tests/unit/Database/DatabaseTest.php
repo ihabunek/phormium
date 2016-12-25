@@ -4,6 +4,7 @@ namespace Phormium\Tests\Unit\Database;
 
 use Evenement\EventEmitter;
 use Mockery as m;
+use Phormium\Database\Connection;
 use Phormium\Database\Database;
 use Phormium\Database\Factory;
 use Phormium\Event;
@@ -21,7 +22,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
     protected function getMockEmitter()
     {
-        $emitter = m::mock("Evenement\\EventEmitter");
+        $emitter = m::mock(EventEmitter::class);
 
         $emitter->shouldReceive('on')->once()
             ->with(Event::QUERY_STARTED, m::type('callable'));
@@ -34,7 +35,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
     protected function newDatabase(Factory $factory = null, EventEmitter $emitter = null)
     {
         if (!isset($factory)) {
-            $factory = m::mock("Phormium\\Database\\Factory");
+            $factory = m::mock(Factory::class);
         }
 
         if (!isset($emitter)) {
@@ -46,7 +47,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
     public function testSetConnection()
     {
-        $conn = m::mock("Phormium\\Database\\Connection");
+        $conn = m::mock(Connection::class);
 
         $database = $this->newDatabase();
         $database->setConnection('foo', $conn);
@@ -61,7 +62,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetConnectionError()
     {
-        $conn = m::mock("Phormium\\Database\\Connection");
+        $conn = m::mock(Connection::class);
 
         $database = $this->newDatabase();
         $database->setConnection('foo', $conn);
@@ -73,7 +74,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
      */
     public function testDisconnect()
     {
-        $conn = m::mock("Phormium\\Database\\Connection");
+        $conn = m::mock(Connection::class);
 
         $database = $this->newDatabase();
         $database->setConnection('foo', $conn);
@@ -97,8 +98,8 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
     public function testDisconnectAll()
     {
-        $conn1 = m::mock("Phormium\\Database\\Connection");
-        $conn2 = m::mock("Phormium\\Database\\Connection");
+        $conn1 = m::mock(Connection::class);
+        $conn2 = m::mock(Connection::class);
 
         $database = $this->newDatabase();
         $database->setConnection('db1', $conn1);
@@ -128,8 +129,8 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
     public function testTransactionCommit()
     {
-        $conn1 = m::mock("Phormium\\Database\\Connection");
-        $conn2 = m::mock("Phormium\\Database\\Connection");
+        $conn1 = m::mock(Connection::class);
+        $conn2 = m::mock(Connection::class);
 
         $database = $this->newDatabase();
         $database->setConnection('db1', $conn1);
@@ -160,8 +161,8 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
     public function testTransactionRollback()
     {
-        $conn1 = m::mock("Phormium\\Database\\Connection");
-        $conn2 = m::mock("Phormium\\Database\\Connection");
+        $conn1 = m::mock(Connection::class);
+        $conn2 = m::mock(Connection::class);
 
         $database = $this->newDatabase();
         $database->setConnection('db1', $conn1);
@@ -192,7 +193,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
     public function testTransactionCallback()
     {
-        $conn = m::mock("Phormium\\Database\\Connection");
+        $conn = m::mock(Connection::class);
 
         $database = $this->newDatabase();
         $database->setConnection('db', $conn);
@@ -215,7 +216,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
      */
     public function testTransactionCallbackRollback()
     {
-        $conn = m::mock("Phormium\\Database\\Connection");
+        $conn = m::mock(Connection::class);
 
         $database = $this->newDatabase();
         $database->setConnection('db', $conn);
@@ -233,9 +234,9 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
     public function testGetConnection()
     {
-        $conn = m::mock("Phormium\\Database\\Connection");
+        $conn = m::mock(Connection::class);
 
-        $factory = m::mock("Phormium\\Database\\Factory");
+        $factory = m::mock(Factory::class);
         $factory->shouldReceive('newConnection')
             ->once()
             ->with('db1')

@@ -3,8 +3,10 @@
 namespace Phormium\Tests\Integration;
 
 use Phormium\Filter\ColumnFilter;
+use Phormium\Filter\CompositeFilter;
 use Phormium\Filter\Filter;
 use Phormium\Orm;
+use Phormium\Query\OrderBy;
 use Phormium\QuerySet;
 use Phormium\Tests\Models\Person;
 
@@ -54,7 +56,7 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEquals($qs1, $qs2);
         $this->assertNotSame($qs1, $qs2);
 
-        $this->assertInstanceOf("\\Phormium\\Filter\\CompositeFilter", $qs2->getFilter());
+        $this->assertInstanceOf(CompositeFilter::class, $qs2->getFilter());
         $this->assertCount(1, $qs2->getFilter()->filters());
 
         $this->assertEmpty($qs1->getOrder());
@@ -98,7 +100,7 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         $orderBy2 = $qs2->getOrder();
         $columnOrder = $orderBy2->orders()[0];
 
-        $this->assertInstanceOf("Phormium\\Query\\OrderBy", $orderBy2);
+        $this->assertInstanceOf(OrderBy::class, $orderBy2);
         $this->assertCount(1, $orderBy2->orders());
         $this->assertSame("name", $columnOrder->column());
         $this->assertSame("desc", $columnOrder->direction());
@@ -108,7 +110,7 @@ class QuerySetTest extends \PHPUnit_Framework_TestCase
         $columnOrder1 = $orderBy3->orders()[0];
         $columnOrder2 = $orderBy3->orders()[1];
 
-        $this->assertInstanceOf("Phormium\\Query\\OrderBy", $orderBy3);
+        $this->assertInstanceOf(OrderBy::class, $orderBy3);
         $this->assertNotSame($orderBy3, $orderBy2);
         $this->assertCount(2, $orderBy3->orders());
         $this->assertSame("name", $columnOrder1->column());

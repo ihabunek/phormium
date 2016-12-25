@@ -2,13 +2,12 @@
 
 namespace Phormium\Tests\Integration;
 
-use Phormium\Connection;
+use PDOException;
+use Phormium\Database\Connection;
 use Phormium\Event;
 use Phormium\Orm;
 use Phormium\Query\QuerySegment;
 use Phormium\Tests\Models\Person;
-
-use PDOException;
 
 /**
  * @group connection
@@ -211,7 +210,7 @@ class ConnectionTest extends DbTest
     {
         $segment = new QuerySegment("SELECT * FROM person WHERE name like ?", ['xxx']);
 
-        $class = "Phormium\\Tests\\Models\\Person";
+        $class = Person::class;
 
         $this->assertEmpty($this->triggeredEvents);
 
@@ -372,7 +371,7 @@ class ConnectionTest extends DbTest
             // Checks valid for all events
             $this->assertSame($segment->query(), $tArgs[0]);
             $this->assertSame($segment->args(), $tArgs[1]);
-            $this->assertInstanceOf("Phormium\\Database\\Connection", $tArgs[2]);
+            $this->assertInstanceOf(Connection::class, $tArgs[2]);
 
             // Check event argument count
             switch ($event) {

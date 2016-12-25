@@ -4,6 +4,16 @@ namespace Phormium\Tests\Unit;
 
 use Phormium\Meta;
 use Phormium\MetaBuilder;
+use Phormium\Tests\Models\Asset;
+use Phormium\Tests\Models\Contact;
+use Phormium\Tests\Models\Model1;
+use Phormium\Tests\Models\Model2;
+use Phormium\Tests\Models\NotModel;
+use Phormium\Tests\Models\InvalidModel1;
+use Phormium\Tests\Models\InvalidModel2;
+use Phormium\Tests\Models\Person;
+use Phormium\Tests\Models\PkLess;
+use Phormium\Tests\Models\Trade;
 
 /**
  * @group unit
@@ -13,7 +23,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     public function testPersonMeta()
     {
         $table = 'person';
-        $class = 'Phormium\\Tests\\Models\\Person';
+        $class = Person::class;
         $database = 'testdb';
         $columns = ['id', 'name', 'email', 'birthday', 'created', 'income', 'is_cool'];
         $pk = ['id'];
@@ -29,7 +39,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     public function testTradeMeta()
     {
         $table = 'trade';
-        $class = 'Phormium\\Tests\\Models\\Trade';
+        $class = Trade::class;
         $database = 'testdb';
         $columns = ['tradedate', 'tradeno', 'price', 'quantity'];
         $pk = ['tradedate', 'tradeno'];
@@ -45,7 +55,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     public function testPkLessMeta()
     {
         $table = 'pkless';
-        $class = 'Phormium\\Tests\\Models\\PkLess';
+        $class = PkLess::class;
         $database = 'testdb';
         $columns = ['foo', 'bar', 'baz'];
         $pk = null;
@@ -61,13 +71,13 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     public function testParse1()
     {
         $builder = new MetaBuilder();
-        $meta = $builder->build("Phormium\\Tests\\Models\\Model1");
+        $meta = $builder->build(Model1::class);
 
         $this->assertInstanceOf(Meta::class, $meta);
         $this->assertSame('model1', $meta->getTable());
         $this->assertSame('database1', $meta->getDatabase());
         $this->assertSame(['id', 'foo', 'bar', 'baz'], $meta->getColumns());
-        $this->assertSame('Phormium\\Tests\\Models\\Model1', $meta->getClass());
+        $this->assertSame(Model1::class, $meta->getClass());
         $this->assertSame(['id'], $meta->getPkColumns());
         $this->assertSame(['foo', 'bar', 'baz'], $meta->getNonPkColumns());
     }
@@ -75,13 +85,13 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     public function testParse2()
     {
         $builder = new MetaBuilder();
-        $meta = $builder->build("Phormium\\Tests\\Models\\Model2");
+        $meta = $builder->build(Model2::class);
 
         $this->assertInstanceOf(Meta::class, $meta);
         $this->assertSame('model2', $meta->getTable());
         $this->assertSame('database1', $meta->getDatabase());
         $this->assertSame(['foo', 'bar', 'baz'], $meta->getColumns());
-        $this->assertSame('Phormium\\Tests\\Models\\Model2', $meta->getClass());
+        $this->assertSame(Model2::class, $meta->getClass());
         $this->assertSame(['foo'], $meta->getPkColumns());
         $this->assertSame(['bar', 'baz'], $meta->getNonPkColumns());
     }
@@ -113,7 +123,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     public function testInvalidClass3()
     {
         $builder = new MetaBuilder();
-        $builder->build("Phormium\\Tests\\Models\\NotModel");
+        $builder->build(NotModel::class);
     }
 
     /**
@@ -123,7 +133,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     public function testParseErrorNotArray()
     {
         $builder = new MetaBuilder();
-        $builder->build("Phormium\\Tests\\Models\\InvalidModel1");
+        $builder->build(InvalidModel1::class);
     }
 
     /**
@@ -133,7 +143,7 @@ class MetaBuilderTest extends \PHPUnit_Framework_TestCase
     public function testParseNoColumns()
     {
         $builder = new MetaBuilder();
-        $builder->build("Phormium\\Tests\\Models\\InvalidModel2");
+        $builder->build(InvalidModel2::class);
     }
 
     /**

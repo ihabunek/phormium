@@ -39,12 +39,12 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
         // Load it from the database
         $p2 = Person::get($id);
-        $this->assertInstanceOf("Phormium\\Tests\\Models\\Person", $p2);
+        $this->assertInstanceOf(Person::class, $p2);
         $this->assertEquals($p, $p2);
 
         // Alternative get
         $p3 = Person::get([$id]);
-        $this->assertInstanceOf("Phormium\\Tests\\Models\\Person", $p3);
+        $this->assertInstanceOf(Person::class, $p3);
         $this->assertEquals($p, $p3);
     }
 
@@ -110,12 +110,12 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
         // Load it from the database
         $t2 = Trade::get($date, $no);
-        $this->assertInstanceOf("Phormium\\Tests\\Models\\Trade", $t2);
+        $this->assertInstanceOf(Trade::class, $t2);
         $this->assertEquals($t, $t2);
 
         // Alternative get
         $t3 = Trade::get([$date, $no]);
-        $this->assertInstanceOf("Phormium\\Tests\\Models\\Trade", $t3);
+        $this->assertInstanceOf(Trade::class, $t3);
         $this->assertEquals($t, $t3);
     }
 

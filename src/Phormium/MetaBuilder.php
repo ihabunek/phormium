@@ -3,7 +3,7 @@
 namespace Phormium;
 
 use Phormium\Exception\InvalidModelException;
-
+use Phormium\Model;
 use ReflectionClass;
 use ReflectionProperty;
 
@@ -91,7 +91,7 @@ class MetaBuilder
             throw new InvalidModelException("Class \"$class\" does not exist.");
         }
 
-        if (!is_subclass_of($class, "Phormium\\Model")) {
+        if (!is_subclass_of($class, Model::class)) {
             throw new InvalidModelException("Class \"$class\" is not a subclass of Phormium\\Model.");
         }
     }

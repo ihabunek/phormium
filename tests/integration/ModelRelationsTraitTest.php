@@ -3,6 +3,7 @@
 namespace Phormium\Tests\Integration;
 
 use Phormium\Orm;
+use Phormium\QuerySet;
 use Phormium\Tests\Models\Person;
 use Phormium\Tests\Models\Contact;
 use Phormium\Tests\Models\Asset;
@@ -36,16 +37,16 @@ class ModelRelationsTraitTest extends \PHPUnit_Framework_TestCase
         $c2->save();
         $c3->save();
 
-        $contacts = self::$person->hasChildren("Phormium\\Tests\\Models\\Contact");
-        $this->assertInstanceOf("Phormium\\QuerySet", $contacts);
+        $contacts = self::$person->hasChildren(Contact::class);
+        $this->assertInstanceOf(QuerySet::class, $contacts);
 
         $actual = $contacts->fetch();
         $expected = [$c1, $c2, $c3];
         $this->assertEquals($expected, $actual);
 
-        $p1 = $c1->hasParent("Phormium\\Tests\\Models\\Person")->single();
-        $p2 = $c2->hasParent("Phormium\\Tests\\Models\\Person")->single();
-        $p3 = $c3->hasParent("Phormium\\Tests\\Models\\Person")->single();
+        $p1 = $c1->hasParent(Person::class)->single();
+        $p2 = $c2->hasParent(Person::class)->single();
+        $p3 = $c3->hasParent(Person::class)->single();
 
         $this->assertEquals(self::$person, $p1);
         $this->assertEquals(self::$person, $p2);
@@ -66,16 +67,16 @@ class ModelRelationsTraitTest extends \PHPUnit_Framework_TestCase
         $a2->save();
         $a3->save();
 
-        $assets = self::$person->hasChildren("Phormium\\Tests\\Models\\Asset", "owner_id");
-        $this->assertInstanceOf("Phormium\\QuerySet", $assets);
+        $assets = self::$person->hasChildren(Asset::class, "owner_id");
+        $this->assertInstanceOf(QuerySet::class, $assets);
 
         $actual = $assets->fetch();
         $expected = [$a1, $a2, $a3];
         $this->assertEquals($expected, $actual);
 
-        $p1 = $a1->hasParent("Phormium\\Tests\\Models\\Person", "owner_id")->single();
-        $p2 = $a2->hasParent("Phormium\\Tests\\Models\\Person", "owner_id")->single();
-        $p3 = $a3->hasParent("Phormium\\Tests\\Models\\Person", "owner_id")->single();
+        $p1 = $a1->hasParent(Person::class, "owner_id")->single();
+        $p2 = $a2->hasParent(Person::class, "owner_id")->single();
+        $p3 = $a3->hasParent(Person::class, "owner_id")->single();
 
         $this->assertEquals(self::$person, $p1);
         $this->assertEquals(self::$person, $p2);
@@ -109,7 +110,7 @@ class ModelRelationsTraitTest extends \PHPUnit_Framework_TestCase
     public function testInvalidKey1()
     {
         // Empty key
-        self::$person->hasChildren("Phormium\\Tests\\Models\\Contact", []);
+        self::$person->hasChildren(Contact::class, []);
     }
 
     /**
@@ -119,7 +120,7 @@ class ModelRelationsTraitTest extends \PHPUnit_Framework_TestCase
     public function testInvalidKey2()
     {
         // Key is a class instead of string or array
-        self::$person->hasChildren("Phormium\\Tests\\Models\\Contact", new Contact());
+        self::$person->hasChildren(Contact::class, new Contact());
     }
 
     /**
@@ -129,6 +130,6 @@ class ModelRelationsTraitTest extends \PHPUnit_Framework_TestCase
     public function testInvalidKey3()
     {
         // Property does not exist
-        self::$person->hasChildren("Phormium\\Tests\\Models\\Contact", "foo");
+        self::$person->hasChildren(Contact::class, "foo");
     }
 }

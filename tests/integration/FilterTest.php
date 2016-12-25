@@ -2,6 +2,8 @@
 
 namespace Phormium\Tests\Integration;
 
+use Phormium\Filter\CompositeFilter;
+use Phormium\Filter\RawFilter;
 use Phormium\Orm;
 use Phormium\Tests\Models\Person;
 
@@ -39,7 +41,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
         $qs = Person::objects()->filter($condition, $arguments);
 
         $filter1 = $qs->getFilter();
-        $expected = "\\Phormium\\Filter\\CompositeFilter";
+        $expected = CompositeFilter::class;
         $this->assertInstanceOf($expected, $filter1);
         $this->assertSame('AND', $filter1->operation());
 
@@ -47,7 +49,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $filters);
 
         $filter2 = $filters[0];
-        $expected = "\\Phormium\\Filter\\RawFilter";
+        $expected = RawFilter::class;
         $this->assertInstanceOf($expected, $filter2);
 
         $this->assertSame($condition, $filter2->condition());

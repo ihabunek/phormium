@@ -15,7 +15,7 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     {
         $filter = Filter::col('test', '=', 1);
 
-        $this->assertInstanceOf("Phormium\Filter\ColumnFilter", $filter);
+        $this->assertInstanceOf(ColumnFilter::class, $filter);
         $this->assertSame('=', $filter->operation());
         $this->assertSame('test', $filter->column());
         $this->assertSame(1, $filter->value());
@@ -25,14 +25,14 @@ class ColumnFilterTest extends \PHPUnit_Framework_TestCase
     {
         $actual = ColumnFilter::fromArray(['id', '=', 123]);
 
-        $this->assertInstanceOf('\\Phormium\\Filter\\ColumnFilter', $actual);
+        $this->assertInstanceOf(ColumnFilter::class, $actual);
         $this->assertSame('id', $actual->column());
         $this->assertSame('=', $actual->operation());
         $this->assertSame(123, $actual->value());
 
         $actual = ColumnFilter::fromArray(['email', 'is null']);
 
-        $this->assertInstanceOf('\\Phormium\\Filter\\ColumnFilter', $actual);
+        $this->assertInstanceOf(ColumnFilter::class, $actual);
         $this->assertSame('email', $actual->column());
         $this->assertSame('IS NULL', $actual->operation());
         $this->assertNull($actual->value());
