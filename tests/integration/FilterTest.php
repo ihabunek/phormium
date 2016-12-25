@@ -6,9 +6,6 @@ use Phormium\Orm;
 use Phormium\Tests\Models\Person;
 
 /**
- * Tests in this class actually run some queries, unlike other test classes in
- * this namespace.
- *
  * @group filter
  */
 class FilterTest extends \PHPUnit_Framework_TestCase
