@@ -6,14 +6,6 @@
     <testsuite name="integration">
         <directory>tests/integration</directory>
     </testsuite>
-    <filter>
-        <whitelist>
-            <directory suffix=".php">src/Phormium</directory>
-        </whitelist>
-    </filter>
-    <logging>
-        <log type="coverage-html" target="target/coverage" charset="UTF-8" />
-    </logging>
     <php>
         <const name="PHORMIUM_CONFIG_FILE" value="tests/config.json"/>
     </php>
