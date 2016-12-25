@@ -20,9 +20,9 @@ abstract class Filter
      *
      * @return CompositeFilter
      */
-    public static function _and()
+    public static function _and(...$filters)
     {
-        return new CompositeFilter(CompositeFilter::OP_AND, func_get_args());
+        return new CompositeFilter(CompositeFilter::OP_AND, $filters);
     }
 
     /**
@@ -34,9 +34,9 @@ abstract class Filter
      *
      * @return CompositeFilter
      */
-    public static function _or()
+    public static function _or(...$filters)
     {
-        return new CompositeFilter(CompositeFilter::OP_OR, func_get_args());
+        return new CompositeFilter(CompositeFilter::OP_OR, $filters);
     }
 
     /**

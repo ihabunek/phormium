@@ -33,11 +33,9 @@ class Orm
         return self::$container;
     }
 
-    public static function configure()
+    public static function configure(...$args)
     {
-        // Pass arguments to the container constructor
-        $reflection = new \ReflectionClass("Phormium\\Container");
-        self::$container = $reflection->newInstanceArgs(func_get_args());
+        self::$container = new Container(...$args);
     }
 
     public static function reset()

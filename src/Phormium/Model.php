@@ -85,17 +85,14 @@ abstract class Model
      *      or as an array of one or several values.
      * @return Model
      */
-    public static function get()
+    public static function get(...$pk)
     {
-        $argv = func_get_args();
-        $argc = func_num_args();
-
-        $qs = self::getQuerySetForPK($argv, $argc);
+        $qs = self::getQuerySetForPK(...$pk);
         $model = $qs->single(true);
 
         if ($model === null) {
             $class = get_called_class();
-            $pk = implode(',', $argv);
+            $pk = implode(',', $pk);
             throw new ModelNotFoundException("[$class] record with primary key [$pk] does not exist.");
         }
 
@@ -110,12 +107,10 @@ abstract class Model
      *      or as an array of one or several values.
      * @return Model|null The Model instance or NULL if not found.
      */
-    public static function find()
+    public static function find(...$pk)
     {
-        $argv = func_get_args();
-        $argc = func_num_args();
+        $qs = self::getQuerySetForPK(...$pk);
 
-        $qs = self::getQuerySetForPK($argv, $argc);
         return $qs->single(true);
     }
 
@@ -127,12 +122,10 @@ abstract class Model
      *      or as an array of one or several values.
      * @return boolean
      */
-    public static function exists()
+    public static function exists(...$pk)
     {
-        $argv = func_get_args();
-        $argc = func_num_args();
+        $qs = self::getQuerySetForPK(...$pk);
 
-        $qs = self::getQuerySetForPK($argv, $argc);
         return $qs->exists();
     }
 
@@ -192,15 +185,14 @@ abstract class Model
     }
 
     /** Inner method used by get(), search() and exists(). */
-    private static function getQuerySetForPK(array $argv, $argc)
+    private static function getQuerySetForPK(...$pk)
     {
         // Allow passing the PK as an array
-        if ($argc == 1 && is_array($argv[0])) {
-            $argv = $argv[0];
-            $argc = count($argv);
+        if (count($pk) == 1 && is_array($pk[0])) {
+            $pk = array_shift($pk);
         }
 
-        $filter = self::getPkFilter($argv);
+        $filter = self::getPkFilter($pk);
 
         return self::objects()->filter($filter);
     }

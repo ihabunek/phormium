@@ -260,9 +260,8 @@ class QuerySet implements \IteratorAggregate
      * columns will be fetched. If no parameters are given, all columns are
      * fetched.
      */
-    public function values()
+    public function values(...$columns)
     {
-        $columns = func_get_args();
         if (empty($columns)) {
             $columns = null;
         }
@@ -285,9 +284,8 @@ class QuerySet implements \IteratorAggregate
      * columns will be fetched. If no parameters are given, all columns are
      * fetched.
      */
-    public function valuesList()
+    public function valuesList(...$columns)
     {
-        $columns = func_get_args();
         if (empty($columns)) {
             $columns = null;
         }
@@ -331,10 +329,8 @@ class QuerySet implements \IteratorAggregate
     /**
      * Performs a SELECT DISTINCT query on the given columns.
      */
-    public function distinct()
+    public function distinct(...$columns)
     {
-        $columns = func_get_args();
-
         return $this->query->selectDistinct(
             $this->filter,
             $this->order,

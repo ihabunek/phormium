@@ -19,10 +19,10 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 
 class Container extends \Pimple\Container
 {
-    public function __construct()
+    public function __construct(...$configs)
     {
         // One or more configurations can be given as constructor arguments
-        $this['config.input'] = func_get_args();
+        $this['config.input'] = $configs;
 
         $this['config.loader'] = function () {
             return new DelegatingLoader(new LoaderResolver([
