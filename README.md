@@ -6,8 +6,11 @@ Phormium is a minimalist ORM for PHP.
 Tested on Informix, MySQL, PosgreSQL and SQLite. Might work on other databases
 with a PDO driver or may require some work.
 
-Warning: This is a work in progress. Test before using! Report any bugs
-[here](https://github.com/ihabunek/phormium/issues).
+---
+
+**This project is no longer maintained and the repository is archived. Thanks for all the fish.**
+
+---
 
 [![Latest Stable Version](https://poser.pugx.org/phormium/phormium/v/stable.png)](https://packagist.org/packages/phormium/phormium) [![Total Downloads](https://poser.pugx.org/phormium/phormium/downloads.png)](https://packagist.org/packages/phormium/phormium) [![Build Status](https://travis-ci.org/ihabunek/phormium.png)](https://travis-ci.org/ihabunek/phormium) [![Coverage Status](https://coveralls.io/repos/ihabunek/phormium/badge.png)](https://coveralls.io/r/ihabunek/phormium)
 
